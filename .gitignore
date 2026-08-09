@@ -1,0 +1,32 @@
+# ── Published papers ────────────────────────────────────────────────────────
+# The PDFs in papers/ are copyrighted (Elsevier, Springer, IEEE). This repository is
+# PUBLIC, so committing them would redistribute paywalled work. They are referenced by
+# citation in docs/PIPELINE.md instead. Keep them locally; do not commit.
+papers/*.pdf
+papers/*.PDF
+
+# ── Regenerable training data ───────────────────────────────────────────────
+# 66 MB, and `src/build_groups.py --seed 42` reproduces it deterministically in ~4 min.
+# A 200-line sample of each split is committed under data/groups/samples/ so the schema
+# is visible without cloning 66 MB.
+data/groups/group_examples_*.jsonl
+
+# ── Local data that is not ours to publish ─────────────────────────────────
+# The Foursquare check-in CSVs come from TSMC2014 / FSQ-OS Places and are obtained via
+# the project's Kaggle datasets, not redistributed here.
+data/train_*.csv
+data/val_*.csv
+data/test_*.csv
+data/poi_metadata_*.csv
+data/vocab.pkl
+data/*.npy
+
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ── OS ─────────────────────────────────────────────────────────────────────
+.DS_Store

@@ -1,0 +1,33 @@
+{
+  "relation_to_id": {
+    "FOLLOWED_BY": 0,
+    "IS_NEAR_TO": 1,
+    "SAME_TAXONOMY_L2": 2,
+    "SAME_TAXONOMY_L3": 3,
+    "SAME_TAXONOMY_L4": 4,
+    "SAME_TAXONOMY_L5": 5
+  },
+  "counts": {
+    "FOLLOWED_BY": 40000,
+    "IS_NEAR_TO": 40000,
+    "SAME_TAXONOMY_L2": 33858,
+    "SAME_TAXONOMY_L3": 21050,
+    "SAME_TAXONOMY_L4": 2662,
+    "SAME_TAXONOMY_L5": 94
+  },
+  "provenance": {
+    "source": "build_kg_dir",
+    "kg_file": "/kaggle/working/kg",
+    "metadata_file": "/kaggle/input/datasets/yosrkharrat/kushflq/poi_metadata_NYC.csv",
+    "n_pois": 5120,
+    "n_native_poi_poi_triples": 116661,
+    "n_after_derive_and_cap": 137664,
+    "derived": "taxonomy",
+    "excluded_relations": [],
+    "max_per_relation": 40000,
+    "seed": 42,
+    "behavioural_relations_present": [
+      "FOLLOWED_BY"
+    ]
+  }
+}

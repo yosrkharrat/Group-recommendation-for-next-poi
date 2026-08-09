@@ -1,0 +1,117 @@
+{
+  "config": {
+    "data_dir": "/private/tmp/claude-502/-Users-macbook-Documents-POI/537577a1-3ad9-4cd4-894d-b13926165be2/scratchpad/repo/data",
+    "out_dir": "/private/tmp/claude-502/-Users-macbook-Documents-POI/537577a1-3ad9-4cd4-894d-b13926165be2/scratchpad/groups_v6",
+    "dataset": "NYC",
+    "window": 60,
+    "min_size": 2,
+    "max_size": 8,
+    "horizon": 240,
+    "min_companion_repeat": 2,
+    "max_venue_visitors": 50,
+    "min_tie_groups": 2,
+    "min_tie_venues": 1,
+    "regimes": [
+      "established",
+      "occasional",
+      "random"
+    ],
+    "affinity_percentile": 99.0,
+    "far_gap_min": 180,
+    "sizes": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "constraint": "cat-inter",
+    "cat_level": 2,
+    "hist_len": 15,
+    "min_hist": 1,
+    "min_member_activity": 5,
+    "require_companion_history": true,
+    "profile_top_k": 5,
+    "profile_cats": 3,
+    "profile_hours": 3,
+    "resplit": true,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "seed": 42,
+    "self_check": false
+  },
+  "n_pois": 5120,
+  "n_users": 1073,
+  "n_checkins": 147539,
+  "n_ephemeral_groups": 2608,
+  "n_real_transitions": 21,
+  "n_co_attended": 4133,
+  "affinity": {
+    "validation": {
+      "n_pairs": 575128,
+      "n_copresent": 4133,
+      "base_rate": 0.007186226370477528,
+      "auc": {
+        "taste": 0.6477314987571402,
+        "rhythm": 0.6458515334997242,
+        "territory": 0.6218005259058663,
+        "far_covisit": 0.5522333348313346,
+        "COMBINED": 0.7218841653108894
+      },
+      "thresholds": {
+        "99.9": {
+          "threshold": 11.144075027917895,
+          "n_pairs": 576,
+          "n_users": 467,
+          "precision": 0.3697916666666667,
+          "lift": 51.45839382208243
+        },
+        "99.5": {
+          "threshold": 6.523748585521683,
+          "n_pairs": 2876,
+          "n_users": 880,
+          "precision": 0.13212795549374132,
+          "lift": 18.386277954803884
+        },
+        "99.0": {
+          "threshold": 5.4683888172220305,
+          "n_pairs": 5752,
+          "n_users": 954,
+          "precision": 0.08675243393602225,
+          "lift": 12.07204302558834
+        },
+        "98.0": {
+          "threshold": 4.623979030817209,
+          "n_pairs": 11503,
+          "n_users": 1008,
+          "precision": 0.05468138746413979,
+          "lift": 7.609193566289811
+        }
+      }
+    },
+    "clique_threshold": 5.4683888172220305,
+    "n_clique_eligible_users": 954
+  },
+  "counts": {
+    "train": 34644,
+    "val": 6486,
+    "test": 13420
+  },
+  "stats": {
+    "individual_examples": 146466,
+    "candidates_established": 71263,
+    "skip_constraint_established": 39406,
+    "skip_no_companions_occasional": 123765,
+    "candidates_random": 146466,
+    "skip_constraint_random": 124643,
+    "skip_no_companions_established": 75203,
+    "skip_inactive_member_random": 365,
+    "emitted": 54550,
+    "skip_anchor_only_history_established": 2701,
+    "skip_anchor_only_history_random": 2856,
+    "skip_inactive_member_established": 701,
+    "candidates_occasional": 22701,
+    "skip_constraint_occasional": 13915,
+    "skip_anchor_only_history_occasional": 1245,
+    "skip_inactive_member_occasional": 48
+  }
+}

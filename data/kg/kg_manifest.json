@@ -1,0 +1,41 @@
+{
+  "config": {
+    "data_dir": "/kaggle/input/datasets/yosrkharrat/kushflq",
+    "groups_dir": "/kaggle/working/groups",
+    "out_dir": "/kaggle/working/kg",
+    "dataset": "NYC",
+    "knn": 10,
+    "max_followed_by": null,
+    "tau": 0.4,
+    "resplit": true,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "self_check": false
+  },
+  "n_entities": 9445,
+  "n_triples": 175727,
+  "n_relations": 11,
+  "node_types": {
+    "CATEGORY": 500,
+    "GROUP": 2608,
+    "LOCALITY": 142,
+    "POI": 5120,
+    "REGION": 2,
+    "USER": 1073
+  },
+  "relation_counts": {
+    "IS_NEAR_TO": 63274,
+    "FOLLOWED_BY": 53387,
+    "VISITED": 27643,
+    "CO_ATTENDED": 8266,
+    "MEMBER_OF": 6275,
+    "HAS_CATEGORY": 5120,
+    "LOCATED_IN": 4561,
+    "OCCURRED_AT": 2608,
+    "GROUP_PREFERS": 2608,
+    "PREFERS_CATEGORY": 1568,
+    "SUBCATEGORY_OF": 417
+  },
+  "n_hierarchy_pairs": 14274,
+  "n_prefers_category": 1568
+}
