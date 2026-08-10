@@ -1,0 +1,21 @@
+# Stage-5 fine-tune (notebooks/stage6b_run2_server.ipynb)
+#
+# transformers is PINNED: 4.46.3 is the version the LLaDA-MoE remote code was validated
+# against, and it needs a huggingface_hub from before the 1.0 API break. Newer transformers
+# releases change the remote-code loading path and break `AutoModel.from_pretrained(...,
+# trust_remote_code=True)` for this model.
+transformers==4.46.3
+peft==0.13.2
+tokenizers
+accelerate
+bitsandbytes            # 4-bit NF4; only used when the GPU has under ~40 GB
+huggingface_hub
+
+# torch is deliberately NOT pinned here -- install the build that matches the host's CUDA
+# first (https://pytorch.org/get-started/locally/), then `pip install -r requirements.txt`.
+# The notebook re-pins whatever torch it finds so this file cannot downgrade a working build.
+
+numpy
+pandas
+scipy
+python-dotenv           # optional: lets the notebook read HF_TOKEN from a .env file
