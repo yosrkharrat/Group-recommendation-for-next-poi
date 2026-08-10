@@ -11,15 +11,22 @@ papers/*.PDF
 # is visible without cloning 66 MB.
 data/groups/group_examples_*.jsonl
 
-# ── Local data that is not ours to publish ─────────────────────────────────
-# The Foursquare check-in CSVs come from TSMC2014 / FSQ-OS Places and are obtained via
-# the project's Kaggle datasets, not redistributed here.
-data/train_*.csv
-data/val_*.csv
-data/test_*.csv
-data/poi_metadata_*.csv
-data/vocab.pkl
-data/*.npy
+# ── Check-in data: COMMITTED on purpose ────────────────────────────────────
+# The five Foursquare files (train/val/test_NYC.csv, poi_metadata_NYC.csv, vocab.pkl) are
+# tracked so this repo is self-contained and a collaborator can clone-and-run. They are
+# already public at eyamhamdi03/finetunning-LLada-MoE-poi-recommendation, TSMC2014 is a
+# freely available research dataset, and FSQ Open Source Places is Apache-2.0. 21 MB total.
+#
+# Still ignored: the PRE-REGULARISER embedding file. It has no radial hierarchy
+# (D1 rho=+0.03, flat radii) and is the file earlier runs silently trained on. The correct
+# one is tracked at data/kg/poi_hyperbolic_embs_NYC.npy.
+data/poi_hyperbolic_embs.npy
+
+# ── Run artifacts ──────────────────────────────────────────────────────────
+# _code/ is the notebook's module-staging dir when not on Kaggle (CODE_STAGE falls back to
+# ./_code); outputs/ holds logs, checkpoints and results json from a run.
+_code/
+outputs/
 
 # ── Python ─────────────────────────────────────────────────────────────────
 __pycache__/
