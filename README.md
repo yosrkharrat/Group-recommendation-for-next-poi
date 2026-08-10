@@ -74,6 +74,20 @@ dataset upload is a flat folder, so sub-packaging would create import friction f
 
 ## Running it
 
+**Getting the check-in data.** The five Foursquare files (`train/val/test_NYC.csv`,
+`poi_metadata_NYC.csv`, `vocab.pkl`) are gitignored here — TSMC2014 / FSQ-OS Places data, not
+ours to redistribute — but they are public in the companion repo:
+
+```bash
+BASE=https://raw.githubusercontent.com/eyamhamdi03/finetunning-LLada-MoE-poi-recommendation/main/data
+mkdir -p data && for f in train_NYC.csv val_NYC.csv test_NYC.csv poi_metadata_NYC.csv vocab.pkl; do
+  curl -sL "$BASE/$f" -o "data/$f"; done
+```
+
+Do **not** also take `poi_hyperbolic_embs.npy` from there: that is the pre-regulariser file
+(ρ = +0.03, flat radii). The correct one is already committed at
+`data/kg/poi_hyperbolic_embs_NYC.npy`.
+
 **Stages 1–4 (Kaggle, CPU).** Attach two datasets — the data (`train/val/test_NYC.csv`,
 `poi_metadata_NYC.csv`) and a private dataset containing `src/*.py`. Then run
 `notebooks/group_pipeline_kaggle.ipynb`. **You paste no paths**: cell 0 finds both by content.
