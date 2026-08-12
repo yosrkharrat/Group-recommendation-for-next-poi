@@ -134,8 +134,8 @@ Two hyperbolic→Euclidean components, easily confused, **complementary not alte
 2. **Score-aggregation baselines** — AVG / least-misery / most-pleasure over the *existing*
    checkpoint on the group test set. No training, only inference. This is the number the group
    model has to beat, and it is much better to learn it before the fine-tune than after.
-3. **Wire `objective.py` into `stage6b_run2_server.ipynb`** — config, `SCORING_MODE='all'`,
-   collator, `batch_loss`, eval reading slot 0. Then fine-tune.
+3. ~~Wire `objective.py` into `stage6b_run2_server.ipynb`~~ — done, off by default. Still on the
+   individual CSVs, not `data/groups/group_examples_*.jsonl`. Then fine-tune.
 4. Add **Hit@10 and NDCG@10** to the evaluation so KCGRS becomes directly citable.
 
 ## Open risks
