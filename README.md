@@ -46,6 +46,7 @@ src/                       all pipeline code, deliberately FLAT
   build_groups.py            stage 1  group construction        (11 self-checks)
   affinity.py                stage 1  multi-signal user affinity
   build_kg.py                stage 2  POI + group KG            (12 self-checks)
+  build_kg_lbsn.py           stage 2  for the LBSN2Vec++ social dataset (15 self-checks)
   train_roth.py              stage 3  RotH + depth regulariser  (4 self-checks)
   build_poi_poi_triples.py   stage 4  triples for the adapter   (9 self-checks)
   alignment.py               stage 5  ManifoldAwareAdapter  (supervisor's, INPUT side)
@@ -105,7 +106,54 @@ python src/build_poi_poi_triples.py  --kg-dir ./data/kg --meta ./data/poi_metada
 ```
 
 Every script has `--self-check`, which runs against a synthetic fixture in seconds and needs no
-data. Run them before a long job: **81 checks, 0 failures** is the expected state.
+data. Run them before a long job: **81 checks, 0 failures** is the expected state
+(96 including `build_kg_lbsn.py`).
+
+### The LBSN2Vec++ social-network track (new)
+
+Second dataset: the Foursquare **global-scale check-in dataset with user social networks**
+(Yang et al., §5 of the dataset page; used by LBSN2Vec++, TKDE 2020). What it adds over
+TSMC2014: a **real friendship graph**. The old pipeline had to infer user–user ties (affinity
+z-sum, AUC 0.72); here `FRIEND_OF` edges are observed.
+
+**Status: stages 0–4 all done and committed.** KG: 12,709 entities / 244,080 triples /
+12 relations. Embeddings: `data/kg_lbsn/poi_hyperbolic_embs_LBSN_NYC.npy` — **D1 ρ = +0.7096
+STRONG, radii fully monotone** (0.736 / 0.747 / 0.974 / 1.321 over depths 1–4; ρ is tie-capped
+below TSMC's +0.85 because 69% of POIs sit at depth 2). Stage 5 hand-over:
+`docs/LBSN_HANDOFF.md`. Still missing: the `--depth-weight 0` control
+(`notebooks/roth_lbsn_kaggle.ipynb` with `RUN_CONTROL = True`).
+
+The canonical extraction follows `notebooks/archive/preprocessing-global-fsq.ipynb`
+(NYC bounding box over the raw 2.68 GB dump, venues ≥ 10 visits, users ≥ 30 →
+**159,304 check-ins, 1,665 users, 6,103 POIs**, real timestamps + coordinates + category
+names), reproduced as a script with one deliberate fix: **friendship snapshots are kept
+separate**. The notebook merged `friendship_old` + `friendship_new` into one edge list; the
+"new" snapshot postdates the check-in period and `(new − old)` is the paper's
+friendship-prediction eval set, so only `friendship_old` may enter a KG —
+`friendship_new_only_LBSN_NYC.csv` is exported for evaluation and asserted absent from the
+triples at build time.
+
+```bash
+python src/prepare_lbsn_csvs.py --zip lsbn2vec_global.zip                # stage 0: raw -> house CSVs
+python src/build_groups.py      --data-dir ./data/lbsn --dataset LBSN_NYC \
+                                --out-dir ./data/lbsn/groups             # stage 1, unchanged
+python src/build_kg_lbsn.py     --csv-dir ./data/lbsn --groups-dir ./data/lbsn/groups   # stage 2
+python src/train_roth.py        --kg-dir ./data/kg_lbsn --data-dir ./data/lbsn --dataset LBSN_NYC \
+                                --epochs 120 --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01
+```
+
+Stage 0 emits the exact house schema (`train/val/test_LBSN_NYC.csv`,
+`poi_metadata_LBSN_NYC.csv`), so stage 1 group construction runs **unchanged** — with real
+timestamps, the co-location mining is exactly what `build_groups.py` already does. Category
+names are mapped to full 2014-Foursquare taxonomy paths via the committed
+`data/lbsn/fsq_category_paths_2014.json` (763 nodes, depth 1–4), which restores the
+`SUBCATEGORY_OF` spine the depth regulariser needs.
+
+`build_kg_lbsn.py --mat data/lbsn/nyc.mat` (DS tag `MAT_NYC`) builds instead from
+`dataset_connected_NYC.mat` — the LBSN2Vec authors' own NYC subset (4,024 users / 8,723 old
+friendships, selected for social connectivity, but no timestamps/coordinates/names; the
+script reconstructs chronology from the hour-of-week wraps). Keep it for paper-comparable
+experiments; the CSV track is the one with full fidelity.
 
 ---
 

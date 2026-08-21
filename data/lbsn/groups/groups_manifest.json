@@ -1,0 +1,117 @@
+{
+  "config": {
+    "data_dir": "./data/lbsn",
+    "out_dir": "./data/lbsn/groups",
+    "dataset": "LBSN_NYC",
+    "window": 60,
+    "min_size": 2,
+    "max_size": 8,
+    "horizon": 240,
+    "min_companion_repeat": 2,
+    "max_venue_visitors": 50,
+    "min_tie_groups": 2,
+    "min_tie_venues": 1,
+    "regimes": [
+      "established",
+      "occasional",
+      "random"
+    ],
+    "affinity_percentile": 99.0,
+    "far_gap_min": 180,
+    "sizes": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "constraint": "cat-inter",
+    "cat_level": 2,
+    "hist_len": 15,
+    "min_hist": 1,
+    "min_member_activity": 5,
+    "require_companion_history": true,
+    "profile_top_k": 5,
+    "profile_cats": 3,
+    "profile_hours": 3,
+    "resplit": false,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "seed": 42,
+    "self_check": false
+  },
+  "n_pois": 6103,
+  "n_users": 1665,
+  "n_checkins": 159304,
+  "n_ephemeral_groups": 3835,
+  "n_real_transitions": 64,
+  "n_co_attended": 5997,
+  "affinity": {
+    "validation": {
+      "n_pairs": 1385280,
+      "n_copresent": 5997,
+      "base_rate": 0.004329088704088704,
+      "auc": {
+        "territory": 0.6645766196036698,
+        "taste": 0.6552159701510221,
+        "rhythm": 0.6546864139463839,
+        "far_covisit": 0.54398057160426,
+        "COMBINED": 0.7187127316339816
+      },
+      "thresholds": {
+        "99.9": {
+          "threshold": 11.994757686270715,
+          "n_pairs": 1386,
+          "n_users": 931,
+          "precision": 0.17604617604617603,
+          "lift": 40.665874062572406
+        },
+        "99.5": {
+          "threshold": 7.0286953161208565,
+          "n_pairs": 6927,
+          "n_users": 1435,
+          "precision": 0.06813916558394688,
+          "lift": 15.739840470256784
+        },
+        "99.0": {
+          "threshold": 5.960465678711152,
+          "n_pairs": 13853,
+          "n_users": 1524,
+          "precision": 0.045405327365913524,
+          "lift": 10.488426195339784
+        },
+        "98.0": {
+          "threshold": 5.053654941035626,
+          "n_pairs": 27706,
+          "n_users": 1581,
+          "precision": 0.03078755504222912,
+          "lift": 7.111786601450585
+        }
+      }
+    },
+    "clique_threshold": 5.960465678711152,
+    "n_clique_eligible_users": 1524
+  },
+  "counts": {
+    "train": 25847,
+    "val": 5782,
+    "test": 12204
+  },
+  "stats": {
+    "individual_examples": 157639,
+    "candidates_established": 88693,
+    "skip_constraint_established": 60988,
+    "skip_no_companions_occasional": 133843,
+    "candidates_random": 157639,
+    "skip_constraint_random": 142521,
+    "skip_no_companions_established": 68946,
+    "emitted": 43833,
+    "candidates_occasional": 23796,
+    "skip_constraint_occasional": 17567,
+    "skip_inactive_member_established": 643,
+    "skip_anchor_only_history_established": 1979,
+    "skip_anchor_only_history_occasional": 526,
+    "skip_inactive_member_random": 273,
+    "skip_anchor_only_history_random": 1729,
+    "skip_inactive_member_occasional": 69
+  }
+}

@@ -1,0 +1,2291 @@
+{
+ "ATM": [
+  "Shop & Service>ATM"
+ ],
+ "Abruzzo Restaurant": [
+  "Food>Italian Restaurant>Abruzzo Restaurant"
+ ],
+ "Acai House": [
+  "Food>Brazilian Restaurant>Acai House"
+ ],
+ "Accessories Store": [
+  "Shop & Service>Clothing Store>Accessories Store"
+ ],
+ "Acehnese Restaurant": [
+  "Food>Indonesian Restaurant>Acehnese Restaurant"
+ ],
+ "Acupuncturist": [
+  "Professional & Other Places>Medical Center>Acupuncturist"
+ ],
+ "Adult Boutique": [
+  "Shop & Service>Adult Boutique"
+ ],
+ "Advertising Agency": [
+  "Professional & Other Places>Office>Advertising Agency"
+ ],
+ "Afghan Restaurant": [
+  "Food>Afghan Restaurant"
+ ],
+ "African Restaurant": [
+  "Food>African Restaurant"
+ ],
+ "Agriturismo": [
+  "Food>Italian Restaurant>Agriturismo"
+ ],
+ "Airport": [
+  "Travel & Transport>Airport"
+ ],
+ "Airport Food Court": [
+  "Travel & Transport>Airport>Airport Food Court"
+ ],
+ "Airport Gate": [
+  "Travel & Transport>Airport>Airport Gate"
+ ],
+ "Airport Lounge": [
+  "Travel & Transport>Airport>Airport Lounge"
+ ],
+ "Airport Terminal": [
+  "Travel & Transport>Airport>Airport Terminal"
+ ],
+ "Airport Tram": [
+  "Travel & Transport>Airport>Airport Tram"
+ ],
+ "Alternative Healer": [
+  "Professional & Other Places>Medical Center>Alternative Healer"
+ ],
+ "American Restaurant": [
+  "Food>American Restaurant"
+ ],
+ "Andhra Restaurant": [
+  "Food>Indian Restaurant>Andhra Restaurant"
+ ],
+ "Anhui Restaurant": [
+  "Food>Chinese Restaurant>Anhui Restaurant"
+ ],
+ "Animal Shelter": [
+  "Professional & Other Places>Animal Shelter"
+ ],
+ "Antique Shop": [
+  "Shop & Service>Antique Shop"
+ ],
+ "Aosta Restaurant": [
+  "Food>Italian Restaurant>Aosta Restaurant"
+ ],
+ "Apres Ski Bar": [
+  "Outdoors & Recreation>Ski Area>Apres Ski Bar"
+ ],
+ "Aquarium": [
+  "Arts & Entertainment>Aquarium"
+ ],
+ "Arcade": [
+  "Arts & Entertainment>Arcade"
+ ],
+ "Arepa Restaurant": [
+  "Food>Latin American Restaurant>Arepa Restaurant"
+ ],
+ "Argentinian Restaurant": [
+  "Food>South American Restaurant>Argentinian Restaurant"
+ ],
+ "Art Gallery": [
+  "Arts & Entertainment>Art Gallery"
+ ],
+ "Art Museum": [
+  "Arts & Entertainment>Museum>Art Museum"
+ ],
+ "Arts & Crafts Store": [
+  "Shop & Service>Arts & Crafts Store"
+ ],
+ "Arts & Entertainment": [
+  "Arts & Entertainment"
+ ],
+ "Asian Restaurant": [
+  "Food>Asian Restaurant"
+ ],
+ "Assisted Living": [
+  "Residence>Assisted Living"
+ ],
+ "Astrologer": [
+  "Shop & Service>Astrologer"
+ ],
+ "Athletics & Sports": [
+  "Outdoors & Recreation>Athletics & Sports"
+ ],
+ "Auditorium": [
+  "Professional & Other Places>Auditorium"
+ ],
+ "Australian Restaurant": [
+  "Food>Australian Restaurant"
+ ],
+ "Austrian Restaurant": [
+  "Food>Austrian Restaurant"
+ ],
+ "Auto Garage": [
+  "Shop & Service>Auto Garage"
+ ],
+ "Automotive Shop": [
+  "Shop & Service>Automotive Shop"
+ ],
+ "Awadhi Restaurant": [
+  "Food>Indian Restaurant>Awadhi Restaurant"
+ ],
+ "BBQ Joint": [
+  "Food>BBQ Joint"
+ ],
+ "Baby Store": [
+  "Shop & Service>Baby Store"
+ ],
+ "Badminton Court": [
+  "Outdoors & Recreation>Athletics & Sports>Badminton Court"
+ ],
+ "Bagel Shop": [
+  "Food>Bagel Shop"
+ ],
+ "Baiano Restaurant": [
+  "Food>Brazilian Restaurant>Baiano Restaurant"
+ ],
+ "Bakery": [
+  "Food>Bakery"
+ ],
+ "Balinese Restaurant": [
+  "Food>Indonesian Restaurant>Balinese Restaurant"
+ ],
+ "Bank": [
+  "Shop & Service>Bank"
+ ],
+ "Bar": [
+  "Nightlife Spot>Bar"
+ ],
+ "Baseball Field": [
+  "Outdoors & Recreation>Athletics & Sports>Baseball Field"
+ ],
+ "Baseball Stadium": [
+  "Arts & Entertainment>Stadium>Baseball Stadium"
+ ],
+ "Basilicata Restaurant": [
+  "Food>Italian Restaurant>Basilicata Restaurant"
+ ],
+ "Basketball Court": [
+  "Outdoors & Recreation>Athletics & Sports>Basketball Court"
+ ],
+ "Basketball Stadium": [
+  "Arts & Entertainment>Stadium>Basketball Stadium"
+ ],
+ "Bath House": [
+  "Outdoors & Recreation>Bath House"
+ ],
+ "Bathing Area": [
+  "Outdoors & Recreation>Bathing Area"
+ ],
+ "Beach": [
+  "Outdoors & Recreation>Beach"
+ ],
+ "Beach Bar": [
+  "Nightlife Spot>Bar>Beach Bar"
+ ],
+ "Bed & Breakfast": [
+  "Travel & Transport>Hotel>Bed & Breakfast"
+ ],
+ "Beer Garden": [
+  "Nightlife Spot>Bar>Beer Garden"
+ ],
+ "Beer Store": [
+  "Shop & Service>Food & Drink Shop>Beer Store"
+ ],
+ "Beijing Restaurant": [
+  "Food>Chinese Restaurant>Beijing Restaurant"
+ ],
+ "Belarusian Restaurant": [
+  "Food>Eastern European Restaurant>Belarusian Restaurant"
+ ],
+ "Belgian Restaurant": [
+  "Food>Belgian Restaurant"
+ ],
+ "Bengali Restaurant": [
+  "Food>Indian Restaurant>Bengali Restaurant"
+ ],
+ "Betawinese Restaurant": [
+  "Food>Indonesian Restaurant>Betawinese Restaurant"
+ ],
+ "Betting Shop": [
+  "Shop & Service>Betting Shop"
+ ],
+ "Big Box Store": [
+  "Shop & Service>Big Box Store"
+ ],
+ "Bike Rental / Bike Share": [
+  "Travel & Transport>Bike Rental / Bike Share"
+ ],
+ "Bike Shop": [
+  "Shop & Service>Bike Shop"
+ ],
+ "Bistro": [
+  "Food>Bistro"
+ ],
+ "Blini House": [
+  "Food>Russian Restaurant>Blini House"
+ ],
+ "Board Shop": [
+  "Shop & Service>Board Shop"
+ ],
+ "Boarding House": [
+  "Travel & Transport>Hotel>Boarding House"
+ ],
+ "Boat or Ferry": [
+  "Travel & Transport>Boat or Ferry"
+ ],
+ "Bookstore": [
+  "Shop & Service>Bookstore"
+ ],
+ "Border Crossing": [
+  "Travel & Transport>Border Crossing"
+ ],
+ "Borek Place": [
+  "Food>Turkish Restaurant>Borek Place"
+ ],
+ "Botanical Garden": [
+  "Outdoors & Recreation>Botanical Garden"
+ ],
+ "Bougatsa Shop": [
+  "Food>Greek Restaurant>Bougatsa Shop"
+ ],
+ "Boutique": [
+  "Shop & Service>Clothing Store>Boutique"
+ ],
+ "Bowling Alley": [
+  "Arts & Entertainment>Bowling Alley"
+ ],
+ "Bowling Green": [
+  "Outdoors & Recreation>Athletics & Sports>Bowling Green"
+ ],
+ "Boxing Gym": [
+  "Shop & Service>Gym / Fitness Center>Boxing Gym"
+ ],
+ "Brazilian Restaurant": [
+  "Food>Brazilian Restaurant"
+ ],
+ "Breakfast Spot": [
+  "Food>Breakfast Spot"
+ ],
+ "Brewery": [
+  "Nightlife Spot>Brewery"
+ ],
+ "Bridal Shop": [
+  "Shop & Service>Bridal Shop"
+ ],
+ "Bridge": [
+  "Outdoors & Recreation>Bridge"
+ ],
+ "Bubble Tea Shop": [
+  "Food>Bubble Tea Shop"
+ ],
+ "Buddhist Temple": [
+  "Professional & Other Places>Spiritual Center>Buddhist Temple"
+ ],
+ "Buffet": [
+  "Food>Buffet"
+ ],
+ "Building": [
+  "Professional & Other Places>Building"
+ ],
+ "Burger Joint": [
+  "Food>Burger Joint"
+ ],
+ "Burrito Place": [
+  "Food>Mexican Restaurant>Burrito Place"
+ ],
+ "Bus Line": [
+  "Travel & Transport>Bus Station>Bus Line"
+ ],
+ "Bus Station": [
+  "Travel & Transport>Bus Station"
+ ],
+ "Bus Stop": [
+  "Travel & Transport>Bus Stop"
+ ],
+ "Business Service": [
+  "Shop & Service>Business Service"
+ ],
+ "Butcher": [
+  "Shop & Service>Food & Drink Shop>Butcher"
+ ],
+ "Cable Car": [
+  "Travel & Transport>Cable Car"
+ ],
+ "Cafeteria": [
+  "Food>Cafeteria"
+ ],
+ "Caf\u00e9": [
+  "Food>Caf\u00e9"
+ ],
+ "Cajun / Creole Restaurant": [
+  "Food>Cajun / Creole Restaurant"
+ ],
+ "Calabria Restaurant": [
+  "Food>Italian Restaurant>Calabria Restaurant"
+ ],
+ "Cambodian Restaurant": [
+  "Food>Asian Restaurant>Cambodian Restaurant"
+ ],
+ "Camera Store": [
+  "Shop & Service>Camera Store"
+ ],
+ "Campaign Office": [
+  "Professional & Other Places>Office>Campaign Office"
+ ],
+ "Campanian Restaurant": [
+  "Food>Italian Restaurant>Campanian Restaurant"
+ ],
+ "Campground": [
+  "Outdoors & Recreation>Campground"
+ ],
+ "Candy Store": [
+  "Shop & Service>Candy Store"
+ ],
+ "Cantonese Restaurant": [
+  "Food>Chinese Restaurant>Cantonese Restaurant"
+ ],
+ "Capitol Building": [
+  "Professional & Other Places>Government Building>Capitol Building"
+ ],
+ "Car Dealership": [
+  "Shop & Service>Car Dealership"
+ ],
+ "Car Wash": [
+  "Shop & Service>Car Wash"
+ ],
+ "Caribbean Restaurant": [
+  "Food>Caribbean Restaurant"
+ ],
+ "Carpet Store": [
+  "Shop & Service>Carpet Store"
+ ],
+ "Casino": [
+  "Arts & Entertainment>Casino"
+ ],
+ "Castle": [
+  "Outdoors & Recreation>Castle"
+ ],
+ "Caucasian Restaurant": [
+  "Food>Caucasian Restaurant"
+ ],
+ "Cemetery": [
+  "Outdoors & Recreation>Cemetery"
+ ],
+ "Central Brazilian Restaurant": [
+  "Food>Brazilian Restaurant>Central Brazilian Restaurant"
+ ],
+ "Chaat Place": [
+  "Food>Indian Restaurant>Chaat Place"
+ ],
+ "Champagne Bar": [
+  "Nightlife Spot>Bar>Champagne Bar"
+ ],
+ "Check Cashing Service": [
+  "Shop & Service>Check Cashing Service"
+ ],
+ "Cheese Shop": [
+  "Shop & Service>Food & Drink Shop>Cheese Shop"
+ ],
+ "Chettinad Restaurant": [
+  "Food>Indian Restaurant>Chettinad Restaurant"
+ ],
+ "Chinese Aristocrat Restaurant": [
+  "Food>Chinese Restaurant>Chinese Aristocrat Restaurant"
+ ],
+ "Chinese Breakfast Place": [
+  "Food>Chinese Restaurant>Chinese Breakfast Place"
+ ],
+ "Chinese Restaurant": [
+  "Food>Chinese Restaurant"
+ ],
+ "Chiropractor": [
+  "Professional & Other Places>Medical Center>Chiropractor"
+ ],
+ "Chocolate Shop": [
+  "Shop & Service>Chocolate Shop"
+ ],
+ "Christmas Market": [
+  "Shop & Service>Christmas Market"
+ ],
+ "Church": [
+  "Professional & Other Places>Spiritual Center>Church"
+ ],
+ "Churrascaria": [
+  "Food>Brazilian Restaurant>Churrascaria"
+ ],
+ "Cigkofte Place": [
+  "Food>Turkish Restaurant>Cigkofte Place"
+ ],
+ "Circus": [
+  "Arts & Entertainment>Circus"
+ ],
+ "Circus School": [
+  "Professional & Other Places>School>Circus School"
+ ],
+ "City": [
+  "Outdoors & Recreation>States & Municipalities>City"
+ ],
+ "City Hall": [
+  "Professional & Other Places>Government Building>City Hall"
+ ],
+ "Climbing Gym": [
+  "Shop & Service>Gym / Fitness Center>Climbing Gym"
+ ],
+ "Clothing Store": [
+  "Shop & Service>Clothing Store"
+ ],
+ "Club House": [
+  "Professional & Other Places>Club House"
+ ],
+ "Cocktail Bar": [
+  "Nightlife Spot>Bar>Cocktail Bar"
+ ],
+ "Coffee Shop": [
+  "Food>Coffee Shop"
+ ],
+ "College & University": [
+  "College & University"
+ ],
+ "College Academic Building": [
+  "College & University>College Academic Building"
+ ],
+ "College Administrative Building": [
+  "College & University>College Administrative Building"
+ ],
+ "College Arts Building": [
+  "College & University>College Academic Building>College Arts Building"
+ ],
+ "College Auditorium": [
+  "College & University>College Auditorium"
+ ],
+ "College Baseball Diamond": [
+  "College & University>College Stadium>College Baseball Diamond"
+ ],
+ "College Basketball Court": [
+  "College & University>College Stadium>College Basketball Court"
+ ],
+ "College Bookstore": [
+  "College & University>College Bookstore"
+ ],
+ "College Cafeteria": [
+  "College & University>College Cafeteria"
+ ],
+ "College Classroom": [
+  "College & University>College Classroom"
+ ],
+ "College Communications Building": [
+  "College & University>College Academic Building>College Communications Building"
+ ],
+ "College Cricket Pitch": [
+  "College & University>College Stadium>College Cricket Pitch"
+ ],
+ "College Engineering Building": [
+  "College & University>College Academic Building>College Engineering Building"
+ ],
+ "College Football Field": [
+  "College & University>College Stadium>College Football Field"
+ ],
+ "College Gym": [
+  "College & University>College Gym"
+ ],
+ "College History Building": [
+  "College & University>College Academic Building>College History Building"
+ ],
+ "College Hockey Rink": [
+  "College & University>College Stadium>College Hockey Rink"
+ ],
+ "College Lab": [
+  "College & University>College Lab"
+ ],
+ "College Library": [
+  "College & University>College Library"
+ ],
+ "College Math Building": [
+  "College & University>College Academic Building>College Math Building"
+ ],
+ "College Quad": [
+  "College & University>College Quad"
+ ],
+ "College Rec Center": [
+  "College & University>College Rec Center"
+ ],
+ "College Residence Hall": [
+  "College & University>College Residence Hall"
+ ],
+ "College Science Building": [
+  "College & University>College Academic Building>College Science Building"
+ ],
+ "College Soccer Field": [
+  "College & University>College Stadium>College Soccer Field"
+ ],
+ "College Stadium": [
+  "College & University>College Stadium"
+ ],
+ "College Technology Building": [
+  "College & University>College Academic Building>College Technology Building"
+ ],
+ "College Tennis Court": [
+  "College & University>College Stadium>College Tennis Court"
+ ],
+ "College Theater": [
+  "College & University>College Theater"
+ ],
+ "College Track": [
+  "College & University>College Stadium>College Track"
+ ],
+ "Comedy Club": [
+  "Arts & Entertainment>Comedy Club"
+ ],
+ "Comfort Food Restaurant": [
+  "Food>Comfort Food Restaurant"
+ ],
+ "Comic Shop": [
+  "Shop & Service>Comic Shop"
+ ],
+ "Community Center": [
+  "Professional & Other Places>Community Center"
+ ],
+ "Community College": [
+  "College & University>Community College"
+ ],
+ "Concert Hall": [
+  "Arts & Entertainment>Concert Hall"
+ ],
+ "Conference": [
+  "Event>Conference"
+ ],
+ "Conference Room": [
+  "Professional & Other Places>Office>Conference Room"
+ ],
+ "Construction & Landscaping": [
+  "Shop & Service>Construction & Landscaping"
+ ],
+ "Convenience Store": [
+  "Shop & Service>Convenience Store"
+ ],
+ "Convention": [
+  "Event>Convention"
+ ],
+ "Convention Center": [
+  "Professional & Other Places>Convention Center"
+ ],
+ "Corporate Cafeteria": [
+  "Professional & Other Places>Office>Corporate Cafeteria"
+ ],
+ "Cosmetics Shop": [
+  "Shop & Service>Cosmetics Shop"
+ ],
+ "Costume Shop": [
+  "Shop & Service>Costume Shop"
+ ],
+ "Country": [
+  "Outdoors & Recreation>States & Municipalities>Country"
+ ],
+ "Country Dance Club": [
+  "Arts & Entertainment>Country Dance Club"
+ ],
+ "County": [
+  "Outdoors & Recreation>States & Municipalities>County"
+ ],
+ "Courthouse": [
+  "Professional & Other Places>Government Building>Courthouse"
+ ],
+ "Coworking Space": [
+  "Professional & Other Places>Office>Coworking Space"
+ ],
+ "Credit Union": [
+  "Shop & Service>Credit Union"
+ ],
+ "Creperie": [
+  "Food>Creperie"
+ ],
+ "Cretan Restaurant": [
+  "Food>Greek Restaurant>Cretan Restaurant"
+ ],
+ "Cricket Ground": [
+  "Arts & Entertainment>Stadium>Cricket Ground"
+ ],
+ "Cruise": [
+  "Travel & Transport>Cruise"
+ ],
+ "Cuban Restaurant": [
+  "Food>Latin American Restaurant>Cuban Restaurant"
+ ],
+ "Cultural Center": [
+  "Professional & Other Places>Cultural Center"
+ ],
+ "Cupcake Shop": [
+  "Food>Dessert Shop>Cupcake Shop"
+ ],
+ "Cycle Studio": [
+  "Shop & Service>Gym / Fitness Center>Cycle Studio"
+ ],
+ "Czech Restaurant": [
+  "Food>Czech Restaurant"
+ ],
+ "Dance Studio": [
+  "Arts & Entertainment>Performing Arts Venue>Dance Studio"
+ ],
+ "Daycare": [
+  "Shop & Service>Daycare"
+ ],
+ "Deli / Bodega": [
+  "Food>Deli / Bodega"
+ ],
+ "Dentist's Office": [
+  "Professional & Other Places>Medical Center>Dentist's Office"
+ ],
+ "Department Store": [
+  "Shop & Service>Department Store"
+ ],
+ "Design Studio": [
+  "Shop & Service>Design Studio"
+ ],
+ "Dessert Shop": [
+  "Food>Dessert Shop"
+ ],
+ "Dhaba": [
+  "Food>Indian Restaurant>Dhaba"
+ ],
+ "Dim Sum Restaurant": [
+  "Food>Chinese Restaurant>Dim Sum Restaurant"
+ ],
+ "Diner": [
+  "Food>Diner"
+ ],
+ "Disc Golf": [
+  "Arts & Entertainment>Disc Golf"
+ ],
+ "Discount Store": [
+  "Shop & Service>Discount Store"
+ ],
+ "Distillery": [
+  "Food>Distillery"
+ ],
+ "Distribution Center": [
+  "Professional & Other Places>Distribution Center"
+ ],
+ "Dive Bar": [
+  "Nightlife Spot>Bar>Dive Bar"
+ ],
+ "Dive Shop": [
+  "Shop & Service>Dive Shop"
+ ],
+ "Dive Spot": [
+  "Outdoors & Recreation>Dive Spot"
+ ],
+ "Doctor's Office": [
+  "Professional & Other Places>Medical Center>Doctor's Office"
+ ],
+ "Dog Run": [
+  "Outdoors & Recreation>Dog Run"
+ ],
+ "Donburi Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Donburi Restaurant"
+ ],
+ "Doner Restaurant": [
+  "Food>Turkish Restaurant>Doner Restaurant"
+ ],
+ "Dongbei Restaurant": [
+  "Food>Chinese Restaurant>Dongbei Restaurant"
+ ],
+ "Donut Shop": [
+  "Food>Dessert Shop>Donut Shop"
+ ],
+ "Dosa Place": [
+  "Food>Indian Restaurant>Dosa Place"
+ ],
+ "Driving School": [
+  "Professional & Other Places>School>Driving School"
+ ],
+ "Drugstore / Pharmacy": [
+  "Shop & Service>Drugstore / Pharmacy"
+ ],
+ "Dry Cleaner": [
+  "Shop & Service>Dry Cleaner"
+ ],
+ "Dumpling Restaurant": [
+  "Food>Dumpling Restaurant"
+ ],
+ "EV Charging Station": [
+  "Shop & Service>EV Charging Station"
+ ],
+ "Eastern European Restaurant": [
+  "Food>Eastern European Restaurant"
+ ],
+ "Electronics Store": [
+  "Shop & Service>Electronics Store"
+ ],
+ "Elementary School": [
+  "Professional & Other Places>School>Elementary School"
+ ],
+ "Embassy / Consulate": [
+  "Professional & Other Places>Government Building>Embassy / Consulate"
+ ],
+ "Emergency Room": [
+  "Professional & Other Places>Medical Center>Emergency Room"
+ ],
+ "Emilia Restaurant": [
+  "Food>Italian Restaurant>Emilia Restaurant"
+ ],
+ "Empada House": [
+  "Food>Brazilian Restaurant>Empada House"
+ ],
+ "Empanada Restaurant": [
+  "Food>Latin American Restaurant>Empanada Restaurant"
+ ],
+ "English Restaurant": [
+  "Food>English Restaurant"
+ ],
+ "Erotic Museum": [
+  "Arts & Entertainment>Museum>Erotic Museum"
+ ],
+ "Ethiopian Restaurant": [
+  "Food>African Restaurant>Ethiopian Restaurant"
+ ],
+ "Event": [
+  "Event"
+ ],
+ "Event Service": [
+  "Shop & Service>Event Service"
+ ],
+ "Event Space": [
+  "Professional & Other Places>Event Space"
+ ],
+ "Eye Doctor": [
+  "Professional & Other Places>Medical Center>Eye Doctor"
+ ],
+ "Fabric Shop": [
+  "Shop & Service>Fabric Shop"
+ ],
+ "Factory": [
+  "Professional & Other Places>Factory"
+ ],
+ "Fair": [
+  "Professional & Other Places>Fair"
+ ],
+ "Falafel Restaurant": [
+  "Food>Falafel Restaurant"
+ ],
+ "Farm": [
+  "Outdoors & Recreation>Farm"
+ ],
+ "Farmers Market": [
+  "Shop & Service>Food & Drink Shop>Farmers Market"
+ ],
+ "Fast Food Restaurant": [
+  "Food>Fast Food Restaurant"
+ ],
+ "Festival": [
+  "Event>Festival"
+ ],
+ "Field": [
+  "Outdoors & Recreation>Field"
+ ],
+ "Filipino Restaurant": [
+  "Food>Asian Restaurant>Filipino Restaurant"
+ ],
+ "Financial or Legal Service": [
+  "Shop & Service>Financial or Legal Service"
+ ],
+ "Fire Station": [
+  "Professional & Other Places>Government Building>Fire Station"
+ ],
+ "Fireworks Store": [
+  "Shop & Service>Fireworks Store"
+ ],
+ "Fish & Chips Shop": [
+  "Food>Fish & Chips Shop"
+ ],
+ "Fish Market": [
+  "Shop & Service>Food & Drink Shop>Fish Market"
+ ],
+ "Fish Taverna": [
+  "Food>Greek Restaurant>Fish Taverna"
+ ],
+ "Fishing Spot": [
+  "Outdoors & Recreation>Fishing Spot"
+ ],
+ "Fishing Store": [
+  "Shop & Service>Fishing Store"
+ ],
+ "Flea Market": [
+  "Shop & Service>Flea Market"
+ ],
+ "Flight School": [
+  "Professional & Other Places>School>Flight School"
+ ],
+ "Flower Shop": [
+  "Shop & Service>Flower Shop"
+ ],
+ "Fondue Restaurant": [
+  "Food>Fondue Restaurant"
+ ],
+ "Food": [
+  "Food"
+ ],
+ "Food & Drink Shop": [
+  "Shop & Service>Food & Drink Shop"
+ ],
+ "Food Court": [
+  "Food>Food Court"
+ ],
+ "Food Truck": [
+  "Food>Food Truck"
+ ],
+ "Football Stadium": [
+  "Arts & Entertainment>Stadium>Football Stadium"
+ ],
+ "Forest": [
+  "Outdoors & Recreation>Forest"
+ ],
+ "Frame Store": [
+  "Shop & Service>Frame Store"
+ ],
+ "Fraternity House": [
+  "College & University>Fraternity House"
+ ],
+ "French Restaurant": [
+  "Food>French Restaurant"
+ ],
+ "Fried Chicken Joint": [
+  "Food>Fried Chicken Joint"
+ ],
+ "Friuli Restaurant": [
+  "Food>Italian Restaurant>Friuli Restaurant"
+ ],
+ "Frozen Yogurt": [
+  "Food>Dessert Shop>Frozen Yogurt"
+ ],
+ "Fruit & Vegetable Store": [
+  "Shop & Service>Fruit & Vegetable Store"
+ ],
+ "Fujian Restaurant": [
+  "Food>Chinese Restaurant>Fujian Restaurant"
+ ],
+ "Funeral Home": [
+  "Professional & Other Places>Funeral Home"
+ ],
+ "Furniture / Home Store": [
+  "Shop & Service>Furniture / Home Store"
+ ],
+ "Gaming Cafe": [
+  "Shop & Service>Gaming Cafe"
+ ],
+ "Garden": [
+  "Outdoors & Recreation>Garden"
+ ],
+ "Garden Center": [
+  "Shop & Service>Garden Center"
+ ],
+ "Gas Station / Garage": [
+  "Shop & Service>Gas Station / Garage"
+ ],
+ "Gastropub": [
+  "Food>Gastropub"
+ ],
+ "Gay Bar": [
+  "Nightlife Spot>Bar>Gay Bar"
+ ],
+ "General College & University": [
+  "College & University>General College & University"
+ ],
+ "General Entertainment": [
+  "Arts & Entertainment>General Entertainment"
+ ],
+ "General Travel": [
+  "Travel & Transport>General Travel"
+ ],
+ "German Restaurant": [
+  "Food>German Restaurant"
+ ],
+ "Gift Shop": [
+  "Shop & Service>Gift Shop"
+ ],
+ "Gluten-free Restaurant": [
+  "Food>Gluten-free Restaurant"
+ ],
+ "Go Kart Track": [
+  "Arts & Entertainment>Go Kart Track"
+ ],
+ "Goan Restaurant": [
+  "Food>Indian Restaurant>Goan Restaurant"
+ ],
+ "Goiano Restaurant": [
+  "Food>Brazilian Restaurant>Goiano Restaurant"
+ ],
+ "Golf Course": [
+  "Outdoors & Recreation>Athletics & Sports>Golf Course"
+ ],
+ "Gourmet Shop": [
+  "Shop & Service>Food & Drink Shop>Gourmet Shop"
+ ],
+ "Government Building": [
+  "Professional & Other Places>Government Building"
+ ],
+ "Gozleme Place": [
+  "Food>Turkish Restaurant>Gozleme Place"
+ ],
+ "Greek Restaurant": [
+  "Food>Greek Restaurant"
+ ],
+ "Grilled Meat Restaurant": [
+  "Food>Greek Restaurant>Grilled Meat Restaurant"
+ ],
+ "Grocery Store": [
+  "Shop & Service>Food & Drink Shop>Grocery Store"
+ ],
+ "Guizhou Restaurant": [
+  "Food>Chinese Restaurant>Guizhou Restaurant"
+ ],
+ "Gujarati Restaurant": [
+  "Food>Indian Restaurant>Gujarati Restaurant"
+ ],
+ "Gun Range": [
+  "Outdoors & Recreation>Gun Range"
+ ],
+ "Gun Shop": [
+  "Shop & Service>Gun Shop"
+ ],
+ "Gym": [
+  "Shop & Service>Gym / Fitness Center>Gym"
+ ],
+ "Gym / Fitness Center": [
+  "Shop & Service>Gym / Fitness Center"
+ ],
+ "Gym Pool": [
+  "Shop & Service>Gym / Fitness Center>Gym Pool"
+ ],
+ "Gymnastics Gym": [
+  "Shop & Service>Gym / Fitness Center>Gymnastics Gym"
+ ],
+ "Hainan Restaurant": [
+  "Food>Chinese Restaurant>Hainan Restaurant"
+ ],
+ "Hakka Restaurant": [
+  "Food>Chinese Restaurant>Hakka Restaurant"
+ ],
+ "Halal Restaurant": [
+  "Food>Halal Restaurant"
+ ],
+ "Harbor / Marina": [
+  "Outdoors & Recreation>Harbor / Marina"
+ ],
+ "Hardware Store": [
+  "Shop & Service>Hardware Store"
+ ],
+ "Hawaiian Restaurant": [
+  "Food>Hawaiian Restaurant"
+ ],
+ "Health & Beauty Service": [
+  "Shop & Service>Health & Beauty Service"
+ ],
+ "Health Food Store": [
+  "Shop & Service>Food & Drink Shop>Health Food Store"
+ ],
+ "Henan Restaurant": [
+  "Food>Chinese Restaurant>Henan Restaurant"
+ ],
+ "Herbs & Spices Store": [
+  "Shop & Service>Herbs & Spices Store"
+ ],
+ "High School": [
+  "Professional & Other Places>School>High School"
+ ],
+ "Himalayan Restaurant": [
+  "Food>Asian Restaurant>Himalayan Restaurant"
+ ],
+ "Hindu Temple": [
+  "Professional & Other Places>Spiritual Center>Hindu Temple"
+ ],
+ "Historic Site": [
+  "Arts & Entertainment>Historic Site"
+ ],
+ "History Museum": [
+  "Arts & Entertainment>Museum>History Museum"
+ ],
+ "Hobby Shop": [
+  "Shop & Service>Hobby Shop"
+ ],
+ "Hockey Arena": [
+  "Arts & Entertainment>Stadium>Hockey Arena"
+ ],
+ "Hockey Field": [
+  "Outdoors & Recreation>Athletics & Sports>Hockey Field"
+ ],
+ "Home (private)": [
+  "Residence>Home (private)"
+ ],
+ "Home Service": [
+  "Shop & Service>Home Service"
+ ],
+ "Hong Kong Restaurant": [
+  "Food>Chinese Restaurant>Hong Kong Restaurant"
+ ],
+ "Hookah Bar": [
+  "Nightlife Spot>Bar>Hookah Bar"
+ ],
+ "Hospital": [
+  "Professional & Other Places>Medical Center>Hospital"
+ ],
+ "Hostel": [
+  "Travel & Transport>Hotel>Hostel"
+ ],
+ "Hot Dog Joint": [
+  "Food>Hot Dog Joint"
+ ],
+ "Hot Spring": [
+  "Outdoors & Recreation>Hot Spring"
+ ],
+ "Hotel": [
+  "Travel & Transport>Hotel"
+ ],
+ "Hotel Bar": [
+  "Nightlife Spot>Bar>Hotel Bar"
+ ],
+ "Hotel Pool": [
+  "Travel & Transport>Hotel>Hotel Pool"
+ ],
+ "Hotpot Restaurant": [
+  "Food>Asian Restaurant>Hotpot Restaurant"
+ ],
+ "Housing Development": [
+  "Residence>Housing Development"
+ ],
+ "Huaiyang Restaurant": [
+  "Food>Chinese Restaurant>Huaiyang Restaurant"
+ ],
+ "Hubei Restaurant": [
+  "Food>Chinese Restaurant>Hubei Restaurant"
+ ],
+ "Hunan Restaurant": [
+  "Food>Chinese Restaurant>Hunan Restaurant"
+ ],
+ "Hungarian Restaurant": [
+  "Food>Hungarian Restaurant"
+ ],
+ "Hunting Supply": [
+  "Shop & Service>Hunting Supply"
+ ],
+ "Hyderabadi Restaurant": [
+  "Food>Indian Restaurant>Hyderabadi Restaurant"
+ ],
+ "IT Services": [
+  "Shop & Service>IT Services"
+ ],
+ "Ice Cream Shop": [
+  "Food>Dessert Shop>Ice Cream Shop"
+ ],
+ "Imperial Restaurant": [
+  "Food>Chinese Restaurant>Imperial Restaurant"
+ ],
+ "Indian Chinese Restaurant": [
+  "Food>Indian Restaurant>Indian Chinese Restaurant"
+ ],
+ "Indian Restaurant": [
+  "Food>Indian Restaurant"
+ ],
+ "Indian Sweet Shop": [
+  "Food>Indian Restaurant>Indian Sweet Shop"
+ ],
+ "Indie Movie Theater": [
+  "Arts & Entertainment>Movie Theater>Indie Movie Theater"
+ ],
+ "Indie Theater": [
+  "Arts & Entertainment>Performing Arts Venue>Indie Theater"
+ ],
+ "Indonesian Meatball Place": [
+  "Food>Indonesian Restaurant>Indonesian Meatball Place"
+ ],
+ "Indonesian Restaurant": [
+  "Food>Indonesian Restaurant"
+ ],
+ "Internet Cafe": [
+  "Shop & Service>Internet Cafe"
+ ],
+ "Intersection": [
+  "Travel & Transport>Intersection"
+ ],
+ "Irani Cafe": [
+  "Food>Indian Restaurant>Irani Cafe"
+ ],
+ "Irish Pub": [
+  "Food>Irish Pub"
+ ],
+ "Island": [
+  "Outdoors & Recreation>Island"
+ ],
+ "Italian Restaurant": [
+  "Food>Italian Restaurant"
+ ],
+ "Jain Restaurant": [
+  "Food>Indian Restaurant>Jain Restaurant"
+ ],
+ "Japanese Curry Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Japanese Curry Restaurant"
+ ],
+ "Japanese Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant"
+ ],
+ "Javanese Restaurant": [
+  "Food>Indonesian Restaurant>Javanese Restaurant"
+ ],
+ "Jazz Club": [
+  "Arts & Entertainment>Music Venue>Jazz Club"
+ ],
+ "Jewelry Store": [
+  "Shop & Service>Jewelry Store"
+ ],
+ "Jewish Restaurant": [
+  "Food>Jewish Restaurant"
+ ],
+ "Jiangsu Restaurant": [
+  "Food>Chinese Restaurant>Jiangsu Restaurant"
+ ],
+ "Jiangxi Restaurant": [
+  "Food>Chinese Restaurant>Jiangxi Restaurant"
+ ],
+ "Juice Bar": [
+  "Food>Juice Bar"
+ ],
+ "Kafenio": [
+  "Food>Greek Restaurant>Kafenio"
+ ],
+ "Kaiseki Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Kaiseki Restaurant"
+ ],
+ "Karaoke Bar": [
+  "Nightlife Spot>Bar>Karaoke Bar"
+ ],
+ "Karnataka Restaurant": [
+  "Food>Indian Restaurant>Karnataka Restaurant"
+ ],
+ "Kebab Restaurant": [
+  "Food>Turkish Restaurant>Kebab Restaurant"
+ ],
+ "Kerala Restaurant": [
+  "Food>Indian Restaurant>Kerala Restaurant"
+ ],
+ "Kids Store": [
+  "Shop & Service>Clothing Store>Kids Store"
+ ],
+ "Knitting Store": [
+  "Shop & Service>Knitting Store"
+ ],
+ "Kofte Place": [
+  "Food>Turkish Restaurant>Kofte Place"
+ ],
+ "Kokore\u00e7 Restaurant": [
+  "Food>Turkish Restaurant>Kokore\u00e7 Restaurant"
+ ],
+ "Korean Restaurant": [
+  "Food>Asian Restaurant>Korean Restaurant"
+ ],
+ "Kosher Restaurant": [
+  "Food>Jewish Restaurant>Kosher Restaurant"
+ ],
+ "Kushikatsu Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Kushikatsu Restaurant"
+ ],
+ "Laboratory": [
+  "Professional & Other Places>Medical Center>Laboratory"
+ ],
+ "Lake": [
+  "Outdoors & Recreation>Lake"
+ ],
+ "Language School": [
+  "Professional & Other Places>School>Language School"
+ ],
+ "Laser Tag": [
+  "Arts & Entertainment>Laser Tag"
+ ],
+ "Latin American Restaurant": [
+  "Food>Latin American Restaurant"
+ ],
+ "Laundromat": [
+  "Shop & Service>Laundromat"
+ ],
+ "Laundry Service": [
+  "Shop & Service>Laundry Service"
+ ],
+ "Law School": [
+  "College & University>Law School"
+ ],
+ "Lawyer": [
+  "Shop & Service>Lawyer"
+ ],
+ "Leather Goods Store": [
+  "Shop & Service>Leather Goods Store"
+ ],
+ "Library": [
+  "Professional & Other Places>Library"
+ ],
+ "Light Rail Station": [
+  "Travel & Transport>Light Rail Station"
+ ],
+ "Lighthouse": [
+  "Outdoors & Recreation>Lighthouse"
+ ],
+ "Lighting Store": [
+  "Shop & Service>Furniture / Home Store>Lighting Store"
+ ],
+ "Ligurian Restaurant": [
+  "Food>Italian Restaurant>Ligurian Restaurant"
+ ],
+ "Lingerie Store": [
+  "Shop & Service>Clothing Store>Lingerie Store"
+ ],
+ "Liquor Store": [
+  "Shop & Service>Food & Drink Shop>Liquor Store"
+ ],
+ "Locksmith": [
+  "Shop & Service>Locksmith"
+ ],
+ "Lombard Restaurant": [
+  "Food>Italian Restaurant>Lombard Restaurant"
+ ],
+ "Lottery Retailer": [
+  "Shop & Service>Lottery Retailer"
+ ],
+ "Lounge": [
+  "Nightlife Spot>Lounge"
+ ],
+ "Luggage Store": [
+  "Shop & Service>Luggage Store"
+ ],
+ "Mac & Cheese Joint": [
+  "Food>Mac & Cheese Joint"
+ ],
+ "Macanese Restaurant": [
+  "Food>Chinese Restaurant>Macanese Restaurant"
+ ],
+ "Magirio": [
+  "Food>Greek Restaurant>Magirio"
+ ],
+ "Maharashtrian Restaurant": [
+  "Food>Indian Restaurant>Maharashtrian Restaurant"
+ ],
+ "Malaysian Restaurant": [
+  "Food>Asian Restaurant>Malaysian Restaurant"
+ ],
+ "Malga": [
+  "Food>Italian Restaurant>Malga"
+ ],
+ "Mall": [
+  "Shop & Service>Mall"
+ ],
+ "Manadonese Restaurant": [
+  "Food>Indonesian Restaurant>Manadonese Restaurant"
+ ],
+ "Manchu Restaurant": [
+  "Food>Chinese Restaurant>Manchu Restaurant"
+ ],
+ "Manti Place": [
+  "Food>Turkish Restaurant>Manti Place"
+ ],
+ "Marche Restaurant": [
+  "Food>Italian Restaurant>Marche Restaurant"
+ ],
+ "Marijuana Dispensary": [
+  "Shop & Service>Marijuana Dispensary"
+ ],
+ "Market": [
+  "Shop & Service>Market"
+ ],
+ "Martial Arts Dojo": [
+  "Shop & Service>Gym / Fitness Center>Martial Arts Dojo"
+ ],
+ "Massage Studio": [
+  "Shop & Service>Massage Studio"
+ ],
+ "Mattress Store": [
+  "Shop & Service>Mattress Store"
+ ],
+ "Medical Center": [
+  "Professional & Other Places>Medical Center"
+ ],
+ "Medical School": [
+  "College & University>Medical School"
+ ],
+ "Mediterranean Restaurant": [
+  "Food>Mediterranean Restaurant"
+ ],
+ "Meeting Room": [
+  "Professional & Other Places>Convention Center>Meeting Room"
+ ],
+ "Men's Store": [
+  "Shop & Service>Clothing Store>Men's Store"
+ ],
+ "Mental Health Office": [
+  "Professional & Other Places>Medical Center>Mental Health Office"
+ ],
+ "Metro Station": [
+  "Travel & Transport>Metro Station"
+ ],
+ "Mexican Restaurant": [
+  "Food>Mexican Restaurant"
+ ],
+ "Meyhane": [
+  "Food>Turkish Restaurant>Meyhane"
+ ],
+ "Meze Restaurant": [
+  "Food>Greek Restaurant>Meze Restaurant"
+ ],
+ "Middle Eastern Restaurant": [
+  "Food>Middle Eastern Restaurant"
+ ],
+ "Middle School": [
+  "Professional & Other Places>School>Middle School"
+ ],
+ "Military Base": [
+  "Professional & Other Places>Military Base"
+ ],
+ "Mineiro Restaurant": [
+  "Food>Brazilian Restaurant>Mineiro Restaurant"
+ ],
+ "Mini Golf": [
+  "Arts & Entertainment>Mini Golf"
+ ],
+ "Miscellaneous Shop": [
+  "Shop & Service>Miscellaneous Shop"
+ ],
+ "Mobile Phone Shop": [
+  "Shop & Service>Mobile Phone Shop"
+ ],
+ "Modern European Restaurant": [
+  "Food>Modern European Restaurant"
+ ],
+ "Modern Greek Restaurant": [
+  "Food>Greek Restaurant>Modern Greek Restaurant"
+ ],
+ "Molecular Gastronomy Restaurant": [
+  "Food>Molecular Gastronomy Restaurant"
+ ],
+ "Molise Restaurant": [
+  "Food>Italian Restaurant>Molise Restaurant"
+ ],
+ "Monastery": [
+  "Professional & Other Places>Spiritual Center>Monastery"
+ ],
+ "Mongolian Restaurant": [
+  "Food>Asian Restaurant>Mongolian Restaurant"
+ ],
+ "Monjayaki Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Monjayaki Restaurant"
+ ],
+ "Monument / Landmark": [
+  "Professional & Other Places>Government Building>Monument / Landmark"
+ ],
+ "Moroccan Restaurant": [
+  "Food>Mediterranean Restaurant>Moroccan Restaurant"
+ ],
+ "Mosque": [
+  "Professional & Other Places>Spiritual Center>Mosque"
+ ],
+ "Motel": [
+  "Travel & Transport>Hotel>Motel"
+ ],
+ "Motorcycle Shop": [
+  "Shop & Service>Motorcycle Shop"
+ ],
+ "Mountain": [
+  "Outdoors & Recreation>Mountain"
+ ],
+ "Movie Theater": [
+  "Arts & Entertainment>Movie Theater"
+ ],
+ "Moving Target": [
+  "Travel & Transport>Moving Target"
+ ],
+ "Mughlai Restaurant": [
+  "Food>Indian Restaurant>Mughlai Restaurant"
+ ],
+ "Multicuisine Indian Restaurant": [
+  "Food>Indian Restaurant>Multicuisine Indian Restaurant"
+ ],
+ "Multiplex": [
+  "Arts & Entertainment>Movie Theater>Multiplex"
+ ],
+ "Museum": [
+  "Arts & Entertainment>Museum"
+ ],
+ "Music Festival": [
+  "Event>Music Festival"
+ ],
+ "Music School": [
+  "Professional & Other Places>School>Music School"
+ ],
+ "Music Store": [
+  "Shop & Service>Music Store"
+ ],
+ "Music Venue": [
+  "Arts & Entertainment>Music Venue"
+ ],
+ "Nabe Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Nabe Restaurant"
+ ],
+ "Nail Salon": [
+  "Shop & Service>Nail Salon"
+ ],
+ "National Park": [
+  "Outdoors & Recreation>National Park"
+ ],
+ "Nature Preserve": [
+  "Outdoors & Recreation>Nature Preserve"
+ ],
+ "Neighborhood": [
+  "Outdoors & Recreation>States & Municipalities>Neighborhood"
+ ],
+ "New American Restaurant": [
+  "Food>American Restaurant>New American Restaurant"
+ ],
+ "Newsstand": [
+  "Shop & Service>Newsstand"
+ ],
+ "Night Market": [
+  "Nightlife Spot>Night Market"
+ ],
+ "Nightclub": [
+  "Nightlife Spot>Nightclub"
+ ],
+ "Nightlife Spot": [
+  "Nightlife Spot"
+ ],
+ "Non-Profit": [
+  "Professional & Other Places>Non-Profit"
+ ],
+ "Noodle House": [
+  "Food>Asian Restaurant>Noodle House"
+ ],
+ "North Indian Restaurant": [
+  "Food>Indian Restaurant>North Indian Restaurant"
+ ],
+ "Northeast Indian Restaurant": [
+  "Food>Indian Restaurant>Northeast Indian Restaurant"
+ ],
+ "Northeastern Brazilian Restaurant": [
+  "Food>Brazilian Restaurant>Northeastern Brazilian Restaurant"
+ ],
+ "Northern Brazilian Restaurant": [
+  "Food>Brazilian Restaurant>Northern Brazilian Restaurant"
+ ],
+ "Nudist Beach": [
+  "Outdoors & Recreation>Beach>Nudist Beach"
+ ],
+ "Nursery School": [
+  "Professional & Other Places>School>Nursery School"
+ ],
+ "Office": [
+  "Professional & Other Places>Office"
+ ],
+ "Okonomiyaki Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Okonomiyaki Restaurant"
+ ],
+ "Opera House": [
+  "Arts & Entertainment>Performing Arts Venue>Opera House"
+ ],
+ "Optical Shop": [
+  "Shop & Service>Optical Shop"
+ ],
+ "Organic Grocery": [
+  "Shop & Service>Food & Drink Shop>Organic Grocery"
+ ],
+ "Other Event": [
+  "Event>Other Event"
+ ],
+ "Other Great Outdoors": [
+  "Outdoors & Recreation>Other Great Outdoors"
+ ],
+ "Other Nightlife": [
+  "Nightlife Spot>Other Nightlife"
+ ],
+ "Other Repair Shop": [
+  "Shop & Service>Other Repair Shop"
+ ],
+ "Outdoor Sculpture": [
+  "Arts & Entertainment>Public Art>Outdoor Sculpture"
+ ],
+ "Outdoor Supply Store": [
+  "Shop & Service>Outdoor Supply Store"
+ ],
+ "Outdoors & Recreation": [
+  "Outdoors & Recreation"
+ ],
+ "Outlet Store": [
+  "Shop & Service>Outlet Store"
+ ],
+ "Ouzeri": [
+  "Food>Greek Restaurant>Ouzeri"
+ ],
+ "Padangnese Restaurant": [
+  "Food>Indonesian Restaurant>Padangnese Restaurant"
+ ],
+ "Paella Restaurant": [
+  "Food>Spanish Restaurant>Paella Restaurant"
+ ],
+ "Paintball Field": [
+  "Outdoors & Recreation>Athletics & Sports>Paintball Field"
+ ],
+ "Pakistani Restaurant": [
+  "Food>Pakistani Restaurant"
+ ],
+ "Palace": [
+  "Outdoors & Recreation>Palace"
+ ],
+ "Paper / Office Supplies Store": [
+  "Shop & Service>Paper / Office Supplies Store"
+ ],
+ "Parade": [
+  "Event>Parade"
+ ],
+ "Park": [
+  "Outdoors & Recreation>Park"
+ ],
+ "Parking": [
+  "Professional & Other Places>Parking"
+ ],
+ "Parsi Restaurant": [
+  "Food>Indian Restaurant>Parsi Restaurant"
+ ],
+ "Pastelaria": [
+  "Food>Brazilian Restaurant>Pastelaria"
+ ],
+ "Patsa Restaurant": [
+  "Food>Greek Restaurant>Patsa Restaurant"
+ ],
+ "Pawn Shop": [
+  "Shop & Service>Pawn Shop"
+ ],
+ "Pedestrian Plaza": [
+  "Outdoors & Recreation>Pedestrian Plaza"
+ ],
+ "Peking Duck Restaurant": [
+  "Food>Chinese Restaurant>Peking Duck Restaurant"
+ ],
+ "Pelmeni House": [
+  "Food>Russian Restaurant>Pelmeni House"
+ ],
+ "Performing Arts Venue": [
+  "Arts & Entertainment>Performing Arts Venue"
+ ],
+ "Perfume Shop": [
+  "Shop & Service>Perfume Shop"
+ ],
+ "Persian Restaurant": [
+  "Food>Middle Eastern Restaurant>Persian Restaurant"
+ ],
+ "Peruvian Restaurant": [
+  "Food>South American Restaurant>Peruvian Restaurant"
+ ],
+ "Pet Service": [
+  "Shop & Service>Pet Service"
+ ],
+ "Pet Store": [
+  "Shop & Service>Pet Store"
+ ],
+ "Photography Lab": [
+  "Shop & Service>Photography Lab"
+ ],
+ "Photography Studio": [
+  "Shop & Service>Photography Studio"
+ ],
+ "Piadineria": [
+  "Food>Italian Restaurant>Piadineria"
+ ],
+ "Piano Bar": [
+  "Arts & Entertainment>Music Venue>Piano Bar"
+ ],
+ "Pide Place": [
+  "Food>Turkish Restaurant>Pide Place"
+ ],
+ "Pie Shop": [
+  "Food>Dessert Shop>Pie Shop"
+ ],
+ "Piedmontese Restaurant": [
+  "Food>Italian Restaurant>Piedmontese Restaurant"
+ ],
+ "Pier": [
+  "Travel & Transport>Pier"
+ ],
+ "Piercing Parlor": [
+  "Shop & Service>Piercing Parlor"
+ ],
+ "Pizza Place": [
+  "Food>Pizza Place"
+ ],
+ "Plane": [
+  "Travel & Transport>Airport>Plane"
+ ],
+ "Planetarium": [
+  "Arts & Entertainment>Museum>Planetarium"
+ ],
+ "Platform": [
+  "Travel & Transport>Train Station>Platform"
+ ],
+ "Playground": [
+  "Outdoors & Recreation>Playground"
+ ],
+ "Plaza": [
+  "Outdoors & Recreation>Plaza"
+ ],
+ "Police Station": [
+  "Professional & Other Places>Government Building>Police Station"
+ ],
+ "Polish Restaurant": [
+  "Food>Polish Restaurant"
+ ],
+ "Pool": [
+  "Outdoors & Recreation>Pool"
+ ],
+ "Pool Hall": [
+  "Arts & Entertainment>Pool Hall"
+ ],
+ "Pop-Up Shop": [
+  "Shop & Service>Pop-Up Shop"
+ ],
+ "Portuguese Restaurant": [
+  "Food>Portuguese Restaurant"
+ ],
+ "Post Office": [
+  "Professional & Other Places>Post Office"
+ ],
+ "Prayer Room": [
+  "Professional & Other Places>Spiritual Center>Prayer Room"
+ ],
+ "Preschool": [
+  "Professional & Other Places>School>Preschool"
+ ],
+ "Print Shop": [
+  "Shop & Service>Print Shop"
+ ],
+ "Prison": [
+  "Professional & Other Places>Prison"
+ ],
+ "Private School": [
+  "Professional & Other Places>School>Private School"
+ ],
+ "Professional & Other Places": [
+  "Professional & Other Places"
+ ],
+ "Pub": [
+  "Nightlife Spot>Bar>Pub"
+ ],
+ "Public Art": [
+  "Arts & Entertainment>Public Art"
+ ],
+ "Puglia Restaurant": [
+  "Food>Italian Restaurant>Puglia Restaurant"
+ ],
+ "Punjabi Restaurant": [
+  "Food>Indian Restaurant>Punjabi Restaurant"
+ ],
+ "RV Park": [
+  "Travel & Transport>RV Park"
+ ],
+ "Racetrack": [
+  "Arts & Entertainment>Racetrack"
+ ],
+ "Radio Station": [
+  "Professional & Other Places>Radio Station"
+ ],
+ "Rafting": [
+  "Outdoors & Recreation>Rafting"
+ ],
+ "Rajasthani Restaurant": [
+  "Food>Indian Restaurant>Rajasthani Restaurant"
+ ],
+ "Ramen Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Ramen Restaurant"
+ ],
+ "Real Estate Office": [
+  "Shop & Service>Real Estate Office"
+ ],
+ "Record Shop": [
+  "Shop & Service>Record Shop"
+ ],
+ "Recording Studio": [
+  "Shop & Service>Recording Studio"
+ ],
+ "Recreation Center": [
+  "Outdoors & Recreation>Recreation Center"
+ ],
+ "Recruiting Agency": [
+  "Professional & Other Places>Recruiting Agency"
+ ],
+ "Recycling Facility": [
+  "Shop & Service>Recycling Facility"
+ ],
+ "Religious School": [
+  "Professional & Other Places>School>Religious School"
+ ],
+ "Rental Car Location": [
+  "Travel & Transport>Rental Car Location"
+ ],
+ "Residence": [
+  "Residence"
+ ],
+ "Residential Building (Apartment / Condo)": [
+  "Residence>Residential Building (Apartment / Condo)"
+ ],
+ "Resort": [
+  "Travel & Transport>Hotel>Resort"
+ ],
+ "Rest Area": [
+  "Travel & Transport>Rest Area"
+ ],
+ "Restaurant": [
+  "Food>Restaurant"
+ ],
+ "Rifugio di Montagna": [
+  "Food>Italian Restaurant>Rifugio di Montagna"
+ ],
+ "River": [
+  "Outdoors & Recreation>River"
+ ],
+ "Road": [
+  "Travel & Transport>Road"
+ ],
+ "Rock Climbing Spot": [
+  "Outdoors & Recreation>Rock Climbing Spot"
+ ],
+ "Rock Club": [
+  "Arts & Entertainment>Music Venue>Rock Club"
+ ],
+ "Roller Rink": [
+  "Arts & Entertainment>Roller Rink"
+ ],
+ "Romagna Restaurant": [
+  "Food>Italian Restaurant>Romagna Restaurant"
+ ],
+ "Roman Restaurant": [
+  "Food>Italian Restaurant>Roman Restaurant"
+ ],
+ "Romanian Restaurant": [
+  "Food>Eastern European Restaurant>Romanian Restaurant"
+ ],
+ "Roof Deck": [
+  "Travel & Transport>Hotel>Roof Deck"
+ ],
+ "Rugby Pitch": [
+  "Outdoors & Recreation>Athletics & Sports>Rugby Pitch"
+ ],
+ "Russian Restaurant": [
+  "Food>Russian Restaurant"
+ ],
+ "Sake Bar": [
+  "Nightlife Spot>Bar>Sake Bar"
+ ],
+ "Salad Place": [
+  "Food>Salad Place"
+ ],
+ "Salon / Barbershop": [
+  "Shop & Service>Salon / Barbershop"
+ ],
+ "Salsa Club": [
+  "Arts & Entertainment>Salsa Club"
+ ],
+ "Sandwich Place": [
+  "Food>Sandwich Place"
+ ],
+ "Sardinian Restaurant": [
+  "Food>Italian Restaurant>Sardinian Restaurant"
+ ],
+ "Scandinavian Restaurant": [
+  "Food>Scandinavian Restaurant"
+ ],
+ "Scenic Lookout": [
+  "Outdoors & Recreation>Scenic Lookout"
+ ],
+ "School": [
+  "Professional & Other Places>School"
+ ],
+ "Science Museum": [
+  "Arts & Entertainment>Museum>Science Museum"
+ ],
+ "Sculpture Garden": [
+  "Outdoors & Recreation>Sculpture Garden"
+ ],
+ "Seafood Restaurant": [
+  "Food>Seafood Restaurant"
+ ],
+ "Shaanxi Restaurant": [
+  "Food>Chinese Restaurant>Shaanxi Restaurant"
+ ],
+ "Shabu-Shabu Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Shabu-Shabu Restaurant"
+ ],
+ "Shandong Restaurant": [
+  "Food>Chinese Restaurant>Shandong Restaurant"
+ ],
+ "Shanghai Restaurant": [
+  "Food>Chinese Restaurant>Shanghai Restaurant"
+ ],
+ "Shanxi Restaurant": [
+  "Food>Chinese Restaurant>Shanxi Restaurant"
+ ],
+ "Shipping Store": [
+  "Shop & Service>Shipping Store"
+ ],
+ "Shoe Repair": [
+  "Shop & Service>Shoe Repair"
+ ],
+ "Shoe Store": [
+  "Shop & Service>Clothing Store>Shoe Store"
+ ],
+ "Shop & Service": [
+  "Shop & Service"
+ ],
+ "Shrine": [
+  "Professional & Other Places>Spiritual Center>Shrine"
+ ],
+ "Sicilian Restaurant": [
+  "Food>Italian Restaurant>Sicilian Restaurant"
+ ],
+ "Skate Park": [
+  "Outdoors & Recreation>Athletics & Sports>Skate Park"
+ ],
+ "Skating Rink": [
+  "Outdoors & Recreation>Athletics & Sports>Skating Rink"
+ ],
+ "Ski Area": [
+  "Outdoors & Recreation>Ski Area"
+ ],
+ "Ski Chairlift": [
+  "Outdoors & Recreation>Ski Area>Ski Chairlift"
+ ],
+ "Ski Chalet": [
+  "Outdoors & Recreation>Ski Area>Ski Chalet"
+ ],
+ "Ski Lodge": [
+  "Outdoors & Recreation>Ski Area>Ski Lodge"
+ ],
+ "Ski Trail": [
+  "Outdoors & Recreation>Ski Area>Ski Trail"
+ ],
+ "Smoke Shop": [
+  "Shop & Service>Smoke Shop"
+ ],
+ "Smoothie Shop": [
+  "Shop & Service>Smoothie Shop"
+ ],
+ "Snack Place": [
+  "Food>Snack Place"
+ ],
+ "Soba Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Soba Restaurant"
+ ],
+ "Soccer Field": [
+  "Outdoors & Recreation>Athletics & Sports>Soccer Field"
+ ],
+ "Soccer Stadium": [
+  "Arts & Entertainment>Stadium>Soccer Stadium"
+ ],
+ "Social Club": [
+  "Professional & Other Places>Social Club"
+ ],
+ "Sorority House": [
+  "College & University>Sorority House"
+ ],
+ "Soup Place": [
+  "Food>Soup Place"
+ ],
+ "South American Restaurant": [
+  "Food>South American Restaurant"
+ ],
+ "South Indian Restaurant": [
+  "Food>Indian Restaurant>South Indian Restaurant"
+ ],
+ "South Tyrolean Restaurant": [
+  "Food>Italian Restaurant>South Tyrolean Restaurant"
+ ],
+ "Southeastern Brazilian Restaurant": [
+  "Food>Brazilian Restaurant>Southeastern Brazilian Restaurant"
+ ],
+ "Southern / Soul Food Restaurant": [
+  "Food>Southern / Soul Food Restaurant"
+ ],
+ "Southern Brazilian Restaurant": [
+  "Food>Brazilian Restaurant>Southern Brazilian Restaurant"
+ ],
+ "Souvenir Shop": [
+  "Shop & Service>Souvenir Shop"
+ ],
+ "Souvlaki Shop": [
+  "Food>Greek Restaurant>Souvlaki Shop"
+ ],
+ "Spa": [
+  "Shop & Service>Spa"
+ ],
+ "Spanish Restaurant": [
+  "Food>Spanish Restaurant"
+ ],
+ "Speakeasy": [
+  "Nightlife Spot>Speakeasy"
+ ],
+ "Spiritual Center": [
+  "Professional & Other Places>Spiritual Center"
+ ],
+ "Sporting Goods Shop": [
+  "Shop & Service>Sporting Goods Shop"
+ ],
+ "Sports Bar": [
+  "Nightlife Spot>Bar>Sports Bar"
+ ],
+ "Sports Club": [
+  "Outdoors & Recreation>Athletics & Sports>Sports Club"
+ ],
+ "Squash Court": [
+  "Outdoors & Recreation>Athletics & Sports>Squash Court"
+ ],
+ "Sri Lankan Restaurant": [
+  "Food>Sri Lankan Restaurant"
+ ],
+ "Stables": [
+  "Outdoors & Recreation>Stables"
+ ],
+ "Stadium": [
+  "Arts & Entertainment>Stadium"
+ ],
+ "State": [
+  "Outdoors & Recreation>States & Municipalities>State"
+ ],
+ "States & Municipalities": [
+  "Outdoors & Recreation>States & Municipalities"
+ ],
+ "Stationery Store": [
+  "Shop & Service>Stationery Store"
+ ],
+ "Steakhouse": [
+  "Food>Steakhouse"
+ ],
+ "Stoop Sale": [
+  "Event>Stoop Sale"
+ ],
+ "Storage Facility": [
+  "Shop & Service>Storage Facility"
+ ],
+ "Street": [
+  "Travel & Transport>Street"
+ ],
+ "Street Art": [
+  "Arts & Entertainment>Public Art>Street Art"
+ ],
+ "Street Fair": [
+  "Event>Street Fair"
+ ],
+ "Street Food Gathering": [
+  "Shop & Service>Food & Drink Shop>Street Food Gathering"
+ ],
+ "Strip Club": [
+  "Nightlife Spot>Strip Club"
+ ],
+ "Student Center": [
+  "College & University>Student Center"
+ ],
+ "Sukiyaki Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Sukiyaki Restaurant"
+ ],
+ "Summer Camp": [
+  "Outdoors & Recreation>Summer Camp"
+ ],
+ "Sundanese Restaurant": [
+  "Food>Indonesian Restaurant>Sundanese Restaurant"
+ ],
+ "Supermarket": [
+  "Shop & Service>Food & Drink Shop>Supermarket"
+ ],
+ "Surf Spot": [
+  "Outdoors & Recreation>Beach>Surf Spot"
+ ],
+ "Sushi Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Sushi Restaurant"
+ ],
+ "Swim School": [
+  "Professional & Other Places>School>Swim School"
+ ],
+ "Swiss Restaurant": [
+  "Food>Swiss Restaurant"
+ ],
+ "Synagogue": [
+  "Professional & Other Places>Spiritual Center>Synagogue"
+ ],
+ "Szechuan Restaurant": [
+  "Food>Chinese Restaurant>Szechuan Restaurant"
+ ],
+ "TV Station": [
+  "Professional & Other Places>TV Station"
+ ],
+ "Taco Place": [
+  "Food>Mexican Restaurant>Taco Place"
+ ],
+ "Tailor Shop": [
+  "Shop & Service>Tailor Shop"
+ ],
+ "Taiwanese Restaurant": [
+  "Food>Chinese Restaurant>Taiwanese Restaurant"
+ ],
+ "Takoyaki Place": [
+  "Food>Asian Restaurant>Japanese Restaurant>Takoyaki Place"
+ ],
+ "Tanning Salon": [
+  "Shop & Service>Tanning Salon"
+ ],
+ "Tapas Restaurant": [
+  "Food>Spanish Restaurant>Tapas Restaurant"
+ ],
+ "Tapiocaria": [
+  "Food>Brazilian Restaurant>Tapiocaria"
+ ],
+ "Tatar Restaurant": [
+  "Food>Eastern European Restaurant>Tatar Restaurant"
+ ],
+ "Tattoo Parlor": [
+  "Shop & Service>Tattoo Parlor"
+ ],
+ "Taverna": [
+  "Food>Greek Restaurant>Taverna"
+ ],
+ "Taxi": [
+  "Travel & Transport>Taxi"
+ ],
+ "Taxi Stand": [
+  "Travel & Transport>Taxi Stand"
+ ],
+ "Tea Room": [
+  "Food>Tea Room"
+ ],
+ "Tech Startup": [
+  "Professional & Other Places>Office>Tech Startup"
+ ],
+ "Temple": [
+  "Professional & Other Places>Spiritual Center>Temple"
+ ],
+ "Tempura Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Tempura Restaurant"
+ ],
+ "Tennis": [
+  "Arts & Entertainment>Stadium>Tennis"
+ ],
+ "Tennis Court": [
+  "Outdoors & Recreation>Athletics & Sports>Tennis Court"
+ ],
+ "Thai Restaurant": [
+  "Food>Asian Restaurant>Thai Restaurant"
+ ],
+ "Theater": [
+  "Arts & Entertainment>Performing Arts Venue>Theater"
+ ],
+ "Theme Park": [
+  "Arts & Entertainment>Theme Park"
+ ],
+ "Theme Park Ride / Attraction": [
+  "Arts & Entertainment>Theme Park>Theme Park Ride / Attraction"
+ ],
+ "Thrift / Vintage Store": [
+  "Shop & Service>Thrift / Vintage Store"
+ ],
+ "Tianjin Restaurant": [
+  "Food>Chinese Restaurant>Tianjin Restaurant"
+ ],
+ "Tibetan Restaurant": [
+  "Food>Asian Restaurant>Tibetan Restaurant"
+ ],
+ "Toll Booth": [
+  "Travel & Transport>Toll Booth"
+ ],
+ "Toll Plaza": [
+  "Travel & Transport>Toll Plaza"
+ ],
+ "Tonkatsu Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Tonkatsu Restaurant"
+ ],
+ "Tourist Information Center": [
+  "Travel & Transport>Tourist Information Center"
+ ],
+ "Town": [
+  "Outdoors & Recreation>States & Municipalities>Town"
+ ],
+ "Town Hall": [
+  "Professional & Other Places>Government Building>Town Hall"
+ ],
+ "Toy / Game Store": [
+  "Shop & Service>Toy / Game Store"
+ ],
+ "Track": [
+  "Shop & Service>Gym / Fitness Center>Track"
+ ],
+ "Track Stadium": [
+  "Arts & Entertainment>Stadium>Track Stadium"
+ ],
+ "Trade School": [
+  "College & University>Trade School"
+ ],
+ "Trail": [
+  "Outdoors & Recreation>Trail"
+ ],
+ "Trailer Park": [
+  "Residence>Trailer Park"
+ ],
+ "Train": [
+  "Travel & Transport>Train Station>Train"
+ ],
+ "Train Station": [
+  "Travel & Transport>Train Station"
+ ],
+ "Tram Station": [
+  "Travel & Transport>Tram Station"
+ ],
+ "Transportation Service": [
+  "Travel & Transport>Transportation Service"
+ ],
+ "Trattoria/Osteria": [
+  "Food>Italian Restaurant>Trattoria/Osteria"
+ ],
+ "Travel & Transport": [
+  "Travel & Transport"
+ ],
+ "Travel Agency": [
+  "Shop & Service>Travel Agency"
+ ],
+ "Travel Lounge": [
+  "Travel & Transport>Travel Lounge"
+ ],
+ "Tree": [
+  "Outdoors & Recreation>Tree"
+ ],
+ "Trentino Restaurant": [
+  "Food>Italian Restaurant>Trentino Restaurant"
+ ],
+ "Tsipouro Restaurant": [
+  "Food>Greek Restaurant>Tsipouro Restaurant"
+ ],
+ "Tunnel": [
+  "Travel & Transport>Tunnel"
+ ],
+ "Turkish Home Cooking Restaurant": [
+  "Food>Turkish Restaurant>Turkish Home Cooking Restaurant"
+ ],
+ "Turkish Restaurant": [
+  "Food>Turkish Restaurant"
+ ],
+ "Tuscan Restaurant": [
+  "Food>Italian Restaurant>Tuscan Restaurant"
+ ],
+ "Udon Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Udon Restaurant"
+ ],
+ "Udupi Restaurant": [
+  "Food>Indian Restaurant>Udupi Restaurant"
+ ],
+ "Ukrainian Restaurant": [
+  "Food>Ukrainian Restaurant"
+ ],
+ "Umbrian Restaurant": [
+  "Food>Italian Restaurant>Umbrian Restaurant"
+ ],
+ "Unagi Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Unagi Restaurant"
+ ],
+ "University": [
+  "College & University>University"
+ ],
+ "Used Bookstore": [
+  "Shop & Service>Used Bookstore"
+ ],
+ "Varenyky restaurant": [
+  "Food>Ukrainian Restaurant>Varenyky restaurant"
+ ],
+ "Vegetarian / Vegan Restaurant": [
+  "Food>Vegetarian / Vegan Restaurant"
+ ],
+ "Veneto Restaurant": [
+  "Food>Italian Restaurant>Veneto Restaurant"
+ ],
+ "Veterinarian": [
+  "Professional & Other Places>Medical Center>Veterinarian"
+ ],
+ "Video Game Store": [
+  "Shop & Service>Video Game Store"
+ ],
+ "Video Store": [
+  "Shop & Service>Video Store"
+ ],
+ "Vietnamese Restaurant": [
+  "Food>Asian Restaurant>Vietnamese Restaurant"
+ ],
+ "Village": [
+  "Outdoors & Recreation>States & Municipalities>Village"
+ ],
+ "Vineyard": [
+  "Outdoors & Recreation>Vineyard"
+ ],
+ "Volcano": [
+  "Outdoors & Recreation>Volcano"
+ ],
+ "Volleyball Court": [
+  "Outdoors & Recreation>Athletics & Sports>Volleyball Court"
+ ],
+ "Voting Booth": [
+  "Professional & Other Places>Voting Booth"
+ ],
+ "Wagashi Place": [
+  "Food>Asian Restaurant>Japanese Restaurant>Wagashi Place"
+ ],
+ "Warehouse": [
+  "Professional & Other Places>Warehouse"
+ ],
+ "Warehouse Store": [
+  "Shop & Service>Warehouse Store"
+ ],
+ "Watch Repair Shop": [
+  "Shop & Service>Watch Repair Shop"
+ ],
+ "Water Park": [
+  "Arts & Entertainment>Water Park"
+ ],
+ "Well": [
+  "Outdoors & Recreation>Well"
+ ],
+ "West-Ukrainian Restaurant": [
+  "Food>Ukrainian Restaurant>West-Ukrainian Restaurant"
+ ],
+ "Whisky Bar": [
+  "Nightlife Spot>Bar>Whisky Bar"
+ ],
+ "Wine Bar": [
+  "Nightlife Spot>Bar>Wine Bar"
+ ],
+ "Wine Shop": [
+  "Shop & Service>Food & Drink Shop>Wine Shop"
+ ],
+ "Winery": [
+  "Food>Winery"
+ ],
+ "Wings Joint": [
+  "Food>Wings Joint"
+ ],
+ "Women's Store": [
+  "Shop & Service>Clothing Store>Women's Store"
+ ],
+ "Xinjiang Restaurant": [
+  "Food>Chinese Restaurant>Xinjiang Restaurant"
+ ],
+ "Yakitori Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Yakitori Restaurant"
+ ],
+ "Yoga Studio": [
+  "Shop & Service>Gym / Fitness Center>Yoga Studio"
+ ],
+ "Yoshoku Restaurant": [
+  "Food>Asian Restaurant>Japanese Restaurant>Yoshoku Restaurant"
+ ],
+ "Yunnan Restaurant": [
+  "Food>Chinese Restaurant>Yunnan Restaurant"
+ ],
+ "Zhejiang Restaurant": [
+  "Food>Chinese Restaurant>Zhejiang Restaurant"
+ ],
+ "Zoo": [
+  "Arts & Entertainment>Zoo"
+ ]
+}
