@@ -1,0 +1,52 @@
+{
+  "config": {
+    "csv_dir": "./data/lbsn",
+    "mat": null,
+    "poi_meta": null,
+    "taxonomy": "./data/lbsn/fsq_category_paths_2014.json",
+    "groups_dir": "./data/lbsn/groups",
+    "out_dir": "./data/kg_lbsn",
+    "export_dir": null,
+    "dataset": "LBSN_NYC",
+    "split": "user",
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "wrap_tol": 24,
+    "cell_deg": 0.01,
+    "knn": 10,
+    "max_followed_by": null,
+    "tau": 0.4,
+    "self_check": false
+  },
+  "source": "./data/lbsn",
+  "dataset": "LBSN_NYC",
+  "n_entities": 12709,
+  "n_triples": 244080,
+  "n_relations": 12,
+  "node_types": {
+    "CATEGORY": 329,
+    "GROUP": 3835,
+    "LOCALITY": 776,
+    "POI": 6103,
+    "REGION": 1,
+    "USER": 1665
+  },
+  "relation_counts": {
+    "IS_NEAR_TO": 75236,
+    "FOLLOWED_BY": 72753,
+    "VISITED": 48848,
+    "CO_ATTENDED": 11994,
+    "MEMBER_OF": 9063,
+    "LOCATED_IN": 6879,
+    "HAS_CATEGORY": 6103,
+    "OCCURRED_AT": 3835,
+    "GROUP_PREFERS": 3835,
+    "FRIEND_OF": 3012,
+    "PREFERS_CATEGORY": 2211,
+    "SUBCATEGORY_OF": 311
+  },
+  "n_hierarchy_pairs": 19339,
+  "n_prefers_category": 2211,
+  "n_friendship_old": 1506,
+  "n_friendship_new_only": 1138
+}

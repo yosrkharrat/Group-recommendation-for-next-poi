@@ -10,6 +10,10 @@ papers/*.PDF
 # A 200-line sample of each split is committed under data/groups/samples/ so the schema
 # is visible without cloning 66 MB.
 data/groups/group_examples_*.jsonl
+# Same deal on the LBSN track (46 MB, ~10 min):
+#   python src/build_groups.py --data-dir ./data/lbsn --dataset LBSN_NYC \
+#          --out-dir ./data/lbsn/groups --no-resplit
+data/lbsn/groups/group_examples_*.jsonl
 
 # ── Check-in data: COMMITTED on purpose ────────────────────────────────────
 # The five Foursquare files (train/val/test_NYC.csv, poi_metadata_NYC.csv, vocab.pkl) are

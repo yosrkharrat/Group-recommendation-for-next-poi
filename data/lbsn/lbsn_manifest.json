@@ -1,0 +1,41 @@
+{
+  "config": {
+    "zip": "/private/tmp/claude-502/-Users-macbook-Documents-POI/a90a54d2-868c-47c5-a481-84c92087c2a0/scratchpad/lsbn2vec_global.zip",
+    "out_dir": "./data/lbsn",
+    "dataset": "LBSN_NYC",
+    "taxonomy": "./data/lbsn/fsq_category_paths_2014.json",
+    "cell_deg": 0.01,
+    "self_check": false
+  },
+  "bbox": {
+    "lat_min": 40.49,
+    "lat_max": 40.92,
+    "lon_min": -74.27,
+    "lon_max": -73.65
+  },
+  "min_venue_visits": 10,
+  "min_user_visits": 30,
+  "n_checkins": 159304,
+  "n_users": 1665,
+  "n_pois": 6103,
+  "n_friend_old": 1506,
+  "n_friend_new_only": 1138,
+  "split_sizes": {
+    "train": 112242,
+    "test": 31209,
+    "val": 15853
+  },
+  "category_depths": {
+    "1": 236,
+    "2": 4231,
+    "3": 1608,
+    "4": 28
+  },
+  "notebook_reference_counts": {
+    "checkins": 159304,
+    "users": 1665,
+    "pois": 6103,
+    "friends_old": 1507,
+    "friends_new": 2278
+  }
+}
