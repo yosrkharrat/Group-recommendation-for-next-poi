@@ -9,9 +9,24 @@ pipeline had to infer user–user ties (affinity z-sum, AUC 0.72); here `FRIEND_
 observed. This branch contains only this track — the TSMC2014 pipeline and its history live
 on `main`.
 
-**→ Adapting / executing the fine-tune? Start with [`docs/LBSN_HANDOFF.md`](docs/LBSN_HANDOFF.md).**
-It has the exact `stage6b_run2_server.ipynb` touchpoints, the leakage rules, and the
-execution notes.
+**→ Running the fine-tune? The adapted notebook is ready:
+[`notebooks/stage5_lbsn_finetune.ipynb`](notebooks/stage5_lbsn_finetune.ipynb).**
+
+```bash
+git clone -b lbsn-handoff https://github.com/yosrkharrat/Group-recommendation-for-next-poi.git
+cd Group-recommendation-for-next-poi
+pip install torch --index-url https://download.pytorch.org/whl/cu124   # match your CUDA
+pip install -r requirements.txt
+export HF_TOKEN=hf_...                  # free READ token; or a .env beside the notebook
+jupyter lab notebooks/stage5_lbsn_finetune.ipynb
+```
+
+All data is committed on this branch — nothing else to download besides the model (which the
+notebook fetches itself). Do one `RUN_PROFILE = "smoke"` pass (~15 min, any CUDA GPU) before
+the real `"full"` run (≥40 GB GPU; the notebook refuses to start `"full"` on less and prints a
+measured ETA from step 25). The Acc@t-guided objective is ON (`USE_ACC_AT_T_OBJECTIVE=True`) —
+the training log shows `oracle_override=… acc@1/5/10=…` per log step as visible proof.
+Background, leakage rules and design notes: [`docs/LBSN_HANDOFF.md`](docs/LBSN_HANDOFF.md).
 
 ---
 
@@ -24,7 +39,7 @@ execution notes.
 | 2 | KG (POI + group + **FRIEND_OF**) | ✅ done | `data/kg_lbsn/kg_triples.pt` — 12,709 entities, 244,080 triples, 12 relations |
 | 3 | RotH + depth regulariser (120 epochs) | ✅ done | `data/kg_lbsn/poi_hyperbolic_embs_LBSN_NYC.npy` — **D1 ρ = +0.7096 STRONG** |
 | 4 | POI-POI triples for the alignment adapter | ✅ done | `data/kg_lbsn/poi_poi_triples_LBSN_NYC.pt` — 132,394 triples |
-| 5 | **LLaDA fine-tune** (adapt `stage6b_run2_server.ipynb`) | ❌ **next** | see `docs/LBSN_HANDOFF.md` |
+| 5 | **LLaDA fine-tune** notebook (Acc@t objective ON, opt-in social prompt) | ✅ built, CPU-verified | `notebooks/stage5_lbsn_finetune.ipynb` — **GPU run is the next step** |
 
 ### The headline result
 
@@ -69,10 +84,12 @@ src/                        flat on purpose (scripts import each other directly)
   phase0_diagnostics.py                standalone D1 / D2 / D3
 
 notebooks/
+  stage5_lbsn_finetune.ipynb    stage 5, the LLaDA fine-tune for THIS dataset — RUN THIS.
+                                Acc@t objective ON; opt-in [friends] prompt (USE_SOCIAL_CONTEXT)
   roth_lbsn_kaggle.ipynb        stages 0-4 on a CPU Kaggle kernel, self-locating inputs,
                                 expected-vs-actual counts printed at every stage
-  stage6b_run2_server.ipynb     stage 5, the LLaDA fine-tune — still configured for the OLD
-                                dataset; the touchpoint checklist is in docs/LBSN_HANDOFF.md
+  stage6b_run2_server.ipynb     the TSMC-configured original stage5 was derived from — kept as
+                                the reference for like-for-like comparisons; do not run it here
   archive/preprocessing-global-fsq.ipynb   the original extraction notebook stage 0 reproduces
 
 data/
@@ -127,5 +144,6 @@ expected values.
 | `data/lbsn/groups/group_examples_{train,val,test}.jsonl` | the group task data (regenerate, see above) |
 | `data/lbsn/friendship_old_LBSN_NYC.csv` | optional social context for prompts — old snapshot ONLY |
 
-The adaptation checklist (the `DATASET` variable, two hardcoded `ALIGN_*` filenames, the
-`vocab.pkl` question, the empty `venue_category_id` column) is in `docs/LBSN_HANDOFF.md`.
+The adaptation checklist in `docs/LBSN_HANDOFF.md` (the `DATASET` variable, the two hardcoded
+`ALIGN_*` filenames, `vocab.pkl`, the split discipline) has been **applied and CPU-verified**
+in `notebooks/stage5_lbsn_finetune.ipynb`; the doc remains as provenance for what changed.

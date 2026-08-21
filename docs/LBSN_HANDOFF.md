@@ -1,8 +1,12 @@
 # LBSN track handoff — for the fine-tune adaptation and execution
 
-Audience: whoever adapts `notebooks/stage6b_run2_server.ipynb` to the new dataset (prompts,
-config), and whoever executes the fine-tune on a GPU. Everything upstream of stage 5 is done,
-verified, and committed; nothing below requires re-running anything unless you want to.
+> **UPDATE: the adaptation is DONE.** Every touchpoint below has been applied and
+> CPU-verified in **`notebooks/stage5_lbsn_finetune.ipynb`** — that is the notebook to run
+> (see "Executing the fine-tune"). This doc remains as the record of what changed and why.
+
+Audience: whoever executes the fine-tune on a GPU (and, historically, whoever adapted
+`notebooks/stage6b_run2_server.ipynb` to the new dataset). Everything upstream of stage 5 is
+done, verified, and committed; nothing below requires re-running anything unless you want to.
 
 ## What exists, and the two headline numbers
 
@@ -36,7 +40,15 @@ Id spaces: `user_id` = rank of the raw anonymised id (0–1664); `poi_idx` = ran
 hex id (0–6102). Both contiguous, both recorded in the exported CSVs. Every artifact above
 uses these spaces consistently.
 
-## Adapting `stage6b_run2_server.ipynb` — the exact touchpoints
+## Adapting `stage6b_run2_server.ipynb` — the exact touchpoints (ALL APPLIED in `stage5_lbsn_finetune.ipynb`)
+
+Resolution of each item: (1) done; (2) done — the `ALIGN_*` names now follow `DATASET`;
+(3) resolved — `vocab.pkl` turned out to be a KG entity vocabulary nothing in the notebook
+reads, so it is dropped; (4) moot — prompts read categories from the metadata, not the empty
+column; (5) implemented as the opt-in `USE_SOCIAL_CONTEXT` `[friends]` block (default False),
+with a leakage guard asserting `friendship_new_only` never reaches prompts. Additionally
+`RESPLIT=False` (rule 2 below) and prompt lengths were verified with the real LLaDA-MoE
+tokenizer (max 621 tokens vs the 1013 cap).
 
 1. `DATASET = "LBSN_NYC"` — this alone repoints `train_{DATASET}.csv`,
    `poi_metadata_{DATASET}.csv`, and `EMB_FILE = poi_hyperbolic_embs_{DATASET}.npy`.
@@ -69,12 +81,17 @@ uses these spaces consistently.
 
 ## Executing the fine-tune (supervisor)
 
-Same flow as the TSMC run of `stage6b_run2_server.ipynb`: attach the data files + the two
-align files + `EMB_FILE` where the notebook's `find()` can see them, GPU required, and do a
-`SMOKE_TEST = True` pass first — it exists precisely to catch config drift in minutes instead
-of hours. The D1 gate inside the notebook re-checks the embeddings at load time; with this
-file it will report ρ = +0.71, monotonic — that is the expected PASS state for LBSN_NYC
-(the ≥ +0.8 seen on TSMC is not the bar here; monotone + STRONG is).
+Run **`notebooks/stage5_lbsn_finetune.ipynb`** — setup commands are in its header cell and
+the README. Everything it needs is committed on this branch; `find()` self-locates the data
+whether the kernel cwd is the repo root or `notebooks/`. Needs only a `HF_TOKEN` (free, READ
+scope) and a CUDA GPU. Do a `RUN_PROFILE = "smoke"` pass first (~15 min, any GPU) — it exists
+precisely to catch config drift in minutes instead of hours — then `"full"` (≥40 GB GPU; the
+notebook refuses `"full"` on less). The D1 gate inside the notebook re-checks the embeddings
+at load time; expect `rho=+0.6337 monotonic=True` — that is the PASS state for LBSN_NYC as
+measured by the notebook's own guard (stage 3's D1 said +0.7096 on the same file with its own
+depth parsing; the ≥ +0.8 seen on TSMC is not the bar here — monotone + ρ > 0.30 is).
+`USE_ACC_AT_T_OBJECTIVE=True` is baked in; the proof it is active is the
+`oracle_override=… acc@1/5/10=…` fields on every training log line.
 
 ## Before/alongside the fine-tune (recommended order)
 
