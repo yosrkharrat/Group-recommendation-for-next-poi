@@ -5,7 +5,7 @@ Why this design (read before changing anything)
 -----------------------------------------------
 The obvious construction -- mine real groups that move together, POI A -> POI B, and predict B --
 does not survive contact with the data. Measured on all 147,539 NYC check-ins, across window
-in {30,60,120,180} min and horizon in {240,720,1440} min, with membership matched by exact set
+in {30,60,120,180} min and horizon in {240,180,1440} min, with membership matched by exact set
 *and* by Jaccard >= 0.34:
 
     real group->group transitions:  17 .. 62        (proposal threshold for "trainable": 5,000)
@@ -108,6 +108,7 @@ import random
 import sys
 from collections import Counter, defaultdict
 
+import networkx as nx
 import numpy as np
 import pandas as pd
 
@@ -254,6 +255,83 @@ def build_real_transitions(groups, horizon_min=240, min_shared=2, min_jaccard=0.
                                  gap_min=gap, n_shared=len(shared), jaccard=round(jac, 4),
                                  members="|".join(map(str, sorted(shared)))))
     return pd.DataFrame(rows) if rows else pd.DataFrame()
+
+
+def load_friend_graph(paths):
+    """Undirected friendship graph from one or more `u1,u2` edge-list CSVs (0-based user_id
+    space, matching the notebook's `load_real_social_graph`)."""
+    G = nx.Graph()
+    for p in paths:
+        if not p:
+            continue
+        e = pd.read_csv(p, dtype={"u1": int, "u2": int})
+        G.add_edges_from(zip(e["u1"].tolist(), e["u2"].tolist()))
+    return G
+
+
+def venue_time_bucket_clusters(df, window_min=180):
+    """(poi_idx, local-time bucket) -> sorted distinct user_ids, bucket size >= 2.
+
+    The notebook floors LOCAL time (`utc_time + timezone_offset`) to `{window_min}min` bins via
+    `dt.floor`. That is exactly `(ts_local // window_min) * window_min` in epoch-minutes space, so
+    no datetime object is needed here -- `ts` (epoch minutes, UTC) plus `timezone_offset` (minutes,
+    defaults to 0 if the column is absent) reproduces it.
+    """
+    tz = df["timezone_offset"].to_numpy() if "timezone_offset" in df.columns \
+        else np.zeros(len(df))
+    ts_local = df["ts"].to_numpy() + tz
+    bucket = np.floor(ts_local / window_min).astype(np.int64) * window_min
+    tmp = pd.DataFrame({"poi_idx": df["poi_idx"].to_numpy(), "bucket": bucket,
+                        "user_id": df["user_id"].to_numpy(), "ts": df["ts"].to_numpy(),
+                        "venue_id": df["venue_id"].to_numpy()})
+    out = []
+    for (poi, buck), g in tmp.groupby(["poi_idx", "bucket"], sort=False):
+        users = sorted(set(g["user_id"].tolist()))
+        if len(users) >= 2:
+            out.append((int(poi), int(buck), g["venue_id"].iloc[0], int(g["ts"].min()), users))
+    return out
+
+
+def build_social_groups(clusters, G, min_size=2, max_size=20, max_hops=5):
+    """Group = a connected component, within `max_hops` friendship reachability, of the users
+    co-present at one (venue, time-bucket). This is LLMGPR's stated rule via CubeRec (SIGIR'22):
+    "a set of users who are connected on the social network visit the same venue at the same
+    time" -- NOT the KCGRS anchor-window construction above. Ported near-verbatim from the
+    notebook's `build_groups`/`reachable_within` (same floor-bucket + connected-components
+    algorithm, same default `max_hops`), on purpose, rather than the LLMGPR_TRACK.md fixes
+    (rolling window, cliques) -- those are a documented follow-up, not applied here.
+    """
+    reach_cache = {}
+
+    def reachable_within(u):
+        if u not in reach_cache:
+            reach_cache[u] = nx.single_source_shortest_path_length(G, u, cutoff=max_hops) \
+                if G.has_node(u) else {}
+        return reach_cache[u]
+
+    rows = []
+    for poi, buck, venue_id, t0, users in clusters:
+        present = [u for u in users if G.has_node(u)]
+        if len(present) < min_size:
+            continue
+        present_set = set(present)
+        sub = nx.Graph()
+        sub.add_nodes_from(present)
+        for u in present:
+            for v, dist in reachable_within(u).items():
+                if v != u and v in present_set and 0 < dist <= max_hops:
+                    sub.add_edge(u, v)
+        for comp in nx.connected_components(sub):
+            comp = sorted(comp)
+            if min_size <= len(comp) <= max_size:
+                rows.append(dict(venue_id=venue_id, poi_idx=poi, start_ts=t0, end_ts=t0,
+                                 span_min=0, size=len(comp), members=comp))
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    out = out.sort_values(["poi_idx", "start_ts"], kind="mergesort").reset_index(drop=True)
+    out.insert(0, "group_id", np.arange(len(out)))
+    return out
 
 
 # --------------------------------------------------------------------------
@@ -598,12 +676,18 @@ def report(groups, transitions, co, examples, stats, a):
     print("\n" + "=" * 72)
     print("SUMMARY")
     print("=" * 72)
-    print(f"  real ephemeral groups     {len(groups):,}   "
-          f"(window {a.window}m, sizes {a.min_size}-{a.max_size})")
+    if a.group_source == "social":
+        print(f"  real social groups        {len(groups):,}   "
+              f"(friendship <= {a.social_max_hops} hops, {a.social_window}m bucket, "
+              f"sizes {a.min_size}-{a.max_size})")
+    else:
+        print(f"  real ephemeral groups     {len(groups):,}   "
+              f"(window {a.window}m, sizes {a.min_size}-{a.max_size})")
     if not groups.empty:
-        print(f"    span min/median/max     {groups.span_min.min()}/"
-              f"{groups.span_min.median():.0f}/{groups.span_min.max()}"
-              f"   <- max must be <= {a.window}")
+        if a.group_source != "social":
+            print(f"    span min/median/max     {groups.span_min.min()}/"
+                  f"{groups.span_min.median():.0f}/{groups.span_min.max()}"
+                  f"   <- max must be <= {a.window}")
         sizes = Counter(groups["size"])
         print("    size distribution       " +
               "  ".join(f"{s}:{c}" for s, c in sorted(sizes.items())))
@@ -734,7 +818,20 @@ def run(a):
 
     # --- everything that shapes a group is mined from TRAIN only ---
     train_df = df[df["split"] == "train"]
-    groups = build_ephemeral_groups(train_df, a.window, a.min_size, a.max_size)
+    if a.group_source == "social":
+        if not (a.friend_old or a.friend_new):
+            raise SystemExit("--group-source social needs --friend-old and/or --friend-new")
+        paths = [p for p, tag in ((a.friend_old, "old"), (a.friend_new, "new"))
+                if p and a.friendship in (tag, "union")]
+        G = load_friend_graph(paths)
+        print(f"social graph ({a.friendship}): {G.number_of_nodes():,} users, "
+              f"{G.number_of_edges():,} friendships")
+        clusters = venue_time_bucket_clusters(train_df, a.social_window)
+        print(f"(venue, {a.social_window}min bucket) candidates with >=2 co-present users: "
+              f"{len(clusters):,}")
+        groups = build_social_groups(clusters, G, a.min_size, a.max_size, a.social_max_hops)
+    else:
+        groups = build_ephemeral_groups(train_df, a.window, a.min_size, a.max_size)
     transitions = build_real_transitions(groups, a.horizon) if not groups.empty else pd.DataFrame()
     co = build_co_attended(groups, venue_rarity(train_df))
 
@@ -904,6 +1001,7 @@ def _self_check():
     # The fixture's 30 busy-venue strangers co-occur 40 times but only ever at venue 99, so
     # this is exactly what must exclude them while keeping the planted two-venue pairs.
     a.min_tie_groups, a.min_tie_venues = 1, 2
+    a.group_source = "copresence"
 
     df = resplit_per_user(df, 0.70, 0.10)
     groups = build_ephemeral_groups(df[df.split == "train"], a.window, a.min_size, a.max_size)
@@ -969,6 +1067,46 @@ def _self_check():
     return all(results)
 
 
+def _self_check_social():
+    """Synthetic fixture for the LLMGPR/CubeRec social-group construction (--group-source
+    social): 4 users co-present at one venue, split across two 180-min time buckets, only some
+    connected on the friendship graph."""
+    print("\nSELF-CHECK (social groups) on a synthetic fixture")
+    base = pd.Timestamp("2012-04-03", tz="UTC")
+    rows = []
+
+    def add(u, poi, minute):
+        rows.append(dict(user_id=u, poi_idx=poi, venue_id=f"v{poi}",
+                         utc_time=base + pd.Timedelta(minutes=int(minute)),
+                         timezone_offset=0))
+
+    # bucket 0: users 1 (friends with 2), 2, and stranger 3 -- all co-present
+    add(1, 10, 100); add(2, 10, 105); add(3, 10, 110)
+    # bucket 1 (180 min later): user 1 again, with stranger 4 -- no friend of 1 present
+    add(1, 10, 100 + 180); add(4, 10, 105 + 180)
+
+    df = pd.DataFrame(rows)
+    df["utc_time"] = pd.to_datetime(df["utc_time"], utc=True)
+    df["ts"] = df["utc_time"].astype("int64") // (60 * 10 ** 9)
+
+    G = nx.Graph()
+    G.add_edge(1, 2)
+
+    clusters = venue_time_bucket_clusters(df, window_min=180)
+    groups = build_social_groups(clusters, G, min_size=2, max_size=20, max_hops=5)
+
+    ok = lambda n, c: (print(f"  {'PASS' if c else 'FAIL'}  {n}"), c)[1]
+    results = [
+        ok("two (venue, bucket) candidates found, 180min apart", len(clusters) == 2),
+        ok("exactly one group forms", len(groups) == 1),
+        ok("the group is the friend pair {1,2} -- stranger 3 excluded",
+           not groups.empty and groups.iloc[0]["members"] == [1, 2]),
+        ok("bucket 1 (user 1 with stranger 4, no friend present) forms no group",
+           len(groups) == 1),
+    ]
+    return all(results)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -976,7 +1114,24 @@ def main():
     p.add_argument("--out-dir", default="./data/groups")
     p.add_argument("--dataset", default="NYC")
     # real group mining
-    p.add_argument("--window", type=int, default=60, help="co-presence window, minutes")
+    p.add_argument("--group-source", choices=["copresence", "social"], default="copresence",
+                   help="copresence: bounded anchor windows, KCGRS-style (default, no "
+                        "friendship needed). social: LLMGPR/CubeRec's own rule, ported from "
+                        "group-recommendation-using-fsq-section3.ipynb -- a connected component "
+                        "of FRIENDS co-present at the same venue in the same time bucket. "
+                        "Needs --friend-old/--friend-new")
+    p.add_argument("--friend-old", default=None,
+                   help="social mode: u1,u2 friendship edge CSV (0-based user_id), 'old' snapshot")
+    p.add_argument("--friend-new", default=None,
+                   help="social mode: ...'new' snapshot")
+    p.add_argument("--friendship", choices=["old", "new", "union"], default="union",
+                   help="social mode: which snapshot(s) count as a friendship edge")
+    p.add_argument("--social-window", type=int, default=180,
+                   help="social mode: time-bucket width, minutes (notebook default, floor-based "
+                        "not rolling -- see build_social_groups docstring)")
+    p.add_argument("--social-max-hops", type=int, default=5,
+                   help="social mode: users within this many friendship hops count as reachable")
+    p.add_argument("--window", type=int, default=60, help="copresence mode: window, minutes")
     p.add_argument("--min-size", type=int, default=2)
     p.add_argument("--max-size", type=int, default=8)
     p.add_argument("--horizon", type=int, default=240, help="real-transition horizon, minutes")
@@ -1031,7 +1186,7 @@ def main():
     a = p.parse_args()
 
     if a.self_check:
-        sys.exit(0 if _self_check() else 1)
+        sys.exit(0 if (_self_check() and _self_check_social()) else 1)
     run(a)
 
 

@@ -18,4 +18,5 @@ huggingface_hub
 numpy
 pandas
 scipy
+networkx                # build_groups.py --group-source social
 python-dotenv           # optional: lets the notebook read HF_TOKEN from a .env file

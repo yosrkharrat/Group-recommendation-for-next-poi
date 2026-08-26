@@ -1,21 +1,17 @@
 """
-Build the POI + social knowledge graph for the LBSN2Vec++ Foursquare dataset (NYC subset).
+It reuses the layer builders from `build_kg.py` so the graphs stay structurally comparable
+across datasets, and its outputs are a drop-in for `train_roth.py`.
 
-This is stage 2 for the NEW dataset track: the "Global-scale Check-in Dataset with User Social
-Networks" (Yang et al., section 5 of the Foursquare dataset page). It reuses the layer builders
-from `build_kg.py` so the two graphs stay structurally comparable, and its outputs are a
-drop-in for `train_roth.py`.
+Two input modes, DIFFERENT populations -- tagged with different --dataset names on purpose:
 
-Two input modes, two DIFFERENT populations -- tagged with different --dataset names on purpose:
-
-* `--csv-dir` (canonical track, DS=LBSN_NYC): the house-format files that
-  `prepare_lbsn_csvs.py` derives from the raw global dump, i.e. the population of the
-  `preprocessing-global-fsq` notebook (1,665 users / 6,103 POIs / 159,304 check-ins, real
-  timestamps + coordinates + taxonomy paths). Full-fidelity graph: every build_kg.py layer
-  plus FRIEND_OF.
-* `--mat` (paper-comparable population, DS=MAT_NYC): `dataset_connected_NYC.mat` as shipped
-  with LBSN2Vec (4,024 users / 3,628 POIs / 105,961 check-ins, 8,723 old friendships -- users
-  chosen for social connectivity, but no timestamps/coordinates/names; see below).
+* `--csv-dir` (the generic, CSV-driven track): house-format files from `prepare_lbsn_csvs.py`
+  (DS=LBSN_NYC, 1,665 users / 6,103 POIs / 159,304 check-ins) or `prepare_llmgpr_csvs.py`
+  (DS=LLMGPR, 6,889 users / 14,402 POIs / 423,376 check-ins, 3 cities). Full-fidelity graph:
+  every build_kg.py layer plus FRIEND_OF.
+* `--mat` (LBSN2Vec paper-comparable population only, DS=MAT_NYC): `dataset_connected_NYC.mat`
+  as shipped with LBSN2Vec (4,024 users / 3,628 POIs / 105,961 check-ins, 8,723 old
+  friendships -- users chosen for social connectivity, but no timestamps/coordinates/names;
+  see below). Not applicable to the LLMGPR track, which has no .mat release.
 
 What is genuinely NEW versus the TSMC2014 graph
 -----------------------------------------------
@@ -93,12 +89,16 @@ Outputs
                                              friendship_new_only_<DS>.csv
 
     <DS> = --dataset, default LBSN_NYC. poi_metadata_<DS>.csv is what train_roth.py needs for D1.
+    `--export-dir` only applies to `--mat` mode; `--csv-dir` mode's inputs are already the
+    house-format CSVs, so there is nothing to export.
 
 Usage
 -----
-    python build_kg_lbsn.py --csv-dir ./data/lbsn                  # canonical track
+    python build_kg_lbsn.py --csv-dir ./data/lbsn                  # LBSN_NYC track
     python build_kg_lbsn.py --csv-dir ./data/lbsn --groups-dir ./data/lbsn/groups
-    python build_kg_lbsn.py --mat ./data/lbsn/nyc.mat              # paper population
+    python build_kg_lbsn.py --csv-dir ./data/llmgpr --dataset LLMGPR \
+        --groups-dir ./data/llmgpr/groups_social --out-dir ./data/llmgpr/kg   # LLMGPR track
+    python build_kg_lbsn.py --mat ./data/lbsn/nyc.mat              # LBSN2Vec paper population
     python build_kg_lbsn.py --self-check
 """
 

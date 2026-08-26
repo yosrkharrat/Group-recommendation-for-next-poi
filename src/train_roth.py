@@ -224,18 +224,21 @@ def depth_loss(model, hier, margin, c=1.0, rel_groups=None, root_pull=0.0):
 
 
 @torch.no_grad()
-def link_prediction(model, triples, n_ent, filt, per_relation=None, max_eval=3000, seed=0):
+def link_prediction(model, triples, n_ent, filt, per_relation=None, max_eval=3000, seed=0,
+                    device=None):
     """Filtered MRR / Hits@1 by corrupting the tail against all entities."""
+    device = device or torch.device("cpu")
     g = torch.Generator().manual_seed(seed)
     idx = torch.randperm(len(triples), generator=g)[:max_eval]
     sub = triples[idx]
-    all_ent = torch.arange(n_ent)
+    all_ent = torch.arange(n_ent, device=device)
     ranks, by_rel = [], {}
     for h, r, t in sub.tolist():
-        s = model.score(torch.tensor([h]), torch.tensor([r]), all_ent.unsqueeze(0))[0]
+        s = model.score(torch.tensor([h], device=device), torch.tensor([r], device=device),
+                        all_ent.unsqueeze(0))[0]
         known = filt.get((h, r), ())
         if known:
-            k = torch.tensor([x for x in known if x != t], dtype=torch.long)
+            k = torch.tensor([x for x in known if x != t], dtype=torch.long, device=device)
             if len(k):
                 s[k] = -1e9
         rank = int((s > s[t]).sum().item()) + 1
@@ -281,8 +284,10 @@ def d1_radial_hierarchy(z_poi, depths):
 
 
 def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None, depths=None):
+    device = torch.device(getattr(a, "device", None) or "cpu")
     torch.manual_seed(a.seed)
-    gen = torch.Generator().manual_seed(a.seed)
+    gen = torch.Generator().manual_seed(a.seed)      # kept on CPU: randperm/randint stay CPU-side,
+                                                      # only the small per-batch slices move to device
 
     # held-out triples for link prediction
     perm = torch.randperm(len(triples), generator=gen)
@@ -323,12 +328,13 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
     rel_w = (cnt.sum() / cnt)
     rel_w = (rel_w / rel_w.mean()).clamp(max=a.max_rel_weight)
 
-    model = RotH(n_ent, n_rel, a.dim)
+    model = RotH(n_ent, n_rel, a.dim).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=a.lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=a.epochs, eta_min=a.lr * 0.02)
 
     # boolean mask per hierarchy relation, so the depth loss weights each type equally
     rel_groups = []
+    hier = hier.to(device)
     if hier.numel() and hier.shape[1] == 3:
         for r in sorted(set(hier[:, 2].tolist())):
             rel_groups.append(hier[:, 2] == r)
@@ -336,8 +342,8 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
             f"{name_of[r]}={int((hier[:,2]==r).sum()):,}" for r in sorted(set(hier[:, 2].tolist()))))
 
     n_batches = math.ceil(len(train_t) / a.batch_size)
-    print(f"entities={n_ent:,} relations={n_rel} dim={a.dim}  train triples={len(train_t):,} "
-          f"val={len(val_t):,}  hierarchy pairs={len(hier):,}")
+    print(f"device={device}  entities={n_ent:,} relations={n_rel} dim={a.dim}  "
+          f"train triples={len(train_t):,} val={len(val_t):,}  hierarchy pairs={len(hier):,}")
     print(f"epochs={a.epochs} batch={a.batch_size} negatives={a.n_neg} "
           f"depth_weight={a.depth_weight} margin={a.depth_margin}\n")
 
@@ -349,12 +355,14 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
         tot = tot_kge = tot_depth = 0.0
         for b in range(n_batches):
             bi = order[b * a.batch_size:(b + 1) * a.batch_size]
-            h, r, t = train_t[bi, 0], train_t[bi, 1], train_t[bi, 2]
-            neg = sample_negatives(t, r, a.n_neg, n_ent, pools, gen)
+            h_cpu, r_cpu, t_cpu = train_t[bi, 0], train_t[bi, 1], train_t[bi, 2]
+            neg_cpu = sample_negatives(t_cpu, r_cpu, a.n_neg, n_ent, pools, gen)
+            w_r = rel_w[r_cpu].to(device)
+            h, r, t, neg = (x.to(device) for x in (h_cpu, r_cpu, t_cpu, neg_cpu))
 
             pos_s = model.score(h, r, t)
             neg_s = model.score(h, r, neg)
-            l_kge = nssa_loss(pos_s, neg_s, a.gamma, a.alpha, rel_w[r])
+            l_kge = nssa_loss(pos_s, neg_s, a.gamma, a.alpha, w_r)
             l_depth = depth_loss(model, hier, a.depth_margin,
                                  rel_groups=rel_groups, root_pull=a.root_pull)
             loss = l_kge + a.depth_weight * l_depth
@@ -373,7 +381,7 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
             if depths is not None and poi_rows is not None:
                 model.eval()
                 with torch.no_grad():
-                    z = model.ball_points(1.0).numpy()[poi_rows]
+                    z = model.ball_points(1.0).cpu().numpy()[poi_rows]
                 d1 = d1_radial_hierarchy(z, depths)
                 msg += f"  D1_rho={d1['spearman']:+.4f} ({d1['verdict']})"
                 history.append(dict(epoch=epoch, loss=tot / n_batches,
@@ -382,7 +390,7 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
 
     model.eval()
     lp = link_prediction(model, val_t, n_ent, filt, per_relation=name_of,
-                         max_eval=a.max_eval, seed=a.seed)
+                         max_eval=a.max_eval, seed=a.seed, device=device)
     return model, lp, history
 
 
@@ -430,8 +438,8 @@ def run(a):
 
     os.makedirs(a.out_dir, exist_ok=True)
     with torch.no_grad():
-        z_all = model.ball_points(a.curvature).numpy().astype(np.float32)
-    torch.save({"state_dict": model.state_dict(), "dim": a.dim,
+        z_all = model.ball_points(a.curvature).cpu().numpy().astype(np.float32)
+    torch.save({"state_dict": {k: v.cpu() for k, v in model.state_dict().items()}, "dim": a.dim,
                 "curvature_per_relation": torch.nn.functional.softplus(
                     model.c_logit.detach()).tolist()},
                os.path.join(a.out_dir, "roth_best.pt"))
@@ -547,10 +555,13 @@ def main():
     p.add_argument("--max-eval", type=int, default=2000)
     p.add_argument("--log-every", type=int, default=10)
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--device", default=None,
+                   help="'cuda' or 'cpu'; default auto-picks cuda if torch.cuda.is_available()")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:
         sys.exit(0 if _self_check() else 1)
+    a.device = a.device or ("cuda" if torch.cuda.is_available() else "cpu")
     run(a)
 
 
