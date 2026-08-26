@@ -1,0 +1,123 @@
+{
+  "config": {
+    "data_dir": "./data/llmgpr",
+    "out_dir": "/private/tmp/claude-502/-Users-macbook-Documents-POI/850abc9f-12a0-48c3-a5a4-63ed04ed27d1/scratchpad/groups_social_llmgpr",
+    "dataset": "LLMGPR",
+    "group_source": "social",
+    "friend_old": "./data/llmgpr/friendship_old_LLMGPR.csv",
+    "friend_new": null,
+    "friendship": "old",
+    "social_window": 180,
+    "social_max_hops": 5,
+    "window": 60,
+    "min_size": 2,
+    "max_size": 8,
+    "horizon": 240,
+    "min_companion_repeat": 2,
+    "max_venue_visitors": 50,
+    "min_tie_groups": 2,
+    "min_tie_venues": 1,
+    "regimes": [
+      "established",
+      "occasional",
+      "random"
+    ],
+    "affinity_percentile": 99.0,
+    "far_gap_min": 180,
+    "sizes": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "constraint": "cat-inter",
+    "cat_level": 2,
+    "hist_len": 90,
+    "min_hist": 1,
+    "min_member_activity": 5,
+    "require_companion_history": true,
+    "profile_top_k": 10,
+    "profile_cats": 3,
+    "profile_hours": 3,
+    "resplit": false,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "seed": 42,
+    "self_check": false
+  },
+  "n_pois": 14402,
+  "n_users": 6889,
+  "n_checkins": 423376,
+  "n_ephemeral_groups": 4804,
+  "n_real_transitions": 308,
+  "n_co_attended": 6685,
+  "affinity": {
+    "validation": {
+      "n_pairs": 23725716,
+      "n_copresent": 6685,
+      "base_rate": 0.0002817617811829156,
+      "auc": {
+        "rhythm": 0.7902498580413455,
+        "taste": 0.7801709463754425,
+        "territory": 0.7618992638838374,
+        "far_covisit": 0.5793577619121147,
+        "COMBINED": 0.893809473707373
+      },
+      "thresholds": {
+        "99.9": {
+          "threshold": 7.636639578798154,
+          "n_pairs": 23726,
+          "n_users": 4685,
+          "precision": 0.018797943184691898,
+          "lift": 66.71573094751467
+        },
+        "99.5": {
+          "threshold": 5.857186225346108,
+          "n_pairs": 118629,
+          "n_users": 6181,
+          "precision": 0.008463360561076971,
+          "lift": 30.03729081192414
+        },
+        "99.0": {
+          "threshold": 5.134722228389018,
+          "n_pairs": 237258,
+          "n_users": 6660,
+          "precision": 0.006103060803007696,
+          "lift": 21.660357119355655
+        },
+        "98.0": {
+          "threshold": 4.37541389204498,
+          "n_pairs": 474515,
+          "n_users": 6854,
+          "precision": 0.00445718259696743,
+          "lift": 15.818975086879837
+        }
+      }
+    },
+    "clique_threshold": 5.134722228389018,
+    "n_clique_eligible_users": 6660
+  },
+  "counts": {
+    "train": 71933,
+    "val": 16164,
+    "test": 33193
+  },
+  "stats": {
+    "individual_examples": 416487,
+    "candidates_established": 365442,
+    "skip_constraint_established": 262994,
+    "skip_no_companions_occasional": 397571,
+    "candidates_random": 416487,
+    "skip_constraint_random": 397392,
+    "emitted": 121290,
+    "candidates_occasional": 18916,
+    "skip_constraint_occasional": 10436,
+    "skip_no_companions_established": 51045,
+    "skip_inactive_member_established": 5264,
+    "skip_inactive_member_random": 1296,
+    "skip_anchor_only_history_random": 730,
+    "skip_inactive_member_occasional": 123,
+    "skip_anchor_only_history_established": 1243,
+    "skip_anchor_only_history_occasional": 77
+  }
+}
