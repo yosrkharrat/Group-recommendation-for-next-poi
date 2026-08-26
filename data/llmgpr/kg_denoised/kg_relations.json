@@ -1,0 +1,37 @@
+{
+  "relation_to_id": {
+    "HAS_CATEGORY": 0,
+    "SUBCATEGORY_OF": 1,
+    "LOCATED_IN": 2,
+    "IS_NEAR_TO": 3,
+    "FOLLOWED_BY": 4,
+    "VISITED": 5,
+    "PREFERS_CATEGORY": 6,
+    "FRIEND_OF": 7,
+    "OCCURRED_AT": 8,
+    "GROUP_PREFERS": 9,
+    "MEMBER_OF": 10,
+    "CO_ATTENDED": 11
+  },
+  "counts": {
+    "FOLLOWED_BY": 177599,
+    "VISITED": 121864,
+    "CO_ATTENDED": 108762,
+    "IS_NEAR_TO": 76666,
+    "MEMBER_OF": 42919,
+    "FRIEND_OF": 17280,
+    "LOCATED_IN": 14405,
+    "HAS_CATEGORY": 14402,
+    "OCCURRED_AT": 13478,
+    "GROUP_PREFERS": 13478,
+    "PREFERS_CATEGORY": 10123,
+    "SUBCATEGORY_OF": 348
+  },
+  "hierarchy_relations": [
+    "HAS_CATEGORY",
+    "SUBCATEGORY_OF",
+    "LOCATED_IN",
+    "PREFERS_CATEGORY",
+    "GROUP_PREFERS"
+  ]
+}
