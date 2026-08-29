@@ -44,6 +44,31 @@ Foursquare taxonomy paths. Per-user chronological 70/10/20 already applied
 Id spaces: `user_id` = rank of the raw numeric id (0–6,888); `poi_idx` = rank of the venue hex id
 (0–14,401). Both contiguous, consistent across every artifact above.
 
+## What the fine-tune actually reads — the full KG is NOT needed
+
+Verified by enumerating every read in the notebook and by running §6b's alignment training on
+CPU with nothing else present. It reads **seven** files:
+
+```
+data/llmgpr/{train,val,test}_LLMGPR.csv        check-in splits
+data/llmgpr/poi_metadata_LLMGPR.csv           N_POI, taxonomy paths, poi_cat
+data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR.npy    EMB_FILE  (§2, §7)
+data/llmgpr/kg_denoised/poi_poi_triples_LLMGPR.pt         ALIGN_TRIPLES_FILE  (§6b)
+data/llmgpr/kg_denoised/poi_relation_vocab_LLMGPR.json    ALIGN_RELVOCAB_FILE (§6b)
+```
+
+plus `friendship_{old,new_only}_LLMGPR.csv` when `USE_SOCIAL_CONTEXT=True`, and the
+`groups_social/group_examples_*.jsonl` it builds itself for §9b.
+
+`kg_triples.pt`, `kg_entities.json`, `kg_hierarchy.pt`, `kg_relations.json`, `kg_poi_rows.json`,
+`kg_manifest.json` and `roth_best.pt` are **not referenced anywhere in the notebook**. The full
+knowledge graph is an *intermediate* — `train_roth.py` consumes it to produce the embeddings, and
+`build_poi_poi_triples.py` distils its POI→POI subset into the two alignment files. Only those
+outputs cross into stage 5, and all of them are committed. Nothing is missing.
+
+(`roth_results.json` appears in prose only, as the place the D1 number *would* be recorded — no
+code reads it. See risk 2.)
+
 ## Running it
 
 ```bash
@@ -199,8 +224,12 @@ PYTHONHASHSEED=2  rows=10124  sha1=cec7ea3c997d91ce     # different KG
 PYTHONHASHSEED=3  rows=10125  sha1=3b3cdc03299df3e7
 ```
 
-Effect is small (±2 in ~10,124) and does not block the fine-tune, but the committed embeddings
-cannot be regenerated bit-exactly and D1 ρ will wobble between rebuilds. Fix is a deterministic
+**It does not affect the fine-tune's inputs.** The two rebuilds agreed exactly on
+`IS_NEAR_TO` (76,666) and `FOLLOWED_BY` (177,599) — and those two are the entire POI→POI subset
+that becomes the alignment file (76,666 + 177,599 = 254,265, matching the committed file). Only
+`PREFERS_CATEGORY` moved, and it is a USER→CATEGORY relation that `build_poi_poi_triples.py`
+drops. So the alignment triples are reproducible; what is not bit-reproducible is the KG that
+`train_roth.py` sees, so a *retrained* embedding file would differ slightly and D1 ρ would wobble. Fix is a deterministic
 tie-break at both sites (`key=lambda nd: (-mass[nd], nd)`). **Not applied here** — it changes the
 KG the committed embeddings were trained on, and `build_kg.py` is shared with the LBSN track, so
 it needs a coordinated decision. Until then, pin `PYTHONHASHSEED` when rebuilding.
