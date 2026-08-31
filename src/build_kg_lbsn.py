@@ -392,8 +392,12 @@ def run_csv(a):
     df["split"] = df["orig_split"]        # prepare_lbsn_csvs already split per-user 70/10/20
     meta = pd.read_csv(os.path.join(a.csv_dir, f"poi_metadata_{a.dataset}.csv"))
     cat_of = meta.set_index("poi_idx")["category"].fillna("Unknown").astype(str).to_dict()
-    friends_old = pd.read_csv(
-        os.path.join(a.csv_dir, f"friendship_old_{a.dataset}.csv")).to_numpy()
+    # --friendship-old lets a DENOISED graph (denoise_social_gbsr.py's output) feed FRIEND_OF.
+    # Before this override existed the filename below was hardcoded, which is exactly how the
+    # FSQ arm shipped un-denoised embeddings while its prose said otherwise (LLMGPR_TRACK.md §2).
+    fo_path = a.friendship_old or os.path.join(a.csv_dir, f"friendship_old_{a.dataset}.csv")
+    print(f"FRIEND_OF source: {fo_path}")
+    friends_old = pd.read_csv(fo_path).to_numpy()
     np_path = os.path.join(a.csv_dir, f"friendship_new_only_{a.dataset}.csv")
     new_only = pd.read_csv(np_path).to_numpy() if os.path.exists(np_path) else \
         np.zeros((0, 2), dtype=int)
@@ -606,6 +610,10 @@ def main():
                    help="JSON: category name -> [full taxonomy paths]")
     p.add_argument("--groups-dir", default=None,
                    help="build_groups.py-schema outputs for the group layer")
+    p.add_argument("--friendship-old", default=None,
+                   help="csv mode: override the FRIEND_OF edge file (u1,u2) -- pass "
+                        "friendship_old_denoised_<DS>.csv to build the KG on the GBSR-denoised "
+                        "graph; default keeps csv-dir's friendship_old_<DS>.csv")
     p.add_argument("--out-dir", default=None,
                    help="default: ./data/kg_lbsn (csv mode) / ./data/kg_lbsn_mat (mat mode)")
     p.add_argument("--export-dir", default=None,

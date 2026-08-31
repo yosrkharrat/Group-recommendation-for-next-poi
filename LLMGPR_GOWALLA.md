@@ -126,15 +126,105 @@ check-ins (the leave-one-out floor); friendship mean degree 8.8 over 84.6% of us
 GBSR/social pre-check that failed on Foursquare (degree 3.2, 28%) starts from much better ground
 here.
 
-## 5. Next steps
+## 5. The pipeline on Gowalla (2026-08-31, second commit on this branch)
 
-0. Wire `src/prepare_llmgpr_csvs.py` (or a Gowalla twin) to the `gowalla_final_*` files — the
-   blockers are Gowalla-specific: category names are Gowalla's own vocabulary (no
-   `fsq_category_paths_2014.json` mapping), and the friendship file has no old/new split.
-1. Group construction (their 2,186 groups / 3.54 ck/group / 2.95 users/group) — same §4 rebuild
-   as Foursquare: rolling window + cliques + recurring member-sets, on the friendship graph.
-   CubeRec's own Gowalla yields 2.66 int./group at 2.31 users/group — their 3.54/2.95 is close
-   to the cited method's range here, unlike Foursquare's 7.34.
-2. The 500-candidate evaluator can reuse `gowalla_final_catalogue.csv` directly (coords + city).
+Stages 0–4 of the `llmgpr-pipeline` flow, run on the adopted build. Two arms, mirroring the
+FSQ track's control/denoised split — and this time the denoised arm is real, because the
+`build_kg_lbsn.py` hardcode that silently kept GBSR's output out of the FSQ KG now has a
+`--friendship-old` override.
+
+### Stage 0 — `src/prepare_gowalla_csvs.py`
+
+`gowalla_final_*` → house CSVs (`--dataset GOWALLA`), same schema as `prepare_llmgpr_csvs.py`
+so every downstream stage runs unchanged. Gowalla-specific decisions (full docstring in the
+script): taxonomy from `gowalla_category_structure.json` (7>134>128 tree, exported as
+`gowalla_category_paths.json` for the KG; 85.9% of named categories resolve, depth histogram
+1:7,926 / 2:29,219 / 3:10,638), friendship = ONE crawl snapshot written to `friendship_old_*`
+with `friendship_new_only_*` EMPTY (no before/after split exists; leakage rule inapplicable),
+`timezone_offset` = city standard time (UTC is authoritative). Splits: 646,749 / 87,803 /
+168,493 over 31,667 users / 47,783 POIs; lat/lon coverage **100.0%** (FSQ managed 43%), so
+`IS_NEAR_TO` covers every POI.
+
+### Stage 1 — groups (`build_groups.py --group-source social`, raw arm)
+
+```
+real social groups (LLMGPR/CubeRec rule)   36,621   sizes 2:31,120 .. 8:42, mean 2.22
+distinct member-sets                       18,362   1.99 pooled check-ins each
+  >= 2 pooled events                        2,987
+  >= 3 pooled events                        1,782      <- LLMGPR's 2,186 sits between these
+real group->group transitions              90,152
+trainable examples (occasional+random)     39,317 train / 8,041 val / 16,970 test
+```
+
+Two findings worth the trip:
+
+- **The recurrence-filter hypothesis confirms on a second dataset.** LLMGPR's 2,186 groups is
+  bracketed by our ≥2 (2,987) and ≥3 (1,782) recurring member-sets, exactly the FSQ §4.0
+  pattern (their 1,715 vs our ≤1,487 there). Their group count is a recurrence-filtered subset
+  of what the cited procedure yields; the filter is still documented nowhere.
+- **Real group transitions are TRAINABLE on Gowalla: 90,152.** On FSQ-NYC the same measurement
+  gave 17–62, and the entire regime construction exists because of that scarcity. Gowalla's
+  denser co-presence + real friendships change the design space: the natural task (group at A →
+  predict B) has data here. Flagged for the evaluation plan.
+
+One scale patch, measured not asserted: the dense `[n,n]` affinity machinery (five ~8 GB
+matrices at 31.7k users) is now built **only when `established` ∈ `--regimes`** — it is that
+regime's only consumer. Gowalla runs `--regimes occasional random`; adding `established` back
+needs a sparse/blocked `affinity.py` rewrite, not a bigger machine.
+
+### Stage 2 — GBSR (`denoise_social_gbsr.py`)
+
+The val-NDCG overflow flagged in `LLMGPR_FINETUNE_HANDOFF.md` (known issue b) is fixed: scores
+are computed in float64 and non-finite values floored, so a diverged epoch can never win model
+selection. Run config: defaults except `--batch-size 4096` (full-graph propagation per batch ×
+457 batches at 1024 was ~4 min/epoch on CPU; sparse ops have no MPS support). Input: 117,949
+undirected edges over 26,779 users, mean degree 8.8 — 2.8× denser than the FSQ graph GBSR
+no-op'd on, so the mask has redundancy to work with this time.
+
+### Stages 2b/3 — KG + RotH (raw arm)
+
+`build_kg_lbsn.py` (PYTHONHASHSEED=0; the `prefers_category` tie-break issue is unchanged):
+**116,401 entities / 2,125,760 triples / 12 relations**, group layer included (MEMBER_OF
+36,621 sets, CO_ATTENDED 63,616, OCCURRED_AT + GROUP_PREFERS 36,621 each), hierarchy 187,791
+pairs, leakage guard green (trivially — the new-only set is empty by construction).
+
+`train_roth.py`: fixed a genuine device bug (`ball_points` created its reference curvature on
+CPU — every non-CPU run crashed at the first `depth_loss`; self-check still passes). Run
+config vs the FSQ handoff: `--batch-size 4096 --n-neg 32 --epochs 50` on MPS — measured
+necessity, not preference: the handoff's 512/128/120 is 8+ min/epoch ≈ 20+ hours on this
+machine (the FSQ arm trained on Kaggle CUDA). Deviations are in `roth_results.json`'s config
+dump.
+
+### Commands (repro)
+
+```bash
+python src/prepare_gowalla_csvs.py
+python src/denoise_social_gbsr.py --data-dir ./data/gowalla --csv-dir ./data/gowalla \
+       --dataset GOWALLA --out-dir ./data/gowalla --batch-size 4096
+# raw / control arm
+python src/build_groups.py --data-dir ./data/gowalla --dataset GOWALLA \
+       --out-dir ./data/gowalla/groups_social_raw --no-resplit --group-source social \
+       --friendship old --friend-old ./data/gowalla/friendship_old_GOWALLA.csv \
+       --regimes occasional random --profile-top-k 10 --hist-len 90
+PYTHONHASHSEED=0 python src/build_kg_lbsn.py --csv-dir ./data/gowalla --dataset GOWALLA \
+       --taxonomy ./data/gowalla/gowalla_category_paths.json \
+       --groups-dir ./data/gowalla/groups_social_raw \
+       --friendship-old ./data/gowalla/friendship_old_GOWALLA.csv --out-dir ./data/gowalla/kg_raw
+PYTORCH_ENABLE_MPS_FALLBACK=1 python src/train_roth.py --kg-dir ./data/gowalla/kg_raw \
+       --data-dir ./data/gowalla --dataset GOWALLA --out-dir ./data/gowalla/kg_raw \
+       --epochs 50 --batch-size 4096 --n-neg 32 --log-every 5 --max-eval 4000 \
+       --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01 --device mps
+# denoised arm: rerun the last three with --friend-old/--friendship-old
+#   ./data/gowalla/friendship_old_denoised_GOWALLA.csv, out-dirs *_denoised
+```
+
+## 6. Next steps
+
+1. When GBSR lands: build `groups_social_denoised` + `kg_denoised` + RotH on the denoised
+   graph (commands above), then compare arms — mask-weight separation first (`gbsr_denoise_manifest.json`);
+   if the mask collapses to a constant here too, the FSQ no-op generalizes and that is the result.
+2. `build_poi_poi_triples.py` on whichever KG wins → the stage-5 alignment file.
+3. The 500-candidate evaluator (`gowalla_final_catalogue.csv` has coords + city).
+4. The 90,152 real transitions deserve a real-group eval arm — FSQ never had this option.
 
 **Do not** re-open the ≥10 reading for Gowalla — §2(a) is a structural bound, not a tuning miss.

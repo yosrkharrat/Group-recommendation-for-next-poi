@@ -850,14 +850,23 @@ def run(a):
     train_df = train_df.copy()
     train_df["day"] = train_df["utc_time"].dt.floor("D")
 
-    A, comp = build_affinity(train_df, cat_of, loc_of, users,
-                             cat_level=a.cat_level, far_gap_min=a.far_gap_min)
-    Y = copresence_labels(groups, users)
-    validation = validate(A, comp, Y, verbose=True)
-    clique_nbrs, clique_G, clique_thr = clique_neighbourhood(A, a.affinity_percentile)
-    n_eligible = sum(1 for v in clique_nbrs.values() if v)
-    print(f"  affinity graph: top {100-a.affinity_percentile:.1f}% (cut={clique_thr:.3f}), "
-          f"{n_eligible}/{len(users)} users with >=1 neighbour")
+    if "established" in a.regimes:
+        A, comp = build_affinity(train_df, cat_of, loc_of, users,
+                                 cat_level=a.cat_level, far_gap_min=a.far_gap_min)
+        Y = copresence_labels(groups, users)
+        validation = validate(A, comp, Y, verbose=True)
+        clique_nbrs, clique_G, clique_thr = clique_neighbourhood(A, a.affinity_percentile)
+        n_eligible = sum(1 for v in clique_nbrs.values() if v)
+        print(f"  affinity graph: top {100-a.affinity_percentile:.1f}% (cut={clique_thr:.3f}), "
+              f"{n_eligible}/{len(users)} users with >=1 neighbour")
+    else:
+        # The dense [n,n] affinity matrices exist only to build `established` cliques, and no
+        # other regime or output reads them. At Gowalla scale (31.7k users) each one is ~8 GB,
+        # so they are skipped whenever `established` is not requested -- adding it back needs
+        # the sparse/blocked rewrite noted in LLMGPR_GOWALLA.md, not a bigger machine.
+        clique_nbrs, clique_G, clique_thr = {}, nx.Graph(), None
+        validation, n_eligible = None, 0
+        print(f"  affinity graph skipped ('established' not in --regimes {a.regimes})")
 
     visitors = train_df.groupby("poi_idx")["user_id"].nunique().to_dict()
     real_by_user = defaultdict(list)

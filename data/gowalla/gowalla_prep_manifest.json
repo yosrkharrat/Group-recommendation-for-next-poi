@@ -1,0 +1,22 @@
+{
+  "dataset": "GOWALLA",
+  "source": "LLMGPR_GOWALLA.md adopted build (R=15 collection, day-dedup, no user filter)",
+  "n_checkins": 903045,
+  "n_users": 31667,
+  "n_pois": 47783,
+  "n_friend_edges_undirected": 117949,
+  "friendship_semantics": "single crawl snapshot; 'old' filename kept for pipeline compat; no before/after split exists for Gowalla",
+  "timezone_offset": "city standard time, minutes, no DST (UTC times are authoritative)",
+  "latlon_coverage": 1.0,
+  "taxonomy_depth_histogram": {
+    "3": 10638,
+    "2": 29219,
+    "1": 7926
+  },
+  "named_category_tree_coverage": 0.8593937775403926,
+  "splits": {
+    "train": 646749,
+    "val": 87803,
+    "test": 168493
+  }
+}

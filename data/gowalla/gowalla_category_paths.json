@@ -1,0 +1,803 @@
+{
+ "Accessories": [
+  "Shopping>Apparel>Accessories"
+ ],
+ "Administration": [
+  "Community>Campus Spot>Administration"
+ ],
+ "African": [
+  "Food>African"
+ ],
+ "Airport": [
+  "Travel>Airport"
+ ],
+ "American": [
+  "Food>American"
+ ],
+ "Antique Hotel": [
+  "Travel>Hotel>Antique Hotel"
+ ],
+ "Antiques": [
+  "Shopping>Antiques"
+ ],
+ "Apartment": [
+  "Community>Home>Apartment"
+ ],
+ "Apparel": [
+  "Shopping>Apparel"
+ ],
+ "Aquarium": [
+  "Entertainment>Aquarium"
+ ],
+ "Arcade": [
+  "Entertainment>Arcade"
+ ],
+ "Architecture": [
+  "Outdoors>Architecture"
+ ],
+ "Arena": [
+  "Entertainment>Arena or Stadium>Arena"
+ ],
+ "Arena or Stadium": [
+  "Entertainment>Arena or Stadium"
+ ],
+ "Art": [
+  "Entertainment>Art"
+ ],
+ "Art & Culture": [
+  "Entertainment>Art & Culture"
+ ],
+ "Asian": [
+  "Food>Asian"
+ ],
+ "Asian Art Museum": [
+  "Entertainment>Art>Asian Art Museum"
+ ],
+ "Asian Food": [
+  "Food>Asian>Asian Food"
+ ],
+ "Aviary": [
+  "Entertainment>Zoo>Aviary"
+ ],
+ "BBQ": [
+  "Food>BBQ"
+ ],
+ "Bakery": [
+  "Food>Bakery"
+ ],
+ "Bank & Financial": [
+  "Shopping>Bank & Financial"
+ ],
+ "Bar": [
+  "Nightlife>Bar"
+ ],
+ "Baseball Field": [
+  "Entertainment>Local Sports>Baseball Field"
+ ],
+ "Baseball Stadium": [
+  "Entertainment>Arena or Stadium>Baseball Stadium"
+ ],
+ "Basketball Court": [
+  "Entertainment>Local Sports>Basketball Court"
+ ],
+ "Beach": [
+  "Outdoors>Beach"
+ ],
+ "Bears": [
+  "Entertainment>Zoo>Bears"
+ ],
+ "Bed & Breakfast": [
+  "Travel>Hotel>Bed & Breakfast"
+ ],
+ "Bike Shop": [
+  "Shopping>Sports & Outdoors>Bike Shop"
+ ],
+ "Bookstore": [
+  "Shopping>Bookstore"
+ ],
+ "Bowling": [
+  "Entertainment>Bowling"
+ ],
+ "Breakfast": [
+  "Food>Breakfast"
+ ],
+ "Bridge": [
+  "Travel>Bridge"
+ ],
+ "Burgers": [
+  "Food>Burgers"
+ ],
+ "Bus Station": [
+  "Travel>Bus Station"
+ ],
+ "Campground": [
+  "Outdoors>Park>Campground"
+ ],
+ "Camping & Outdoors": [
+  "Shopping>Sports & Outdoors>Camping & Outdoors"
+ ],
+ "Campus - Other": [
+  "Community>Campus Spot>Campus - Other"
+ ],
+ "Campus Commons": [
+  "Community>Campus Spot>Campus Commons"
+ ],
+ "Campus Spot": [
+  "Community>Campus Spot"
+ ],
+ "Canal": [
+  "Outdoors>Canal"
+ ],
+ "Candy Store": [
+  "Food>Dessert>Candy Store"
+ ],
+ "Casino": [
+  "Entertainment>Casino"
+ ],
+ "Castle": [
+  "Outdoors>Architecture>Castle"
+ ],
+ "Cave": [
+  "Outdoors>Cave"
+ ],
+ "Cemetery": [
+  "Outdoors>Cemetery"
+ ],
+ "Chalet": [
+  "Outdoors>Ski & Snowboard Area>Chalet"
+ ],
+ "Children's Apparel": [
+  "Shopping>Apparel>Children's Apparel"
+ ],
+ "Chocolate": [
+  "Food>Dessert>Chocolate"
+ ],
+ "Church": [
+  "Community>Place of Worship>Church"
+ ],
+ "City Hall": [
+  "Community>Government>City Hall"
+ ],
+ "City Park": [
+  "Outdoors>Park>City Park"
+ ],
+ "Coffee Shop": [
+  "Food>Coffee Shop"
+ ],
+ "College": [
+  "Community>School>College"
+ ],
+ "Community": [
+  "Community"
+ ],
+ "Condo": [
+  "Community>Home>Condo"
+ ],
+ "Contemporary Church": [
+  "Community>Place of Worship>Contemporary Church"
+ ],
+ "Convention Center": [
+  "Entertainment>Convention Center"
+ ],
+ "Corporate Office": [
+  "Community>Office>Corporate Office"
+ ],
+ "Courthouse": [
+  "Community>Government>Courthouse"
+ ],
+ "Coworking": [
+  "Community>Office>Coworking"
+ ],
+ "Crafts & Creative": [
+  "Shopping>Crafts & Creative"
+ ],
+ "Craftsman": [
+  "Community>Home>Craftsman"
+ ],
+ "Dancefloor": [
+  "Nightlife>Dancefloor"
+ ],
+ "Dentist": [
+  "Shopping>Medical>Dentist"
+ ],
+ "Department Store": [
+  "Shopping>Department Store"
+ ],
+ "Dessert": [
+  "Food>Dessert"
+ ],
+ "Diner": [
+  "Food>Diner"
+ ],
+ "Disc Golf Course": [
+  "Entertainment>Disc Golf Course"
+ ],
+ "Discount Store": [
+  "Shopping>Discount Store"
+ ],
+ "Dive Bar": [
+  "Nightlife>Dive Bar"
+ ],
+ "Doctor's Office": [
+  "Shopping>Medical>Doctor's Office"
+ ],
+ "Dog Park": [
+  "Outdoors>Dog Park"
+ ],
+ "Dormitory": [
+  "Community>Campus Spot>Dormitory"
+ ],
+ "Doughnuts": [
+  "Food>Doughnuts"
+ ],
+ "Drugstore & Pharmacy": [
+  "Shopping>Drugstore & Pharmacy",
+  "Shopping>Medical>Drugstore & Pharmacy"
+ ],
+ "Duplex": [
+  "Community>Home>Duplex"
+ ],
+ "Elephants": [
+  "Entertainment>Zoo>Elephants"
+ ],
+ "Entertainment": [
+  "Entertainment"
+ ],
+ "Farm": [
+  "Outdoors>Farm"
+ ],
+ "Farmers Market": [
+  "Shopping>Farmers Market"
+ ],
+ "Ferry": [
+  "Travel>Ferry"
+ ],
+ "Fine Dining": [
+  "Food>Fine Dining"
+ ],
+ "Fire Station": [
+  "Community>Government>Fire Station"
+ ],
+ "Fish & Chips": [
+  "Food>Fish & Chips"
+ ],
+ "Flower Shop": [
+  "Shopping>Flower Shop"
+ ],
+ "Food": [
+  "Food"
+ ],
+ "Football Field": [
+  "Entertainment>Local Sports>Football Field"
+ ],
+ "Fountain": [
+  "Outdoors>Fountain"
+ ],
+ "Frat House": [
+  "Community>Campus Spot>Frat House"
+ ],
+ "French": [
+  "Food>French"
+ ],
+ "Frozen Yogurt": [
+  "Food>Dessert>Frozen Yogurt"
+ ],
+ "Furniture": [
+  "Shopping>Furniture"
+ ],
+ "Gallery": [
+  "Entertainment>Art>Gallery"
+ ],
+ "Garden": [
+  "Outdoors>Garden"
+ ],
+ "Gas & Automotive": [
+  "Shopping>Gas & Automotive"
+ ],
+ "Giraffes": [
+  "Entertainment>Zoo>Giraffes"
+ ],
+ "Glade": [
+  "Outdoors>Ski & Snowboard Area>Glade"
+ ],
+ "Golf Course": [
+  "Entertainment>Golf Course"
+ ],
+ "Golf Shop": [
+  "Shopping>Sports & Outdoors>Golf Shop"
+ ],
+ "Gondola": [
+  "Outdoors>Ski & Snowboard Area>Gondola"
+ ],
+ "Government": [
+  "Community>Government"
+ ],
+ "Grocery": [
+  "Shopping>Grocery"
+ ],
+ "Gym": [
+  "Shopping>Gym"
+ ],
+ "Halfpipe": [
+  "Outdoors>Ski & Snowboard Area>Halfpipe"
+ ],
+ "Hall": [
+  "Community>Campus Spot>Hall"
+ ],
+ "Hardware Store": [
+  "Shopping>Hardware Store"
+ ],
+ "Health & Fitness": [
+  "Shopping>Health & Fitness"
+ ],
+ "High School": [
+  "Community>School>High School"
+ ],
+ "Hippos": [
+  "Entertainment>Zoo>Hippos"
+ ],
+ "Historic Church": [
+  "Community>Place of Worship>Historic Church"
+ ],
+ "Historic Landmark": [
+  "Outdoors>Architecture>Historic Landmark"
+ ],
+ "History Museum": [
+  "Entertainment>Museum>History Museum"
+ ],
+ "Home": [
+  "Community>Home"
+ ],
+ "Hospital": [
+  "Shopping>Medical>Hospital"
+ ],
+ "Hostel": [
+  "Travel>Hotel>Hostel"
+ ],
+ "Hot Dogs & Sausages": [
+  "Food>Street Fare>Hot Dogs & Sausages"
+ ],
+ "Hotel": [
+  "Travel>Hotel"
+ ],
+ "Ice Cream": [
+  "Food>Dessert>Ice Cream"
+ ],
+ "Ice Skating": [
+  "Entertainment>Ice Skating"
+ ],
+ "Indian": [
+  "Food>Indian"
+ ],
+ "Italian": [
+  "Food>Italian"
+ ],
+ "Karaoke": [
+  "Nightlife>Karaoke"
+ ],
+ "Lab": [
+  "Community>Campus Spot>Lab"
+ ],
+ "Lake/River": [
+  "Outdoors>Lake/River"
+ ],
+ "Law School": [
+  "Community>School>Law School"
+ ],
+ "Library": [
+  "Community>Library"
+ ],
+ "Lifthouse": [
+  "Outdoors>Ski & Snowboard Area>Lifthouse"
+ ],
+ "Light Rail": [
+  "Travel>Light Rail"
+ ],
+ "Lighthouse": [
+  "Outdoors>Architecture>Lighthouse"
+ ],
+ "Lions": [
+  "Entertainment>Zoo>Lions"
+ ],
+ "Live Music": [
+  "Entertainment>Live Music"
+ ],
+ "Local Sports": [
+  "Entertainment>Local Sports"
+ ],
+ "Luxury Hotel": [
+  "Travel>Hotel>Luxury Hotel"
+ ],
+ "Mall": [
+  "Shopping>Mall"
+ ],
+ "Medical": [
+  "Shopping>Medical"
+ ],
+ "Medical School": [
+  "Community>School>Medical School"
+ ],
+ "Mediterranean": [
+  "Food>Mediterranean"
+ ],
+ "Men's Apparel": [
+  "Shopping>Apparel>Men's Apparel"
+ ],
+ "Mexican": [
+  "Food>Mexican"
+ ],
+ "Microbrewery": [
+  "Nightlife>Microbrewery"
+ ],
+ "Middle Eastern": [
+  "Food>Middle Eastern"
+ ],
+ "Mission": [
+  "Community>Place of Worship>Mission"
+ ],
+ "Modern": [
+  "Community>Home>Modern"
+ ],
+ "Modern Art Museum": [
+  "Entertainment>Art>Modern Art Museum"
+ ],
+ "Modern Hotel": [
+  "Travel>Hotel>Modern Hotel"
+ ],
+ "Monument": [
+  "Outdoors>Architecture>Monument"
+ ],
+ "Mosque": [
+  "Community>Place of Worship>Mosque"
+ ],
+ "Motel": [
+  "Travel>Hotel>Motel"
+ ],
+ "Movie Rental": [
+  "Shopping>Movie Rental"
+ ],
+ "Movie Theatre": [
+  "Entertainment>Movie Theatre"
+ ],
+ "Museum": [
+  "Entertainment>Museum"
+ ],
+ "Music": [
+  "Shopping>Music"
+ ],
+ "National Park": [
+  "Outdoors>Park>National Park"
+ ],
+ "Nightlife": [
+  "Nightlife"
+ ],
+ "Non-Profit": [
+  "Community>Office>Non-Profit"
+ ],
+ "Office": [
+  "Community>Office"
+ ],
+ "Other - Architecture": [
+  "Outdoors>Architecture>Other - Architecture"
+ ],
+ "Other - Entertainment": [
+  "Entertainment>Other - Entertainment"
+ ],
+ "Other - Food": [
+  "Food>Other - Food"
+ ],
+ "Other - Medical": [
+  "Shopping>Medical>Other - Medical"
+ ],
+ "Other - Nightlife": [
+  "Nightlife>Other - Nightlife"
+ ],
+ "Other - Place of Worship": [
+  "Community>Place of Worship>Other - Place of Worship"
+ ],
+ "Other - Services": [
+  "Shopping>Other - Services"
+ ],
+ "Other - Shopping": [
+  "Shopping>Other - Shopping"
+ ],
+ "Other - Street Fare": [
+  "Food>Street Fare>Other - Street Fare"
+ ],
+ "Other - Zoo": [
+  "Entertainment>Zoo>Other - Zoo"
+ ],
+ "Other Sports": [
+  "Shopping>Sports & Outdoors>Other Sports"
+ ],
+ "Outdoors": [
+  "Outdoors"
+ ],
+ "Pan Pacific": [
+  "Food>Asian>Pan Pacific"
+ ],
+ "Paper Goods": [
+  "Shopping>Paper Goods"
+ ],
+ "Park": [
+  "Outdoors>Park"
+ ],
+ "Park - Other": [
+  "Outdoors>Park>Park - Other"
+ ],
+ "Pavilion": [
+  "Outdoors>Pavilion"
+ ],
+ "Performing Arts": [
+  "Entertainment>Performing Arts"
+ ],
+ "Pet Store": [
+  "Shopping>Pet Store"
+ ],
+ "Pizza": [
+  "Food>Pizza"
+ ],
+ "Place of Worship": [
+  "Community>Place of Worship"
+ ],
+ "Planetarium": [
+  "Entertainment>Museum>Planetarium"
+ ],
+ "Playground": [
+  "Outdoors>Playground"
+ ],
+ "Plaza/Square": [
+  "Outdoors>Plaza/Square"
+ ],
+ "Police Station": [
+  "Community>Government>Police Station"
+ ],
+ "Pool": [
+  "Outdoors>Pool"
+ ],
+ "Post Office": [
+  "Community>Government>Post Office"
+ ],
+ "Primates": [
+  "Entertainment>Zoo>Primates"
+ ],
+ "Pub": [
+  "Nightlife>Pub"
+ ],
+ "Racetrack": [
+  "Entertainment>Racetrack"
+ ],
+ "Rec Center": [
+  "Community>Campus Spot>Rec Center"
+ ],
+ "Record Store": [
+  "Shopping>Record Store"
+ ],
+ "Regional/State Park": [
+  "Outdoors>Park>Regional/State Park"
+ ],
+ "Rental Car": [
+  "Travel>Rental Car"
+ ],
+ "Reptiles": [
+  "Entertainment>Zoo>Reptiles"
+ ],
+ "Resort": [
+  "Travel>Resort"
+ ],
+ "Running": [
+  "Shopping>Sports & Outdoors>Running"
+ ],
+ "Salon & Barbershop": [
+  "Shopping>Salon & Barbershop"
+ ],
+ "Saloon": [
+  "Nightlife>Saloon"
+ ],
+ "Sandwich Shop": [
+  "Food>Sandwich Shop"
+ ],
+ "Scenic Lookout": [
+  "Outdoors>Scenic Lookout"
+ ],
+ "School": [
+  "Community>School"
+ ],
+ "School - Other": [
+  "Community>School>School - Other"
+ ],
+ "Science Museum": [
+  "Entertainment>Museum>Science Museum"
+ ],
+ "Sculpture": [
+  "Entertainment>Art>Sculpture"
+ ],
+ "Seafood": [
+  "Food>Seafood"
+ ],
+ "Shoes": [
+  "Shopping>Apparel>Shoes"
+ ],
+ "Shopping": [
+  "Shopping"
+ ],
+ "Skate Shop": [
+  "Shopping>Sports & Outdoors>Skate Shop"
+ ],
+ "Skatepark": [
+  "Entertainment>Skatepark"
+ ],
+ "Ski & Snowboard Area": [
+  "Outdoors>Ski & Snowboard Area"
+ ],
+ "Ski Shop": [
+  "Shopping>Sports & Outdoors>Ski Shop"
+ ],
+ "Skyscraper": [
+  "Community>Office>Skyscraper"
+ ],
+ "Snow Cones": [
+  "Food>Dessert>Snow Cones",
+  "Food>Street Fare>Snow Cones"
+ ],
+ "Soccer Field": [
+  "Entertainment>Local Sports>Soccer Field"
+ ],
+ "Soccer Stadium": [
+  "Entertainment>Arena or Stadium>Soccer Stadium"
+ ],
+ "Sorority House": [
+  "Community>Campus Spot>Sorority House"
+ ],
+ "Soul Food": [
+  "Food>Soul Food"
+ ],
+ "South American/Latin": [
+  "Food>South American/Latin"
+ ],
+ "Sports & Outdoors": [
+  "Shopping>Sports & Outdoors"
+ ],
+ "Sports Bar": [
+  "Nightlife>Sports Bar"
+ ],
+ "Stadium": [
+  "Entertainment>Arena or Stadium>Stadium"
+ ],
+ "Startup": [
+  "Community>Office>Startup"
+ ],
+ "Steakhouse": [
+  "Food>Steakhouse"
+ ],
+ "Street Fare": [
+  "Food>Street Fare"
+ ],
+ "Student Center": [
+  "Community>Campus Spot>Student Center"
+ ],
+ "Subway": [
+  "Travel>Subway"
+ ],
+ "Summit": [
+  "Outdoors>Ski & Snowboard Area>Summit"
+ ],
+ "Sushi": [
+  "Food>Asian>Sushi"
+ ],
+ "Synagogue": [
+  "Community>Place of Worship>Synagogue"
+ ],
+ "Tacos": [
+  "Food>Street Fare>Tacos"
+ ],
+ "Tattoo Parlor": [
+  "Shopping>Tattoo Parlor"
+ ],
+ "Tea Room": [
+  "Food>Tea Room"
+ ],
+ "Technology": [
+  "Shopping>Technology"
+ ],
+ "Temple": [
+  "Community>Place of Worship>Temple"
+ ],
+ "Tennis Court": [
+  "Entertainment>Local Sports>Tennis Court"
+ ],
+ "Terminal": [
+  "Travel>Airport>Terminal"
+ ],
+ "Terrain Park": [
+  "Outdoors>Ski & Snowboard Area>Terrain Park"
+ ],
+ "Thai": [
+  "Food>Asian>Thai"
+ ],
+ "Theatre": [
+  "Entertainment>Theatre"
+ ],
+ "Theme Park": [
+  "Entertainment>Theme Park"
+ ],
+ "Thrift Store": [
+  "Shopping>Thrift Store"
+ ],
+ "Tigers": [
+  "Entertainment>Zoo>Tigers"
+ ],
+ "Tobacco & Cigars": [
+  "Shopping>Tobacco & Cigars"
+ ],
+ "Tower": [
+  "Outdoors>Architecture>Tower"
+ ],
+ "Toys & Games": [
+  "Shopping>Toys & Games"
+ ],
+ "Trade/Tech School": [
+  "Community>School>Trade/Tech School"
+ ],
+ "Traditional Art Museum": [
+  "Entertainment>Art>Traditional Art Museum"
+ ],
+ "Trailhead": [
+  "Outdoors>Park>Trailhead"
+ ],
+ "Train Station": [
+  "Travel>Train Station"
+ ],
+ "Tram": [
+  "Travel>Airport>Tram"
+ ],
+ "Travel": [
+  "Travel"
+ ],
+ "Travel-Other": [
+  "Travel>Travel-Other"
+ ],
+ "Ultra-lounge": [
+  "Nightlife>Ultra-lounge"
+ ],
+ "University": [
+  "Community>School>University"
+ ],
+ "Vegetarian": [
+  "Food>Vegetarian"
+ ],
+ "Veterinarian": [
+  "Shopping>Veterinarian"
+ ],
+ "Victorian": [
+  "Community>Home>Victorian"
+ ],
+ "Vietnamese": [
+  "Food>Asian>Vietnamese"
+ ],
+ "Vineyard": [
+  "Food>Vineyard",
+  "Outdoors>Vineyard"
+ ],
+ "Warehouse & Industrial": [
+  "Community>Office>Warehouse & Industrial"
+ ],
+ "Wine & Spirits": [
+  "Shopping>Wine & Spirits"
+ ],
+ "Wine Bar": [
+  "Nightlife>Wine Bar"
+ ],
+ "Wings": [
+  "Food>Wings"
+ ],
+ "Women's Apparel": [
+  "Shopping>Apparel>Women's Apparel"
+ ],
+ "Zebras": [
+  "Entertainment>Zoo>Zebras"
+ ],
+ "Zoo": [
+  "Entertainment>Zoo"
+ ]
+}

@@ -149,7 +149,9 @@ class RotH(nn.Module):
         The saved artifact must be at one curvature, not each relation's own -- the downstream
         LLaDA pipeline applies logmap0 with c=CURVATURE_C=1.0.
         """
-        cc = torch.full((1,), float(c))
+        # the reference curvature must live where the embeddings do -- created on CPU it
+        # crashed every non-CPU run (mps/cuda) at the first depth_loss call
+        cc = torch.full((1,), float(c), device=self.ent.weight.device)
         return expmap0(self.ent.weight, cc)
 
 

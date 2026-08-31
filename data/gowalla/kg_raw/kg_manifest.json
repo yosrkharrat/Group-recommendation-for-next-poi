@@ -1,0 +1,53 @@
+{
+  "config": {
+    "csv_dir": "./data/gowalla",
+    "mat": null,
+    "poi_meta": null,
+    "taxonomy": "./data/gowalla/gowalla_category_paths.json",
+    "groups_dir": "./data/gowalla/groups_social_raw",
+    "friendship_old": "./data/gowalla/friendship_old_GOWALLA.csv",
+    "out_dir": "./data/gowalla/kg_raw",
+    "export_dir": null,
+    "dataset": "GOWALLA",
+    "split": "user",
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "wrap_tol": 24,
+    "cell_deg": 0.01,
+    "knn": 10,
+    "max_followed_by": null,
+    "tau": 0.4,
+    "self_check": false
+  },
+  "source": "./data/gowalla",
+  "dataset": "GOWALLA",
+  "n_entities": 116401,
+  "n_triples": 2125760,
+  "n_relations": 12,
+  "node_types": {
+    "CATEGORY": 324,
+    "GROUP": 36621,
+    "LOCALITY": 3,
+    "POI": 47783,
+    "REGION": 3,
+    "USER": 31667
+  },
+  "relation_counts": {
+    "IS_NEAR_TO": 587154,
+    "VISITED": 468597,
+    "FOLLOWED_BY": 464672,
+    "FRIEND_OF": 235898,
+    "MEMBER_OF": 81411,
+    "CO_ATTENDED": 63616,
+    "PREFERS_CATEGORY": 55377,
+    "LOCATED_IN": 47786,
+    "HAS_CATEGORY": 47783,
+    "OCCURRED_AT": 36621,
+    "GROUP_PREFERS": 36621,
+    "SUBCATEGORY_OF": 224
+  },
+  "n_hierarchy_pairs": 187791,
+  "n_prefers_category": 55377,
+  "n_friendship_old": 117949,
+  "n_friendship_new_only": 0
+}

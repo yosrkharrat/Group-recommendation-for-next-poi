@@ -248,7 +248,14 @@ def ndcg_at_k(user_emb, item_emb, train_pos, val_pos, k=20, max_users=2000, seed
     users = list(val_pos.keys())
     if len(users) > max_users:
         users = list(rng.choice(users, max_users, replace=False))
-    scores_all = item_emb @ user_emb.T          # [n_items, n_users_scored]
+    # float64 + finite floor: fp32 overflow here used to yield non-finite scores that silently
+    # corrupted the val NDCG used for MODEL SELECTION (LLMGPR_FINETUNE_HANDOFF.md, known issue b).
+    # Non-finite -> a floor score, so a diverged epoch ranks near 0 and is never chosen as best.
+    scores_all = item_emb.astype(np.float64) @ user_emb.astype(np.float64).T   # [n_items, n_users_scored]
+    bad = ~np.isfinite(scores_all)
+    if bad.any():
+        print(f"  WARNING: {int(bad.sum()):,} non-finite scores in ndcg_at_k -- flooring them")
+        scores_all[bad] = -1e18
     ndcgs = []
     for j, u in enumerate(users):
         s = scores_all[:, j].copy()

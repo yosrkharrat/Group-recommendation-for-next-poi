@@ -15,6 +15,21 @@ data/groups/group_examples_*.jsonl
 #          --out-dir ./data/lbsn/groups --no-resplit
 data/lbsn/groups/group_examples_*.jsonl
 data/llmgpr/groups_social*/group_examples_*.jsonl
+# Gowalla: same deal. House CSVs regenerate in ~1 min from the committed gowalla_final_*
+# (python src/prepare_gowalla_csvs.py), group examples in ~15 min (the build_groups command in
+# LLMGPR_GOWALLA.md, seed 42), KG tensors deterministically under PYTHONHASHSEED=0
+# (the build_kg_lbsn command there). The small groups/kg CSVs + manifests ARE committed.
+data/gowalla/train_GOWALLA.csv
+data/gowalla/val_GOWALLA.csv
+data/gowalla/test_GOWALLA.csv
+data/gowalla/poi_metadata_GOWALLA.csv
+data/gowalla/users_GOWALLA.csv
+data/gowalla/friendship_old_GOWALLA.csv
+data/gowalla/friendship_new_only_GOWALLA.csv
+data/gowalla/groups_social*/group_examples_*.jsonl
+data/gowalla/kg_*/kg_triples.pt
+data/gowalla/kg_*/kg_hierarchy.pt
+data/gowalla/kg_*/roth_best.pt
 
 # ── Check-in data: COMMITTED on purpose ────────────────────────────────────
 # The five Foursquare files (train/val/test_NYC.csv, poi_metadata_NYC.csv, vocab.pkl) are
