@@ -213,6 +213,16 @@ conclusion — **the finding is that there is no denoised arm to build**, which 
 FSQ `llmgpr-no-denoise` conclusion, now confirmed on a graph that was supposed to be dense enough
 to save it. The β sweep decides whether a *meaningfully* pruned graph exists to build an arm from.
 
+**Correction to a prior finding — `LLMGPR_FINETUNE_HANDOFF.md`'s "known issue b" is not a bug.**
+That doc reported `divide by zero` / `overflow` / `invalid value` RuntimeWarnings from the val-NDCG
+matmul and concluded "non-finite values there silently corrupt which epoch is chosen". Measured:
+**those three warnings reproduce on known-finite inputs producing a finite output** — a matmul of
+random finite arrays at the real shapes (47,783×64 @ 64×2,000, max |out| = 0.12) raises all three
+under numpy 2.0.2 + Apple Accelerate, which reports stale FPU status flags. They are platform
+noise, and on the real Gowalla run the explicit finiteness check never fired once. `ndcg_at_k`
+now silences the false alarm with `np.errstate` and keeps the isfinite floor, which is what
+actually protects model selection. No GBSR result on either track was affected by this.
+
 Perf note (semantics unchanged, all self-checks green): `propagate()` now takes an edge-value
 vector and does gather + `index_add_` instead of `torch.sparse.mm`. Autograd through
 `sparse.mm` w.r.t. its values materialises a dense [79,450 × 79,450] intermediate every batch

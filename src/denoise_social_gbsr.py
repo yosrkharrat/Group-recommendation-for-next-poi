@@ -275,10 +275,18 @@ def ndcg_at_k(user_emb, item_emb, train_pos, val_pos, k=20, max_users=2000, seed
     users = list(val_pos.keys())
     if len(users) > max_users:
         users = list(rng.choice(users, max_users, replace=False))
-    # float64 + finite floor: fp32 overflow here used to yield non-finite scores that silently
-    # corrupted the val NDCG used for MODEL SELECTION (LLMGPR_FINETUNE_HANDOFF.md, known issue b).
-    # Non-finite -> a floor score, so a diverged epoch ranks near 0 and is never chosen as best.
-    scores_all = item_emb.astype(np.float64) @ user_emb.astype(np.float64).T   # [n_items, n_users_scored]
+    # This matmul feeds the val NDCG used for MODEL SELECTION, so it asserts its own finiteness:
+    # a diverged epoch is floored rather than allowed to win silently.
+    #
+    # LLMGPR_FINETUNE_HANDOFF.md "known issue b" reported divide-by-zero / overflow /
+    # invalid-value RuntimeWarnings here and concluded the NDCG was being corrupted. That
+    # diagnosis is WRONG: those three warnings reproduce on known-finite inputs with a finite
+    # output (numpy 2.0.2 + Apple Accelerate reports stale FPU status flags; verified by matmul
+    # of random finite arrays of these shapes, max|out| = 0.12, all three warnings raised).
+    # They are platform noise. `errstate` silences the false alarm; the isfinite check below is
+    # what actually protects model selection, and on the real Gowalla run it never fired.
+    with np.errstate(divide="ignore", over="ignore", invalid="ignore"):
+        scores_all = item_emb.astype(np.float64) @ user_emb.astype(np.float64).T
     bad = ~np.isfinite(scores_all)
     if bad.any():
         print(f"  WARNING: {int(bad.sum()):,} non-finite scores in ndcg_at_k -- flooring them")
