@@ -243,7 +243,49 @@ CPU — every non-CPU run crashed at the first `depth_loss`; self-check still pa
 config vs the FSQ handoff: `--batch-size 4096 --n-neg 32 --epochs 50` on MPS — measured
 necessity, not preference: the handoff's 512/128/120 is 8+ min/epoch ≈ 20+ hours on this
 machine (the FSQ arm trained on Kaggle CUDA). Deviations are in `roth_results.json`'s config
-dump.
+dump. 50 epochs, 4.5 h, clean monotone convergence (loss 0.0838 → 0.0271, no instability).
+
+**Result — the hierarchy the FSQ arm never got.**
+
+```
+D1  Spearman(taxonomy depth, hyperbolic radius) = +0.8683   VERDICT: STRONG
+    depth 1: n= 7,926  mean radius 0.3211
+    depth 2: n=29,219  mean radius 0.6008        monotone, well separated
+    depth 3: n=10,638  mean radius 0.9008
+```
+
+FSQ cleared its `> 0.30` gate by 0.025 (ρ = +0.3245) and `LLMGPR_FINETUNE_HANDOFF.md` named that
+as the **first thing to suspect if the hyperbolic-vs-random ablation comes out flat**. Here ρ is
++0.87 and stable from epoch 1 onward, so on Gowalla that suspicion is off the table. The cause is
+structural, not luck: this KG carries **five** depth-loss relations against FSQ's two, because
+every POI has coordinates (100% vs 43%) and the taxonomy resolves three levels.
+
+**But the depth regulariser dominates the objective, and the hierarchical relations pay for it.**
+Filtered link prediction (n = 4,000, tails corrupted against all 116,401 entities; random MRR
+≈ 1.05e-04): overall **MRR 0.0840, Hits@1 0.0318, Hits@10 0.1948**.
+
+```
+relation             MRR   vs random    n        relation             MRR   vs random    n
+GROUP_PREFERS     0.3308      3145x    70        VISITED           0.0507       483x   879
+OCCURRED_AT       0.2387      2273x    63        FOLLOWED_BY       0.0442       421x   863
+PREFERS_CATEGORY  0.1951      1858x   105        MEMBER_OF         0.0241       230x   134
+IS_NEAR_TO        0.1331      1266x  1142        HAS_CATEGORY      0.0105       100x    81
+CO_ATTENDED       0.0848       808x   126        LOCATED_IN        0.0027        26x    84
+FRIEND_OF         0.0607       578x   452
+```
+
+At epoch 50 the loss decomposes as kge 0.011972 + 5.0 × depth 0.003035 = 0.027146, i.e. the
+depth term is **55.9% of the objective** — it is not a regulariser at this weight, it is the
+larger half of the loss. The signature is consistent: the two relations the depth term acts on
+most directly, `HAS_CATEGORY` (100× random) and `LOCATED_IN` (26× random), are the weakest in
+the table, while FSQ's best run reached HAS_CATEGORY MRR 0.191. Radial ordering was bought at
+the cost of ranking the category tail.
+
+**This is a tradeoff to sweep, not a defect to hide** — and the good news is where the strength
+landed: `GROUP_PREFERS` (3145×) and `OCCURRED_AT` (2273×) are the two best relations in the KG,
+and they are exactly the group layer this project exists to model. `src/roth_depth_weight_probe.py`
+runs the matched comparison (depth_weight ∈ {0, 1, 5}, equal budget) to confirm the causal story
+and pick the operating point before stage 5 consumes the embeddings.
 
 ### Commands (repro)
 

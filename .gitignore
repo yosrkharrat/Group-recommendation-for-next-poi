@@ -34,6 +34,10 @@ data/gowalla/groups_social*/group_examples_*.jsonl
 data/gowalla/kg_*/kg_triples.pt
 data/gowalla/kg_*/kg_hierarchy.pt
 data/gowalla/kg_*/roth_best.pt
+# 30 MB of all-entity embeddings; stage 5 consumes poi_hyperbolic_embs_<DS>.npy, which IS
+# committed. Rerun train_roth.py (config in roth_results.json) to regenerate.
+data/gowalla/kg_*/entity_hyperbolic_embs.npy
+data/gowalla/_depth_probe/
 
 # ── Check-in data: COMMITTED on purpose ────────────────────────────────────
 # The five Foursquare files (train/val/test_NYC.csv, poi_metadata_NYC.csv, vocab.pkl) are
