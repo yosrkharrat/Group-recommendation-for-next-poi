@@ -237,11 +237,36 @@ Two controls make this a property of the data-plus-hyperparameters rather than o
   evidence. The check now tests the converged mask, which is also the one that gets exported.)*
 
 **Consequence for the arms.** The denoised graph differs from the raw one by 16 of 117,949 edges
-(0.014%), i.e. ≤32 of the KG's 2,125,760 triples (0.0015%). A RotH run on that KG would differ
-from the raw arm by less than seed noise, so raw-vs-denoised is not a comparison that can carry a
-conclusion — **the finding is that there is no denoised arm to build**, which is precisely the
-FSQ `llmgpr-no-denoise` conclusion, now confirmed on a graph that was supposed to be dense enough
-to save it. The β sweep decides whether a *meaningfully* pruned graph exists to build an arm from.
+(0.014%). That is not by itself proof the arms coincide, and the first version of this paragraph
+asserted more than it had measured: 4 of those 16 edges turn out to be **co-membership pairs**
+(both endpoints appear together in some constructed group), so group construction *can* move.
+`data/gowalla/groups_social_denoised/` is therefore built and diffed rather than assumed — see
+the arm-diff table below. Beyond the group layer the KG impact is exact arithmetic: `FRIEND_OF`
+is stored in both directions, so **32 of 2,125,760 triples (0.0015%)** differ.
+
+**The measured arm diff** (`groups_social_raw` vs `groups_social_denoised`, identical seed and
+flags, only the friendship file differs):
+
+```
+metric                       raw   denoised    delta      rel
+co-presence events        36,621     36,615       -6   -0.016%
+distinct member-sets      18,362     18,360       -2   -0.011%
+member-sets >=3 pooled     1,782      1,781       -1   -0.056%
+co-attendance pairs       31,808     31,806       -2   -0.006%
+constructed groups        11,239     11,228      -11   -0.098%
+group examples train      39,317     39,328      +11   +0.028%
+group examples val         8,041      8,027      -14   -0.174%
+group examples test       16,970     16,935      -35   -0.206%
+```
+
+So the arms are **not** byte-identical — every count moves, by ≤ 0.21%. Adding the group-layer
+delta to the 32 `FRIEND_OF` triples puts the total KG difference around 0.002% of 2,125,760
+triples. A 4.5 h RotH run on that cannot produce a difference distinguishable from seed noise, so
+raw-vs-denoised is not a comparison that can carry a conclusion — **the finding is that there is
+no denoised arm worth building**, which is precisely the FSQ `llmgpr-no-denoise` conclusion, now
+confirmed on a graph that was supposed to be dense enough to save it and (per the β sweep) not
+rescuable by tuning. The denoised group artifacts are committed anyway so the claim stays
+checkable instead of resting on this paragraph.
 
 **Correction to a prior finding — `LLMGPR_FINETUNE_HANDOFF.md`'s "known issue b" is not a bug.**
 That doc reported `divide by zero` / `overflow` / `invalid value` RuntimeWarnings from the val-NDCG

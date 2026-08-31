@@ -1,0 +1,76 @@
+{
+  "config": {
+    "data_dir": "./data/gowalla",
+    "out_dir": "./data/gowalla/groups_social_denoised",
+    "dataset": "GOWALLA",
+    "group_source": "social",
+    "friend_old": "./data/gowalla/friendship_old_denoised_GOWALLA.csv",
+    "friend_new": null,
+    "friendship": "old",
+    "social_window": 180,
+    "social_max_hops": 5,
+    "window": 60,
+    "min_size": 2,
+    "max_size": 8,
+    "horizon": 240,
+    "min_companion_repeat": 2,
+    "max_venue_visitors": 50,
+    "min_tie_groups": 2,
+    "min_tie_venues": 1,
+    "regimes": [
+      "occasional",
+      "random"
+    ],
+    "affinity_percentile": 99.0,
+    "far_gap_min": 180,
+    "sizes": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "constraint": "cat-inter",
+    "cat_level": 2,
+    "hist_len": 90,
+    "min_hist": 1,
+    "min_member_activity": 5,
+    "require_companion_history": true,
+    "profile_top_k": 10,
+    "profile_cats": 3,
+    "profile_hours": 3,
+    "resplit": false,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "seed": 42,
+    "self_check": false
+  },
+  "n_pois": 47783,
+  "n_users": 31667,
+  "n_checkins": 903045,
+  "n_ephemeral_groups": 36615,
+  "n_real_transitions": 90152,
+  "n_co_attended": 31806,
+  "affinity": {
+    "validation": null,
+    "clique_threshold": null,
+    "n_clique_eligible_users": 0
+  },
+  "counts": {
+    "train": 39328,
+    "val": 8027,
+    "test": 16935
+  },
+  "stats": {
+    "individual_examples": 871378,
+    "skip_no_companions_occasional": 723252,
+    "candidates_random": 871378,
+    "skip_constraint_random": 858488,
+    "candidates_occasional": 148126,
+    "skip_constraint_occasional": 81721,
+    "emitted": 64290,
+    "skip_inactive_member_occasional": 1314,
+    "skip_anchor_only_history_random": 3538,
+    "skip_inactive_member_random": 1968,
+    "skip_anchor_only_history_occasional": 8185
+  }
+}
