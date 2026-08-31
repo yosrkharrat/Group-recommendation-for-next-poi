@@ -201,10 +201,40 @@ Two controls make this a property of the data-plus-hyperparameters rather than o
   std **4.3e-01**, range 1.0, and separates planted signal from noise edges (all 5 checks pass,
   including that the upstream `detach()` bug stays fixed). Real-data std is 2.2e-05 — four
   orders of magnitude smaller.
-- **`src/gbsr_beta_sweep.py`** tests whether *any* bottleneck strength prunes this graph
-  (β ∈ {5, 100, 2000}, mask std/range/distinct/ceiling-fraction logged per epoch against val
-  NDCG). BPR always prefers keeping edges; the HSIC term is the only opposing force, and at
-  β = 5 it plainly loses. Results in `gbsr_denoise_manifest.json` / `gbsr_beta_sweep.json`.
+- **`src/gbsr_beta_sweep.py` — no bottleneck strength prunes this graph.** BPR always prefers
+  keeping edges; the HSIC term is the only opposing force. Sweeping it (identical seed/data,
+  6 epochs each) settles the "just tune β" hypothesis in the negative:
+
+  ```
+    beta   final std   uniq  at-ceiling  val NDCG@20
+       5    4.74e-05     18      100.0%       0.0369
+     100    0.00e+00      1      100.0%       0.0022
+    2000    0.00e+00      1      100.0%       0.0000
+  ```
+
+  At β = 5 the mask saturates upward (every edge pinned at the 1.5 ceiling). At β ≥ 100 it
+  collapses to **exactly one distinct value, std identically zero** — a second, independent route
+  to the same dead end (HSIC crushing all edges together rather than BPR saturating them up) —
+  and it takes the recommender with it (val NDCG 0.0369 → 0.0000). **The converged mask is
+  constant at every strength tested.**
+
+  The β = 5 trajectory shows the collapse happening, which rules out undertraining:
+
+  ```
+  epoch     0        1        2        3        4       5      6
+  uniq  113,503  93,582  60,126   1,732     273      53     18
+  ceil     0.0%    0.0%    0.0%    6.0%   99.4%  100.0% 100.0%
+  NDCG        -  0.0054  0.0123  0.0265  0.0359  0.0371 0.0369
+  ```
+
+  **Val NDCG rises monotonically as the mask collapses**: GBSR reaches its best recommendation
+  accuracy precisely by switching its own denoiser off. That is the mechanism, not a symptom.
+
+  *(Verdict-criterion correction, recorded because it nearly produced a wrong claim: this script
+  first asked "any epoch with mask std > 1e-3" and answered YES for every β. That counts epochs
+  1–2, where the mask still carries initialisation noise — uniq ≈ 113k at epoch 0, before any
+  training. Losing that variance IS the collapse, so early-epoch variance is the opposite of
+  evidence. The check now tests the converged mask, which is also the one that gets exported.)*
 
 **Consequence for the arms.** The denoised graph differs from the raw one by 16 of 117,949 edges
 (0.014%), i.e. ≤32 of the KG's 2,125,760 triples (0.0015%). A RotH run on that KG would differ

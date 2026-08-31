@@ -162,10 +162,29 @@ def main():
         last = df[(df.beta == beta) & (df.epoch == df[df.beta == beta].epoch.max())].iloc[0]
         print(f"{beta:>8.0f}{last['std']:>12.2e}{last['rng']:>13.2e}{last['uniq']:>7,}"
               f"{100*last['frac_ceiling']:>11.1f}%{last['val_ndcg']:>10.4f}")
-    disc = df[(df.epoch > 0) & (df["std"] > 1e-3)]
-    print(f"\nany epoch with mask std > 1e-3: {'YES' if len(disc) else 'NO'}"
-          + (f" (betas {sorted(set(disc.beta))})" if len(disc) else
-             "  -> the mask saturates at EVERY bottleneck strength tested"))
+    # The verdict must be about the CONVERGED mask, which is what gets exported and what the
+    # denoised arm would be built from. An earlier version of this check asked "any epoch with
+    # std > 1e-3" and reported YES for every beta -- but that counts epochs 1-2, where the mask
+    # still carries its initialisation noise (uniq ~113k at epoch 0, before any training). The
+    # mask losing that variance IS the collapse, so early-epoch variance is the opposite of
+    # evidence for discrimination.
+    THR = 1e-3
+    finals = {}
+    for beta in a.betas:
+        sub = df[df.beta == beta]
+        finals[beta] = sub[sub.epoch == sub.epoch.max()].iloc[0]
+    disc = [b for b, r in finals.items() if r["std"] > THR]
+    print(f"\nconverged mask std > {THR:g} at any beta: {'YES ' + str(disc) if disc else 'NO'}")
+    if not disc:
+        print("  -> the mask collapses to a CONSTANT at every bottleneck strength tested;")
+        print("     GBSR cannot prune this graph, and the collapse is not a tuning miss.")
+        worst = min(finals.items(), key=lambda kv: kv[1]["val_ndcg"])
+        print(f"     raising beta also destroys the recommender: "
+              f"val NDCG {finals[a.betas[0]]['val_ndcg']:.4f} (beta={a.betas[0]:g}) "
+              f"-> {worst[1]['val_ndcg']:.4f} (beta={worst[0]:g})")
+    early = df[(df.epoch <= 2) & (df["std"] > THR)]
+    print(f"  (mask std > {THR:g} in epochs <=2 for betas {sorted(set(early.beta))} -- "
+          f"initialisation noise, washed out by training, NOT discrimination)")
     with open(a.out, "w") as f:
         json.dump(dict(config=vars(a), gumbel_temp=G.GUMBEL_TEMP, rows=all_rows), f, indent=2)
     print(f"wrote {a.out}")
