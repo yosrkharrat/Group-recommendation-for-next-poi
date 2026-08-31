@@ -1,0 +1,40 @@
+{
+  "config": {
+    "data_dir": "./data/gowalla",
+    "csv_dir": "./data/gowalla",
+    "out_dir": "./data/gowalla",
+    "dataset": "GOWALLA",
+    "dim": 64,
+    "gcn_layer": 3,
+    "edge_bias": 0.5,
+    "lr": 0.001,
+    "beta": 5.0,
+    "sigma": 0.25,
+    "l2_reg": 0.0001,
+    "batch_size": 8192,
+    "hsic_sample": 1024,
+    "epochs": 200,
+    "min_epochs": 30,
+    "early_stop": 5,
+    "eval_every": 2,
+    "topk": 20,
+    "keep_threshold": null,
+    "seed": 42,
+    "device": null,
+    "self_check": false
+  },
+  "n_users": 31667,
+  "n_items": 47783,
+  "n_train_interactions": 468597,
+  "n_social_edges": 117949,
+  "best_val_ndcg": 0.04192186265288446,
+  "threshold": 1.5,
+  "n_kept": 117933,
+  "n_pruned": 16,
+  "mask_weight": {
+    "mean": 1.5,
+    "std": 2.1783704141853377e-05,
+    "min": 1.4925343990325928,
+    "max": 1.5
+  }
+}

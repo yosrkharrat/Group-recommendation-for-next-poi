@@ -172,14 +172,54 @@ matrices at 31.7k users) is now built **only when `established` ∈ `--regimes`*
 regime's only consumer. Gowalla runs `--regimes occasional random`; adding `established` back
 needs a sparse/blocked `affinity.py` rewrite, not a bigger machine.
 
-### Stage 2 — GBSR (`denoise_social_gbsr.py`)
+### Stage 2 — GBSR: **a measured no-op again, and the sparsity explanation is falsified**
 
-The val-NDCG overflow flagged in `LLMGPR_FINETUNE_HANDOFF.md` (known issue b) is fixed: scores
-are computed in float64 and non-finite values floored, so a diverged epoch can never win model
-selection. Run config: defaults except `--batch-size 4096` (full-graph propagation per batch ×
-457 batches at 1024 was ~4 min/epoch on CPU; sparse ops have no MPS support). Input: 117,949
-undirected edges over 26,779 users, mean degree 8.8 — 2.8× denser than the FSQ graph GBSR
-no-op'd on, so the mask has redundancy to work with this time.
+Run to convergence (early stop at epoch 32; best val NDCG@20 = 0.0419 at epoch 6, BPR AUC rising
+to 0.984 afterwards while val fell — i.e. past epoch 6 it only memorises). The exported mask
+comes from the best-val checkpoint, as it should.
+
+```
+mask weight: mean=1.4999999302  std=2.18e-05  min=1.4925344  max=1.5000000
+range 7.5e-03   distinct values 15 over 117,949 edges   117,933 of them at exactly 1.5000000
+kept 117,933/117,949 (100.0%), pruned 16
+```
+
+The gate is `sigmoid((logit + gumbel)/0.2) + edge_bias`, so its ceiling is `1 + 0.5 = 1.5`:
+**99.99% of edges are pinned at the saturation ceiling**, the "pruning" of 16 edges is the
+non-saturated tail losing a tie against a median that equals the maximum, and only 6 of those 16
+edges even touch a user in any constructed group. This reproduces the FSQ result
+(`LLMGPR_TRACK.md` §2, std 1.3e-09, 1 edge pruned) — but the important part is what it kills:
+
+> **The FSQ track's explanation was graph sparsity** — mean degree 3.2 vs GBSR's yelp at 38.6, so
+> "on a graph this sparse, masking edges may simply destroy signal … check whether it has
+> anything to do." **Gowalla's graph is 2.8× denser (degree 8.8, 117,949 edges, 84.6% user
+> coverage) and the collapse is identical. Sparsity is not the cause.**
+
+Two controls make this a property of the data-plus-hyperparameters rather than of our code:
+
+- **The same code discriminates on the synthetic fixture**: `--self-check` reports mask
+  std **4.3e-01**, range 1.0, and separates planted signal from noise edges (all 5 checks pass,
+  including that the upstream `detach()` bug stays fixed). Real-data std is 2.2e-05 — four
+  orders of magnitude smaller.
+- **`src/gbsr_beta_sweep.py`** tests whether *any* bottleneck strength prunes this graph
+  (β ∈ {5, 100, 2000}, mask std/range/distinct/ceiling-fraction logged per epoch against val
+  NDCG). BPR always prefers keeping edges; the HSIC term is the only opposing force, and at
+  β = 5 it plainly loses. Results in `gbsr_denoise_manifest.json` / `gbsr_beta_sweep.json`.
+
+**Consequence for the arms.** The denoised graph differs from the raw one by 16 of 117,949 edges
+(0.014%), i.e. ≤32 of the KG's 2,125,760 triples (0.0015%). A RotH run on that KG would differ
+from the raw arm by less than seed noise, so raw-vs-denoised is not a comparison that can carry a
+conclusion — **the finding is that there is no denoised arm to build**, which is precisely the
+FSQ `llmgpr-no-denoise` conclusion, now confirmed on a graph that was supposed to be dense enough
+to save it. The β sweep decides whether a *meaningfully* pruned graph exists to build an arm from.
+
+Perf note (semantics unchanged, all self-checks green): `propagate()` now takes an edge-value
+vector and does gather + `index_add_` instead of `torch.sparse.mm`. Autograd through
+`sparse.mm` w.r.t. its values materialises a dense [79,450 × 79,450] intermediate every batch
+(`SparseAddmmBackward0` → full `at::mm`, caught by stack-sampling the live process); the rewrite
+is numerically identical (max |diff| 9.3e-10 against `sparse.mm`) and turned ~20 min/epoch into
+~2. Also: the rejection sampler is vectorised (same distribution, ~60× faster) and
+`--hsic-sample` caps the HSIC estimator's [b,b] kernels, which otherwise dominate large batches.
 
 ### Stages 2b/3 — KG + RotH (raw arm)
 

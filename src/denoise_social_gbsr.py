@@ -172,10 +172,12 @@ class GBSR(nn.Module):
 
         weights = torch.ones(self.adj.values().shape[0], device=logit.device)
         weights = weights.index_copy(0, self.social_index, gate)
-        masked_values = self.adj.values() * weights
-        masked_adj = torch.sparse_coo_tensor(self.adj.indices(), masked_values,
-                                             self.adj.shape).coalesce()
-        return masked_adj
+        # returns the masked edge VALUES, not a sparse tensor: autograd through
+        # torch.sparse.mm w.r.t. the values materialises a dense [n,n] intermediate
+        # (SparseAddmmBackward0 -> full at::mm; ~25 GB at n=79,450, measured as THE
+        # bottleneck by stack sampling). propagate() consumes values via gather/index_add,
+        # which is the same D^-1/2 A D^-1/2 product with O(nnz*d) forward AND backward.
+        return self.adj.values() * weights
 
     def deterministic_gate(self):
         """Expectation-trick mask for export: drop the Gumbel noise term (eps=0.5 -> logit
@@ -187,18 +189,25 @@ class GBSR(nn.Module):
             logit = self.mask_mlp(cat).view(-1)
             return (torch.sigmoid(logit / GUMBEL_TEMP) + self.edge_bias).cpu().numpy()
 
-    def propagate(self, adj):
+    def propagate(self, values=None):
+        """Mean-pooled LightGCN layers over the shared graph, from an edge-value vector
+        (None = the unmasked graph). y = A_norm @ x is computed as a gather + index_add over
+        the coalesced edge list -- identical arithmetic to torch.sparse.mm, but its backward
+        w.r.t. `values` stays O(nnz*d) instead of materialising a dense [n,n] product."""
+        v = self.adj.values() if values is None else values
+        row, col = self.adj.indices()[0], self.adj.indices()[1]
         ego = torch.cat([self.user_emb.weight, self.item_emb.weight], dim=0)
         layers = [ego]
         for _ in range(self.gcn_layer):
-            layers.append(torch.sparse.mm(adj, layers[-1]))
+            x = layers[-1]
+            layers.append(torch.zeros_like(x).index_add_(0, row, x[col] * v.unsqueeze(1)))
         mean = torch.stack(layers, dim=1).mean(dim=1)
         return mean[:self.n_users], mean[self.n_users:]
 
-    def forward(self, users, pos, neg, beta, sigma, l2_reg):
-        masked_adj = self.graph_learner()
-        u_old, i_old = self.propagate(self.adj)
-        u_new, i_new = self.propagate(masked_adj)
+    def forward(self, users, pos, neg, beta, sigma, l2_reg, hsic_cap=None):
+        masked_values = self.graph_learner()
+        u_old, i_old = self.propagate()
+        u_new, i_new = self.propagate(masked_values)
 
         ue, pe, ne = u_new[users], i_new[pos], i_new[neg]
         pos_s = (ue * pe).sum(-1)
@@ -213,6 +222,15 @@ class GBSR(nn.Module):
 
         uu = torch.unique(users)
         ii = torch.unique(pos)
+        # HSIC's kernel matrices are [b,b]; at large batches they dominate the step (measured
+        # 4.6s vs 1.3s per forward at batch 4096 vs 1024 on this graph). `hsic_cap` estimates
+        # the same HSIC on a uniform subsample of the batch's unique users/items -- the
+        # regulariser's target is unchanged, only the estimator's variance grows.
+        if hsic_cap is not None:
+            if len(uu) > hsic_cap:
+                uu = uu[torch.randperm(len(uu), device=uu.device)[:hsic_cap]]
+            if len(ii) > hsic_cap:
+                ii = ii[torch.randperm(len(ii), device=ii.device)[:hsic_cap]]
         hx = F.normalize(u_old[uu], dim=1)
         hy = F.normalize(u_new[uu], dim=1)
         ib_u = hsic(kernel_matrix(hx, sigma), kernel_matrix(hy, sigma), len(uu))
@@ -228,17 +246,26 @@ class GBSR(nn.Module):
 # training
 # --------------------------------------------------------------------------
 
-def sample_negatives(users, pos_by_user, n_items, gen):
+def sample_negatives(users, pos_keys, n_items, gen):
     """Reject-sample until the negative is genuinely not a positive -- matches upstream
     rec_dataset.py's `negative_sampling` (unbounded retry), rather than silently accepting an
-    occasional false negative after a fixed number of tries."""
+    occasional false negative after a fixed number of tries.
+
+    Vectorized (the original per-element Python loop cost ~1 min/epoch at 469k pairs): all
+    collisions are redrawn together each round, which is the same rejection sampler -- uniform
+    over each user's non-positives -- consuming the generator in a different order.
+    `pos_keys` is the SORTED int64 array of (user * n_items + item) positives."""
+    u64 = users.to(torch.int64) * n_items
     neg = torch.randint(0, n_items, (len(users),), generator=gen)
-    for k in range(len(users)):
-        u = int(users[k])
-        pos = pos_by_user.get(u, ())
-        while int(neg[k]) in pos:
-            neg[k] = torch.randint(0, n_items, (1,), generator=gen)
-    return neg
+    if len(pos_keys) == 0:
+        return neg
+    while True:
+        loc = np.searchsorted(pos_keys, (u64 + neg).numpy())
+        loc[loc >= len(pos_keys)] = len(pos_keys) - 1
+        bad = torch.from_numpy(pos_keys[loc] == (u64 + neg).numpy())
+        if not bad.any():
+            return neg
+        neg[bad] = torch.randint(0, n_items, (int(bad.sum()),), generator=gen)
 
 
 @torch.no_grad()
@@ -277,6 +304,7 @@ def train(a, n_users, n_items, train_pairs, social_edges, val_pos, device):
     for u, i in train_pairs:
         pos_by_user.setdefault(u, set()).add(i)
     train_pos = {u: tuple(v) for u, v in pos_by_user.items()}
+    pos_keys = np.sort(np.array([u * n_items + i for u, i in train_pairs], dtype=np.int64))
     users_t = torch.tensor([u for u, _ in train_pairs], dtype=torch.long)
     pos_t = torch.tensor([i for _, i in train_pairs], dtype=torch.long)
 
@@ -300,9 +328,10 @@ def train(a, n_users, n_items, train_pairs, social_edges, val_pos, device):
             if len(bi) == 0:
                 continue
             u, p = users_t[bi], pos_t[bi]
-            neg = sample_negatives(u, train_pos, n_items, gen)
+            neg = sample_negatives(u, pos_keys, n_items, gen)
             u, p, neg = u.to(device), p.to(device), neg.to(device)
-            out = model(u, p, neg, a.beta, a.sigma, a.l2_reg)
+            out = model(u, p, neg, a.beta, a.sigma, a.l2_reg,
+                        hsic_cap=getattr(a, "hsic_sample", None))
             opt.zero_grad()
             out["loss"].backward()
             opt.step()
@@ -315,9 +344,15 @@ def train(a, n_users, n_items, train_pairs, social_edges, val_pos, device):
                 u_emb, i_emb = model.propagate(model.graph_learner())
             val_ndcg = ndcg_at_k(u_emb.cpu().numpy(), i_emb.cpu().numpy(), train_pos, val_pos,
                                 a.topk, seed=a.seed)
+            # mask stats every eval, not just at export: a mask that is already saturated at
+            # the best-val epoch cannot be discriminating edges, and without the trajectory a
+            # flat FINAL mask is indistinguishable from one that never had variance at all.
+            gs = model.deterministic_gate()
             print(f"epoch {epoch:>4}/{a.epochs}  loss={tot['loss']/n_batches:.4f} "
                   f"bpr={tot['bpr']/n_batches:.4f} ib={tot['ib']/n_batches:.4f} "
-                  f"auc={tot['auc']/n_batches:.4f}  val_NDCG@{a.topk}={val_ndcg:.4f}")
+                  f"auc={tot['auc']/n_batches:.4f}  val_NDCG@{a.topk}={val_ndcg:.4f}  "
+                  f"mask std={gs.std():.2e} range={gs.max()-gs.min():.2e} "
+                  f"uniq={len(np.unique(gs)):,}")
             if val_ndcg >= best_ndcg:
                 best_ndcg, since_improve = val_ndcg, 0
                 best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -517,9 +552,7 @@ def _check_detach_bug_is_fixed():
     weights = weights.index_copy(0, model.social_index, gate)
     weights = weights.detach()                         # upstream's exact bug, reproduced
     masked_values = model.adj.values() * weights
-    masked_adj = torch.sparse_coo_tensor(model.adj.indices(), masked_values,
-                                         model.adj.shape).coalesce()
-    u_new, i_new = model.propagate(masked_adj)
+    u_new, i_new = model.propagate(masked_values)
     bpr = -F.logsigmoid((u_new[users] * i_new[pos]).sum(-1) -
                         (u_new[users] * i_new[neg]).sum(-1)).mean()
     bpr.backward()
@@ -550,6 +583,10 @@ def main():
     p.add_argument("--sigma", type=float, default=0.25, help="HSIC kernel bandwidth")
     p.add_argument("--l2-reg", type=float, default=1e-4)
     p.add_argument("--batch-size", type=int, default=1024)
+    p.add_argument("--hsic-sample", type=int, default=None,
+                   help="cap the HSIC estimator to this many unique users/items per batch "
+                        "(the [b,b] kernels dominate large-batch steps; subsampling keeps the "
+                        "estimator's target and adds variance)")
     p.add_argument("--epochs", type=int, default=200)
     p.add_argument("--min-epochs", type=int, default=30,
                    help="no early stop before this many epochs, mirrors upstream's epoch>50 gate")

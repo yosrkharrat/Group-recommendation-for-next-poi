@@ -26,6 +26,10 @@ data/gowalla/poi_metadata_GOWALLA.csv
 data/gowalla/users_GOWALLA.csv
 data/gowalla/friendship_old_GOWALLA.csv
 data/gowalla/friendship_new_only_GOWALLA.csv
+# GBSR's pruned edge list: 99.99% identical to the raw graph (16 of 117,949 edges dropped) and
+# rederived from the committed social_edge_weights_GOWALLA.csv by a median threshold. The
+# WEIGHTS file is the evidence of the collapse and is committed.
+data/gowalla/friendship_old_denoised_GOWALLA.csv
 data/gowalla/groups_social*/group_examples_*.jsonl
 data/gowalla/kg_*/kg_triples.pt
 data/gowalla/kg_*/kg_hierarchy.pt
