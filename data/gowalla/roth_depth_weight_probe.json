@@ -1,0 +1,85 @@
+{
+  "config": {
+    "kg_dir": "./data/gowalla/kg_raw",
+    "data_dir": "./data/gowalla",
+    "dataset": "GOWALLA",
+    "work_dir": "./data/gowalla/_depth_probe",
+    "out": "./data/gowalla/roth_depth_weight_probe.json",
+    "weights": [
+      0.0,
+      1.0,
+      5.0
+    ],
+    "epochs": 6,
+    "batch_size": 4096,
+    "n_neg": 32,
+    "max_eval": 4000,
+    "device": "mps",
+    "seed": 42
+  },
+  "rows": [
+    {
+      "depth_weight": 0.0,
+      "d1": -0.030303657374406684,
+      "verdict": "ABSENT",
+      "mrr": 0.043595348866830474,
+      "hits10": 0.10075,
+      "per_relation": {
+        "HAS_CATEGORY": 2.1454569805857383e-05,
+        "LOCATED_IN": 8.64414736864842e-06,
+        "PREFERS_CATEGORY": 0.00021619491370131931,
+        "GROUP_PREFERS": 0.055067027494762076,
+        "IS_NEAR_TO": 0.06932400038654053,
+        "SUBCATEGORY_OF": 0.00012214486380847684
+      },
+      "final": {
+        "epoch": 6,
+        "loss": 0.01136803583275934,
+        "depth": 0.7496935381339147,
+        "d1": -0.030303657374406684
+      }
+    },
+    {
+      "depth_weight": 1.0,
+      "d1": 0.8054870284158038,
+      "verdict": "STRONG",
+      "mrr": 0.034904192418670404,
+      "hits10": 0.07375,
+      "per_relation": {
+        "HAS_CATEGORY": 0.08606994999459085,
+        "LOCATED_IN": 0.0006810877740944779,
+        "PREFERS_CATEGORY": 0.3214133927388255,
+        "GROUP_PREFERS": 0.33935091725117134,
+        "IS_NEAR_TO": 0.0001301643655727689,
+        "SUBCATEGORY_OF": 0.0002512562814070352
+      },
+      "final": {
+        "epoch": 6,
+        "loss": 0.01773727222568231,
+        "depth": 0.0035596498936746527,
+        "d1": 0.8054870284158038
+      }
+    },
+    {
+      "depth_weight": 5.0,
+      "d1": 0.8665512054739272,
+      "verdict": "STRONG",
+      "mrr": 0.028065552541253976,
+      "hits10": 0.05875,
+      "per_relation": {
+        "HAS_CATEGORY": 0.0378162336212549,
+        "LOCATED_IN": 0.002090370056996189,
+        "PREFERS_CATEGORY": 0.3317550913080919,
+        "GROUP_PREFERS": 0.3439077664216972,
+        "IS_NEAR_TO": 1.6157094901328354e-05,
+        "SUBCATEGORY_OF": 0.0009009009009009009
+      },
+      "final": {
+        "epoch": 6,
+        "loss": 0.030865423347393752,
+        "depth": 0.003050751542966617,
+        "d1": 0.8665512054739272
+      }
+    }
+  ]
+}

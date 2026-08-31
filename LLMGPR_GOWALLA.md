@@ -336,11 +336,42 @@ most directly, `HAS_CATEGORY` (100× random) and `LOCATED_IN` (26× random), are
 the table, while FSQ's best run reached HAS_CATEGORY MRR 0.191. Radial ordering was bought at
 the cost of ranking the category tail.
 
-**This is a tradeoff to sweep, not a defect to hide** — and the good news is where the strength
-landed: `GROUP_PREFERS` (3145×) and `OCCURRED_AT` (2273×) are the two best relations in the KG,
-and they are exactly the group layer this project exists to model. `src/roth_depth_weight_probe.py`
-runs the matched comparison (depth_weight ∈ {0, 1, 5}, equal budget) to confirm the causal story
-and pick the operating point before stage 5 consumes the embeddings.
+The good news is where the strength landed: `GROUP_PREFERS` (3145×) and `OCCURRED_AT` (2273×) are
+the two best relations in the KG, and they are exactly the group layer this project exists to
+model.
+
+**The "depth term steals from hierarchical link prediction" hypothesis is REFUTED.**
+`src/roth_depth_weight_probe.py` ran the matched comparison (identical seed, data, 6-epoch budget
+and evaluation; only `depth_weight` varies) and the effect runs the *other* way:
+
+```
+depth_w   D1 rho  verdict     MRR    H@10  HAS_CATEGORY  LOCATED_IN  GROUP_PREFERS
+      0  -0.0303   ABSENT  0.0436  0.1008        0.0000      0.0000         0.0551
+      1  +0.8055   STRONG  0.0349  0.0737        0.0861      0.0007         0.3394
+      5  +0.8666   STRONG  0.0281  0.0587        0.0378      0.0021         0.3439
+```
+
+Switch the depth term **off** and the category relations collapse to zero — `HAS_CATEGORY`
+0.0000, `PREFERS_CATEGORY` 0.0002, `GROUP_PREFERS` 0.0551 — while the KGE loss reaches *0.0114 in
+6 epochs*, lower than the weighted run's 0.0120 after 50. The model fits the training triples
+better without the regulariser and generalises far worse on exactly the relations the regulariser
+touches. **The depth term is not taxing hierarchical link prediction; it is what makes it work**,
+by preventing a fit that does not generalise. Three things follow:
+
+1. **The operating point is non-monotone and `depth_weight = 5` overshoots.** At matched budget,
+   `dw = 1` gives 2.3× the `HAS_CATEGORY` MRR of `dw = 5` (0.0861 vs 0.0378) for 0.06 of D1
+   (+0.8055 vs +0.8666, both STRONG). The endpoint-only verdict this script prints ("tradeoff not
+   reproduced") is right about the hypothesis but blind to this interior optimum — read the table.
+2. **At `dw = 5`, more training makes `HAS_CATEGORY` worse**: 0.0378 at 6 epochs → 0.0105 at 50.
+   The depth term progressively dominates (55.9% of the objective by epoch 50). `dw = 1` is the
+   better long-budget bet, and a 50-epoch `dw = 1` arm is running as the candidate replacement.
+3. **The depth term genuinely hurts the *spatial* relation.** `IS_NEAR_TO` goes 0.0693 (dw = 0) →
+   0.0001 (dw = 1) at 6 epochs and only recovers with a long budget (0.1331 at dw = 5, 50 epochs).
+   Since `IS_NEAR_TO` carries the largest evaluation sample, it is what drags *overall* MRR down
+   as `dw` rises — the headline MRR column is dominated by this one relation and should not be
+   read as a summary of embedding quality.
+
+Full per-epoch numbers in `data/gowalla/roth_depth_weight_probe.json`.
 
 ### Commands (repro)
 
