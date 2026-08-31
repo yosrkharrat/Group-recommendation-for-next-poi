@@ -27,6 +27,11 @@ data/llmgpr/groups_social*/group_examples_*.jsonl
 # one is tracked at data/kg/poi_hyperbolic_embs_NYC.npy.
 data/poi_hyperbolic_embs.npy
 
+# ── Gowalla raw dump (figshare 22126586, the yongliu.org / Liu CIKM'13 crawl) ─
+# 1.7 GB, six files, md5-verified against figshare's manifest. Re-download with the
+# curl loop documented in LLMGPR_GOWALLA.md; derived parquets live beside them.
+data/gowalla_raw/
+
 # ── Run artifacts ──────────────────────────────────────────────────────────
 # _code/ is the notebook's module-staging dir when not on Kaggle (CODE_STAGE falls back to
 # ./_code); outputs/ holds logs, checkpoints and results json from a run.

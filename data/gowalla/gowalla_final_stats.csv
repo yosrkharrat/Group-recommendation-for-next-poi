@@ -1,0 +1,10 @@
+column,ours,theirs,ratio
+users,31667.0,31751.0,0.9974
+pois,81240.0,81123.0,1.0014
+cats,326.0,537.0,0.6071
+ck,903045.0,862502.0,1.047
+check_ins_per_user,28.52,27.16,1.05
+match4,0.8895,1.0,0.8895
+match3_users_pois_ck,0.9837,1.0,0.9837
+friend_directed_edges,235898.0,,
+users_with_friend_edge,26779.0,,

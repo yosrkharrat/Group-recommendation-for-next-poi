@@ -9,6 +9,14 @@ Audience: a fresh session picking this up cold. Everything below was established
 > statistic, or convention from that pipeline carries over. All files for this track live at
 > the repo root plus `src/probe_section3.py` and `src/to_gbsr.py`.
 
+> **Gowalla (2026-08-31, `gowalla` branch):** the same Table-1 recovery for their Gowalla
+> column lives in `LLMGPR_GOWALLA.md` + `llmgpr-gowalla-recovery.ipynb`, with the working
+> dataset committed at `data/gowalla/`. Headline: dump identified (the Liu CIKM'13 crawl,
+> figshare 22126586); users/POIs/check-ins recovered at 0.997×/1.001×/1.047× — but only with
+> **no ≥10 user cut** (their stated rule tops out at 0.74 there) and `#POIs` as a **km≤28
+> catalogue**; `#categories` (537) is hard-bounded unreachable from that dump (341 in-region,
+> 637–667 whole-history). Same multi-stage-table pathology as §1.4/§1.9b below.
+
 **Goal.** Follow LLMGPR (CIKM'25, `papers/3746252.3761018.pdf`) — its data split, its
 leave-one-out evaluation, its group-construction rule — on Foursquare NYC / LA / Chicago,
 matching its Table 1 statistics. Then denoise with GBSR (KDD'24, `yimutianyang/KDD24-GBSR`).
