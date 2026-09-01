@@ -851,19 +851,39 @@ def run(a):
     train_df["day"] = train_df["utc_time"].dt.floor("D")
 
     if "established" in a.regimes:
-        A, comp = build_affinity(train_df, cat_of, loc_of, users,
-                                 cat_level=a.cat_level, far_gap_min=a.far_gap_min)
-        Y = copresence_labels(groups, users)
-        validation = validate(A, comp, Y, verbose=True)
-        clique_nbrs, clique_G, clique_thr = clique_neighbourhood(A, a.affinity_percentile)
-        n_eligible = sum(1 for v in clique_nbrs.values() if v)
-        print(f"  affinity graph: top {100-a.affinity_percentile:.1f}% (cut={clique_thr:.3f}), "
-              f"{n_eligible}/{len(users)} users with >=1 neighbour")
+        # Backend choice is about MEMORY, not semantics: affinity.py allocates five dense
+        # [n,n] float64 matrices plus triu_indices -- fine at the Foursquare arm's 7,849 users
+        # (~0.5 GB each), impossible at Gowalla's 31,667 (~8 GB each). affinity_blocked computes
+        # the same z-summed affinity and the same exact percentile cut blockwise, and its
+        # --self-check asserts the threshold, every neighbour set and every G[i,j] match the
+        # dense path bit-for-bit. `auto` keeps the dense path (and byte-identical Foursquare
+        # reproduction) below the threshold and switches above it.
+        use_blocked = (a.affinity_backend == "blocked" or
+                       (a.affinity_backend == "auto" and len(users) > a.affinity_dense_max))
+        if use_blocked:
+            from affinity_blocked import clique_neighbourhood_blocked
+            print(f"  affinity backend: BLOCKED ({len(users):,} users > "
+                  f"{a.affinity_dense_max:,} dense limit; a dense [n,n] would be "
+                  f"{len(users)**2 * 8 / 1e9:.1f} GB each x5)")
+            clique_nbrs, clique_G, clique_thr, _astats = clique_neighbourhood_blocked(
+                train_df, cat_of, loc_of, users, cat_level=a.cat_level,
+                far_gap_min=a.far_gap_min, percentile=a.affinity_percentile)
+            n_eligible = _astats["n_users_with_neighbour"]
+            # validate() ranks EVERY pair of EVERY component against the co-presence labels,
+            # which needs the dense matrices this backend exists to avoid. It is a diagnostic
+            # (AUC table) and feeds no output, so it is reported as skipped rather than faked.
+            validation = dict(skipped="requires dense [n,n] components; backend=blocked",
+                              affinity_stats=_astats)
+        else:
+            A, comp = build_affinity(train_df, cat_of, loc_of, users,
+                                     cat_level=a.cat_level, far_gap_min=a.far_gap_min)
+            Y = copresence_labels(groups, users)
+            validation = validate(A, comp, Y, verbose=True)
+            clique_nbrs, clique_G, clique_thr = clique_neighbourhood(A, a.affinity_percentile)
+            n_eligible = sum(1 for v in clique_nbrs.values() if v)
+            print(f"  affinity graph: top {100-a.affinity_percentile:.1f}% "
+                  f"(cut={clique_thr:.3f}), {n_eligible}/{len(users)} users with >=1 neighbour")
     else:
-        # The dense [n,n] affinity matrices exist only to build `established` cliques, and no
-        # other regime or output reads them. At Gowalla scale (31.7k users) each one is ~8 GB,
-        # so they are skipped whenever `established` is not requested -- adding it back needs
-        # the sparse/blocked rewrite noted in LLMGPR_GOWALLA.md, not a bigger machine.
         clique_nbrs, clique_G, clique_thr = {}, nx.Graph(), None
         validation, n_eligible = None, 0
         print(f"  affinity graph skipped ('established' not in --regimes {a.regimes})")
@@ -1162,6 +1182,13 @@ def main():
                    choices=["established", "occasional", "random"],
                    help="KCGRS's group taxonomy: established=affinity clique, "
                         "occasional=real co-presence, random=uniform")
+    p.add_argument("--affinity-backend", choices=["auto", "dense", "blocked"], default="auto",
+                   help="'established' affinity: dense builds five [n,n] float64 matrices "
+                        "(8 GB each at 31.7k users); blocked computes the identical z-summed "
+                        "affinity and exact percentile cut without them (verified bit-identical "
+                        "by affinity_blocked.py's self-check). auto switches by --affinity-dense-max")
+    p.add_argument("--affinity-dense-max", type=int, default=12000,
+                   help="auto backend: user count above which the blocked path is used")
     p.add_argument("--affinity-percentile", type=float, default=99.0,
                    help="keep the top (100-p)%% of user pairs as affinity edges; 99.0 gives "
                         "5,752 pairs / 905 users / 1,704 5-cliques on FSQ-NYC")
