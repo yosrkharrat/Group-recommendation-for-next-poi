@@ -99,8 +99,11 @@ python src/train_roth.py --kg-dir ./data/gowalla/kg_raw --data-dir ./data/gowall
     --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01 --device cuda
 ```
 
-The committed embeddings are valid and clear the D1 gate comfortably (+0.8683); this is a
-parameter-parity gap, not a correctness one.
+**Decision taken (2026-09-01): keep the committed embeddings and do NOT run the parity job.**
+This is a parameter-parity gap, not a correctness one — RotH is fully trained (50/50 epochs),
+D1 ρ = +0.8683 STRONG, and stage 5 can consume it as-is. The 120/512/128 run is optional, belongs
+on the GPU box if anyone wants strict comparability with the Foursquare numbers, and is **not** a
+prerequisite for the fine-tune. Do not treat its absence as an unfinished stage.
 
 ### b. The depth weight may be mistuned
 

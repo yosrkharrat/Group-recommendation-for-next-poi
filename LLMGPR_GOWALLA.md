@@ -404,6 +404,14 @@ by preventing a fit that does not generalise. Three things follow:
 
 Full per-epoch numbers in `data/gowalla/roth_depth_weight_probe.json`.
 
+**RotH hyperparameters: divergence accepted by decision (2026-09-01).** The FSQ/LBSN arm used
+`--epochs 120 --batch-size 512 --n-neg 128`; this arm used `50 / 4096 / 32`. Measured, not
+estimated: FSQ's exact settings run at **15.3 min/epoch = 30.7 h** for 120 epochs on this laptop
+against 3.2 min/epoch for the committed config (the FSQ arm itself trained on Kaggle CUDA, where
+the exact settings are ~2–3 h). **Decision: keep the committed embeddings.** RotH is fully
+trained, D1 is STRONG at +0.8683, and stage 5 consumes it unchanged; the parity run is optional
+and belongs on a GPU. Everything else in stages 0–4 is at full Foursquare parity.
+
 ### Commands (repro)
 
 ```bash
