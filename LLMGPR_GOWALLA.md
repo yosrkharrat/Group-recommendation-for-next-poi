@@ -145,7 +145,11 @@ with `friendship_new_only_*` EMPTY (no before/after split exists; leakage rule i
 168,493 over 31,667 users / 47,783 POIs; lat/lon coverage **100.0%** (FSQ managed 43%), so
 `IS_NEAR_TO` covers every POI.
 
-### Stage 1 — groups (`build_groups.py --group-source social`, raw arm)
+### Stage 1 — groups (`build_groups.py --group-source social`), FULL FOURSQUARE PARITY
+
+Diffing the two `groups_manifest.json` configs found **`regimes` was the only substantive
+divergence** — every other knob already matched the FSQ arm. It is now closed, so the command is
+the Foursquare one with paths changed:
 
 ```
 real social groups (LLMGPR/CubeRec rule)   36,621   sizes 2:31,120 .. 8:42, mean 2.22
@@ -153,7 +157,11 @@ distinct member-sets                       18,362   1.99 pooled check-ins each
   >= 2 pooled events                        2,987
   >= 3 pooled events                        1,782      <- LLMGPR's 2,186 sits between these
 real group->group transitions              90,152
-trainable examples (occasional+random)     39,317 train / 8,041 val / 16,970 test
+trainable examples   train 84,205 / val 18,964 / test 42,694
+  established  45,026 / 10,833 / 25,929      occasional  35,119 / 7,208 / 14,554
+  random        4,060 /    923 /  2,211
+asserts: 4,258 established groups verified true cliques; 56,881 occasional groups each carry a
+companion met >= 2x; causality + integrity on 6,000 sampled examples
 ```
 
 Two findings worth the trip:
@@ -167,10 +175,33 @@ Two findings worth the trip:
   denser co-presence + real friendships change the design space: the natural task (group at A →
   predict B) has data here. Flagged for the evaluation plan.
 
-One scale patch, measured not asserted: the dense `[n,n]` affinity machinery (five ~8 GB
-matrices at 31.7k users) is now built **only when `established` ∈ `--regimes`** — it is that
-regime's only consumer. Gowalla runs `--regimes occasional random`; adding `established` back
-needs a sparse/blocked `affinity.py` rewrite, not a bigger machine.
+**`established` required a new affinity backend, not a relaxed rule.** `affinity.py` allocates
+five dense `[n,n]` float64 matrices plus `triu_indices` — ~0.5 GB each at FSQ's 7,849 users,
+**~8 GB each at 31,667**. `src/affinity_blocked.py` gets the same numbers without them: for a
+cosine component the exact upper-triangle moments follow in closed form from the `[n,k]` one-hot
+matrix (`Σᵢⱼ Sᵢⱼ = ‖colsum(M)‖²`, `Σᵢⱼ Sᵢⱼ² = ‖MᵀM‖²_F` — a `[k,k]` Gram product), far-co-visit
+stays sparse, and the percentile is found by a two-pass histogram plus a re-scan of only the bin
+holding the target order statistic so it reproduces `np.percentile`'s interpolation exactly.
+
+```
+exact cut 5.660150 over all 501,383,611 pairs -> 5,013,928 edges = 1.00000% (top 1% by definition)
+31,667/31,667 users with >= 1 neighbour, mean degree 316.7, peak RSS ~4.2 GB
+```
+
+Its `--self-check` asserts the threshold, **every** neighbour set and **every** `G[i,j]` match the
+dense path at percentiles 99/95/90, plus that the Gram-trick moments equal numpy's `mean`/`std`
+to 1e-12 — an exact reimplementation, not an approximation. `--affinity-backend auto` keeps the
+dense path below 12,000 users so FSQ reproduction stays byte-identical. The one thing blocked mode
+does not produce is `validate()`'s per-component AUC-vs-co-presence table, which ranks every pair
+of every component and so needs the very matrices this avoids; it feeds no output and the manifest
+records it as skipped rather than faking a number.
+
+**Superseded directories, kept as the record of two measurements.** `groups_social_raw` is the
+same build without `established` (the earlier divergence); `groups_social_denoised` is the
+GBSR-denoised control (≤0.21% drift, below). The KG-layer inputs — `ephemeral_groups.csv`,
+`group_members.csv`, `co_attended.csv`, `real_group_transitions.csv` — are **byte-identical
+across all three**, since the real co-presence groups do not depend on the regime set, so the KG,
+the alignment triples and the RotH embeddings needed no rebuild when parity was restored.
 
 ### Stage 2 — GBSR: **a measured no-op again, and the sparsity explanation is falsified**
 

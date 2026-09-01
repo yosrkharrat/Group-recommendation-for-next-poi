@@ -12,15 +12,14 @@ parameterised by environment variables, so **no notebook edits are needed**.
 ```bash
 export STAGE6B_DATASET=GOWALLA
 export STAGE6B_DATA_DIR=./data/gowalla
-export STAGE6B_GROUPS_DIR=./data/gowalla/groups_social_raw
+export STAGE6B_GROUPS_DIR=./data/gowalla/groups_social
 jupyter lab notebooks/stage5_lbsn_finetune.ipynb
 ```
 
 `_autodetect_data_dir` finds `./data/gowalla` on its own (it searches by content for
 `train_GOWALLA.csv` + `poi_metadata_GOWALLA.csv`), and `find()` locates the embedding and
-alignment files recursively under it, so `STAGE6B_DATA_DIR` is belt-and-braces. **`STAGE6B_GROUPS_DIR`
-is not** — the default is `<DATA_DIR>/groups_social`, and this arm's directory is
-`groups_social_raw`. Set it.
+alignment files recursively under it, so all three exports are belt-and-braces: the groups
+directory is now `groups_social`, which is also the notebook's default.
 
 ## One preparation step (5 seconds)
 
@@ -46,32 +45,64 @@ Everything `prepare_gowalla_csvs.py` reads is committed.
 | `data/gowalla/poi_metadata_GOWALLA.csv` | §2, `N_POI` = 47,783 | regenerate |
 | `data/gowalla/friendship_old_GOWALLA.csv` | §9b group build (117,949 edges) | regenerate |
 | `data/gowalla/kg_raw/poi_hyperbolic_embs_GOWALLA.npy` | `EMB_FILE` (47,783 × 64) | **committed** |
-| `data/gowalla/kg_raw/poi_poi_triples_GOWALLA.pt` | `ALIGN_TRIPLES_FILE` (160,000 × 3) | **committed** |
-| `data/gowalla/kg_raw/poi_relation_vocab_GOWALLA.json` | `ALIGN_RELVOCAB_FILE` (4 relations) | **committed** |
+| `data/gowalla/kg_raw/poi_poi_triples_GOWALLA.pt` | `ALIGN_TRIPLES_FILE` (1,051,826 × 3) | **committed** |
+| `data/gowalla/kg_raw/poi_relation_vocab_GOWALLA.json` | `ALIGN_RELVOCAB_FILE` (2 relations) | **committed** |
 
-Group examples (`group_examples_{train,val,test}.jsonl`, 146 MB) are gitignored and **§9b builds
-them itself** (~10 min) if absent, so there is no manual step. 200-record samples plus schema
-notes are committed at `data/gowalla/groups_social_raw/samples/`.
+Group examples (`group_examples_{train,val,test}.jsonl`, ~310 MB) are gitignored and **§9b builds
+them itself** (~25 min) if absent, so there is no manual step. 200-record samples plus schema
+notes are committed at `data/gowalla/groups_social/samples/`. Sizes: train 84,205 · val 18,964 ·
+test 42,694 (established 45,026 / 10,833 / 25,929 · occasional 35,119 / 7,208 / 14,554 ·
+random 4,060 / 923 / 2,211).
 
 ## What differs from the Foursquare arm
 
-1. **The regime set.** `established` needs the dense `[n,n]` affinity matrices — ~8 GB each at
-   31,667 users. §9b now picks `occasional random` for `GOWALLA` automatically
-   (`_DEFAULT_REGIMES`, overridable via `STAGE6B_GROUP_REGIMES`). **Before this patch the
-   auto-build would have OOM'd.** If you build groups by hand, pass
-   `--regimes occasional random`.
+**Stages 0–4 are now at full parity.** Diffing the two `groups_manifest.json` configs shows zero
+substantive divergences: all three KCGRS regimes, window 180, hops 5, sizes 2–5,
+`min_companion_repeat` 2, `max_venue_visitors` 50, `affinity_percentile` 99, `hist_len` 90,
+`profile_top_k` 10, seed 42. The alignment stage matches the FSQ arm's *actual* provenance
+(`derived: none`, `max_per_relation: null` → the two flat relations), not its handoff's reproduce
+command, which contradicts its own committed artifact. Four things remain genuinely different,
+all forced by the data or the hardware:
+
+1. **`established` needs `src/affinity_blocked.py`.** `affinity.py`'s five dense `[n,n]` float64
+   matrices are ~8 GB each at 31,667 users. The blocked backend computes the identical z-summed
+   affinity and the identical exact percentile cut (5.660150 over all 501,383,611 pairs →
+   5,013,928 edges, exactly 1.00%), and its self-check asserts threshold, neighbour sets and every
+   `G[i,j]` match the dense path bit-for-bit. `--affinity-backend auto` keeps the dense path below
+   12,000 users, so FSQ reproduction is untouched. One diagnostic is skipped in blocked mode:
+   `validate()`'s per-component AUC table needs the dense matrices; the manifest records it as
+   skipped rather than faking a number.
 2. **The KG dir is `kg_raw`, not `kg_denoised`** — and that is the finding, not an oversight.
-   GBSR is a measured no-op on this graph at every bottleneck strength tested; the denoised arm
-   is built and diffed at `groups_social_denoised/` and every count moves by ≤ 0.21%
+   GBSR is a measured no-op on this graph at every bottleneck strength tested; the denoised
+   control is at `groups_social_denoised/` and every count moves by ≤ 0.21%
    (`LLMGPR_GOWALLA.md` §5). Cite it as the control.
-3. **4 alignment relations, not 2** — `FOLLOWED_BY`, `IS_NEAR_TO`, `SAME_TAXONOMY_L2`,
-   `SAME_TAXONOMY_L3` at 40,000 each (capped). The FSQ arm had only the two flat ones, which its
-   handoff flagged as leaving "the TransE term with no hierarchical signal of its own". Fixed here.
-4. **D1 ρ = +0.8683 STRONG** against FSQ's +0.3245. `IS_NEAR_TO` covers 100% of POIs here
-   (FSQ: 43%), so if the hyperbolic-vs-random ablation comes out flat, the weak-hierarchy
+3. **RotH hyperparameters — the one open parity gap.** See below.
+4. **D1 ρ = +0.8683 STRONG** against FSQ's +0.3245, and `IS_NEAR_TO` covers 100% of POIs here
+   (FSQ: 43%). So if the hyperbolic-vs-random ablation comes out flat, the weak-hierarchy
    explanation the FSQ handoff offered does **not** apply — look elsewhere.
 
-## Open item, stated plainly
+## Open items, stated plainly
+
+### a. RotH hyperparameters are not yet at parity
+
+The FSQ/LBSN arm used `--epochs 120 --batch-size 512 --n-neg 128`; the committed Gowalla
+embeddings used `--epochs 50 --batch-size 4096 --n-neg 32`. This was forced by wall clock and is
+**measured, not estimated**: FSQ's exact settings run at **15.3 min/epoch = 30.7 h** for 120
+epochs on an M-series laptop (the batch-4096 variant is 3.2 min/epoch). The FSQ arm itself trained
+on Kaggle CUDA, where the exact settings are ~2–3 h, so **running the command below on a GPU is
+both faithful and cheap** and is the recommended way to close this gap:
+
+```bash
+python src/train_roth.py --kg-dir ./data/gowalla/kg_raw --data-dir ./data/gowalla \
+    --dataset GOWALLA --out-dir ./data/gowalla/kg_parity --epochs 120 \
+    --batch-size 512 --n-neg 128 --log-every 10 --max-eval 4000 \
+    --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01 --device cuda
+```
+
+The committed embeddings are valid and clear the D1 gate comfortably (+0.8683); this is a
+parameter-parity gap, not a correctness one.
+
+### b. The depth weight may be mistuned
 
 The committed embeddings were trained at `--depth-weight 5.0`, where the depth term is **55.9% of
 the objective** at epoch 50. The matched probe (`data/gowalla/roth_depth_weight_probe.json`) says

@@ -1,0 +1,113 @@
+{
+  "config": {
+    "data_dir": "./data/gowalla",
+    "out_dir": "./data/gowalla/groups_social",
+    "dataset": "GOWALLA",
+    "group_source": "social",
+    "friend_old": "./data/gowalla/friendship_old_GOWALLA.csv",
+    "friend_new": null,
+    "friendship": "old",
+    "social_window": 180,
+    "social_max_hops": 5,
+    "window": 60,
+    "min_size": 2,
+    "max_size": 8,
+    "horizon": 240,
+    "min_companion_repeat": 2,
+    "max_venue_visitors": 50,
+    "min_tie_groups": 2,
+    "min_tie_venues": 1,
+    "regimes": [
+      "established",
+      "occasional",
+      "random"
+    ],
+    "affinity_backend": "auto",
+    "affinity_dense_max": 12000,
+    "affinity_percentile": 99.0,
+    "far_gap_min": 180,
+    "sizes": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "constraint": "cat-inter",
+    "cat_level": 2,
+    "hist_len": 90,
+    "min_hist": 1,
+    "min_member_activity": 5,
+    "require_companion_history": true,
+    "profile_top_k": 10,
+    "profile_cats": 3,
+    "profile_hours": 3,
+    "resplit": false,
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "seed": 42,
+    "self_check": false
+  },
+  "n_pois": 47783,
+  "n_users": 31667,
+  "n_checkins": 903045,
+  "n_ephemeral_groups": 36621,
+  "n_real_transitions": 90152,
+  "n_co_attended": 31808,
+  "affinity": {
+    "validation": {
+      "skipped": "requires dense [n,n] components; backend=blocked",
+      "affinity_stats": {
+        "threshold": 5.6601503931089825,
+        "n_pairs": 501383611,
+        "n_edges": 5013928,
+        "n_users": 31667,
+        "n_users_with_neighbour": 31667,
+        "mean_degree": 316.6658035178577,
+        "backend": "blocked",
+        "z_params": {
+          "taste": {
+            "mean": 0.0881578809334302,
+            "std": 0.15831129718118137
+          },
+          "rhythm": {
+            "mean": 0.04181383352408221,
+            "std": 0.09738252781662873
+          },
+          "territory": {
+            "mean": 0.41113986630682464,
+            "std": 0.47165228048498026
+          },
+          "far_covisit": {
+            "mean": 1.0061150238138049e-05,
+            "std": 0.003697805094453342
+          }
+        }
+      }
+    },
+    "clique_threshold": 5.6601503931089825,
+    "n_clique_eligible_users": 31667
+  },
+  "counts": {
+    "train": 84205,
+    "val": 18964,
+    "test": 42694
+  },
+  "stats": {
+    "individual_examples": 871378,
+    "candidates_established": 864063,
+    "skip_constraint_established": 757426,
+    "skip_no_companions_occasional": 724034,
+    "candidates_random": 871378,
+    "skip_constraint_random": 858697,
+    "candidates_occasional": 147344,
+    "skip_constraint_occasional": 81139,
+    "emitted": 145863,
+    "skip_inactive_member_occasional": 1319,
+    "skip_inactive_member_random": 1971,
+    "skip_no_companions_established": 7315,
+    "skip_inactive_member_established": 9712,
+    "skip_anchor_only_history_established": 15137,
+    "skip_anchor_only_history_occasional": 8005,
+    "skip_anchor_only_history_random": 3516
+  }
+}
