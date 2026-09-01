@@ -9,6 +9,14 @@ parameterised by environment variables, so **no notebook edits are needed**.
 
 ## Run it
 
+**On Kaggle/GPU the `gowalla` branch must be pushed first.** §0b stages `src/*.py` from
+`REPO_RAW`, which now points at
+`raw.githubusercontent.com/yosrkharrat/Group-recommendation-for-next-poi/**gowalla**/src` —
+`affinity_blocked.py` and the `--regimes`/`--affinity-backend` flags exist only on this branch, so
+a run against `llmgpr-pipeline` would stage the old `build_groups.py` and fail on the unknown
+argument (and then OOM on dense affinity if it got past that). Running **locally** from the repo
+root is unaffected: `find()` resolves `src/` directly and never fetches.
+
 ```bash
 export STAGE6B_DATASET=GOWALLA
 export STAGE6B_DATA_DIR=./data/gowalla
