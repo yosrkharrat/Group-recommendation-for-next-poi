@@ -250,7 +250,7 @@ def main():
     p.add_argument("--checkins", default="./data/gowalla/gowalla_final_checkins.csv.gz")
     p.add_argument("--catalogue", default="./data/gowalla/gowalla_final_catalogue.csv")
     p.add_argument("--friendships", default="./data/gowalla/gowalla_final_friendships.csv")
-    p.add_argument("--structure", default="./data/gowalla_raw/gowalla_category_structure.json")
+    p.add_argument("--structure", default="./data/gowalla/gowalla_category_structure.json")
     p.add_argument("--out-dir", default="./data/gowalla")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()

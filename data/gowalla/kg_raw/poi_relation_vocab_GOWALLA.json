@@ -1,0 +1,29 @@
+{
+  "relation_to_id": {
+    "FOLLOWED_BY": 0,
+    "IS_NEAR_TO": 1,
+    "SAME_TAXONOMY_L2": 2,
+    "SAME_TAXONOMY_L3": 3
+  },
+  "counts": {
+    "FOLLOWED_BY": 40000,
+    "IS_NEAR_TO": 40000,
+    "SAME_TAXONOMY_L2": 40000,
+    "SAME_TAXONOMY_L3": 40000
+  },
+  "provenance": {
+    "source": "build_kg_dir",
+    "kg_file": "/Users/macbook/Documents/POI/data/gowalla/kg_raw",
+    "metadata_file": "/Users/macbook/Documents/POI/data/gowalla/poi_metadata_GOWALLA.csv",
+    "n_pois": 47783,
+    "n_native_poi_poi_triples": 1051826,
+    "n_after_derive_and_cap": 160000,
+    "derived": "taxonomy",
+    "excluded_relations": [],
+    "max_per_relation": 40000,
+    "seed": 42,
+    "behavioural_relations_present": [
+      "FOLLOWED_BY"
+    ]
+  }
+}
