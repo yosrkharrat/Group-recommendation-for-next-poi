@@ -28,7 +28,7 @@
 # src/eval_protocol.py's docstring; nothing about the protocol is decided in this cell.
 #
 # Names this cell relies on (all defined earlier in stage5_lbsn_finetune.ipynb):
-#   meta_df, full_df, test_ex, build_split_examples, collate, model, BATCH_SIZE, SEED,
+#   meta_df, full_df, test_ex, build_split_examples, collate, model, EVAL_BATCH_SIZE, SEED,
 #   TEST_MAX, SMOKE_TEST, OUT_DIR, DATASET, EMB_CONDITION, MODEL_NAME, SCORING_MODE, N_MASKS,
 #   USE_ACC_AT_T_OBJECTIVE, _forward_multimask / _forward_single,
 #   and, for the group task, group_ex, build_group_example, _load_group_examples (§9b).
@@ -68,7 +68,7 @@ if cp_desc["coord_coverage"] < 0.999:
 def comparison_protocol_pass(examples, cands, name):
     """One forward pass -> rank among the 501 candidates AND rank against the full catalogue."""
     model.eval()
-    loader = DataLoader(list(range(len(examples))), batch_size=BATCH_SIZE, shuffle=False,
+    loader = DataLoader(list(range(len(examples))), batch_size=EVAL_BATCH_SIZE, shuffle=False,
                         collate_fn=lambda idx: (collate([examples[i] for i in idx]),
                                                 cands[np.asarray(idx)]))
     r_cand, r_full = [], []
