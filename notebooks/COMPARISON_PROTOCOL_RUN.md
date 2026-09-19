@@ -22,6 +22,14 @@ manual-resume path in §10, the training loop is skipped (resume epoch > `EPOCHS
 GPU guard is bypassed (evaluation runs on a 16 GB card), the full validation and test splits are
 used, and sections **11**, **11b** and **11c** run. Leave `EVAL_CKPT = None` to train as before.
 
+**Alignment adapter.** `save_checkpoint()` now copies `alignment_modules_<DATASET>.pt` (the trained
+curvature-aware adapter, ~17 MB) into every `ckpt_*` folder, and an `EVAL_CKPT` run loads it instead
+of re-training §6b, so `W_POI` is exactly the table the checkpoint was trained against. For a
+checkpoint trained *before* this change, put that file (from the training run's `outputs/`) next to
+`adapter_model.safetensors`, or point `STAGE6B_ALIGN_MODULES` at it. If it cannot be found the
+notebook falls back to re-training the alignment and says so; the tied-scorer numbers of such a run
+are approximate, not the checkpoint's own.
+
 | branch | dataset | what runs |
 |---|---|---|
 | `llmgpr-pipeline` | Foursquare | already trained → `EVAL_CKPT` = that checkpoint, run all |
