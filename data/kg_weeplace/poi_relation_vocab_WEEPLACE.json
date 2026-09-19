@@ -4,7 +4,7 @@
     "FOLLOWED_BY": 1
   },
   "counts": {
-    "IS_NEAR_TO": 158658,
+    "IS_NEAR_TO": 158650,
     "FOLLOWED_BY": 380531
   },
   "provenance": {
@@ -12,8 +12,8 @@
     "kg_file": "C:\\backup\\Bureau\\stage\\Group-recommendation-for-next-poi\\data\\kg_weeplace",
     "metadata_file": "C:\\backup\\Bureau\\stage\\Group-recommendation-for-next-poi\\data\\Weeplace\\poi_metadata_WEEPLACE.csv",
     "n_pois": 12931,
-    "n_native_poi_poi_triples": 539189,
-    "n_after_derive_and_cap": 539189,
+    "n_native_poi_poi_triples": 539181,
+    "n_after_derive_and_cap": 539181,
     "derived": "none",
     "excluded_relations": [],
     "max_per_relation": null,

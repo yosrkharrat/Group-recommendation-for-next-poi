@@ -248,8 +248,8 @@ def write_outputs(out_dir, ds, df, meta, users, edges, groups_df, group_ck_df, m
     meta[meta_cols].to_csv(os.path.join(out_dir, f"poi_metadata_{ds}.csv"), index=False)
     print(f"  poi_metadata_{ds}.csv  {len(meta):,} POIs")
 
-    edges.to_csv(os.path.join(out_dir, f"friendship_{ds}.csv"), index=False)
-    print(f"  friendship_{ds}.csv  {len(edges):,} edges")
+    edges.to_csv(os.path.join(out_dir, f"friendship_old_{ds}.csv"), index=False)
+    print(f"  friendship_old_{ds}.csv  {len(edges):,} edges")
 
     users.to_csv(os.path.join(out_dir, f"users_{ds}.csv"), index=False)
 

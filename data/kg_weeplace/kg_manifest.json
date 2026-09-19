@@ -1,0 +1,52 @@
+{
+  "config": {
+    "csv_dir": "./data/Weeplace",
+    "mat": null,
+    "poi_meta": null,
+    "taxonomy": "",
+    "groups_dir": "./data/Weeplace/groups_social",
+    "out_dir": "./data/kg_weeplace_v2",
+    "export_dir": null,
+    "dataset": "WEEPLACE",
+    "split": "user",
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "wrap_tol": 24,
+    "cell_deg": 0.01,
+    "knn": 10,
+    "max_followed_by": null,
+    "tau": 0.4,
+    "self_check": false
+  },
+  "source": "./data/Weeplace",
+  "dataset": "WEEPLACE",
+  "n_entities": 60697,
+  "n_triples": 1152073,
+  "n_relations": 12,
+  "node_types": {
+    "CATEGORY": 461,
+    "GROUP": 42733,
+    "LOCALITY": 3,
+    "POI": 12931,
+    "REGION": 3,
+    "USER": 4566
+  },
+  "relation_counts": {
+    "FOLLOWED_BY": 380531,
+    "VISITED": 246995,
+    "IS_NEAR_TO": 158650,
+    "CO_ATTENDED": 113770,
+    "MEMBER_OF": 103612,
+    "OCCURRED_AT": 42733,
+    "GROUP_PREFERS": 42733,
+    "FRIEND_OF": 31318,
+    "LOCATED_IN": 12934,
+    "HAS_CATEGORY": 12931,
+    "PREFERS_CATEGORY": 5419,
+    "SUBCATEGORY_OF": 447
+  },
+  "n_hierarchy_pairs": 74464,
+  "n_prefers_category": 5419,
+  "n_friendship_old": 15659,
+  "n_friendship_new_only": 0
+}
