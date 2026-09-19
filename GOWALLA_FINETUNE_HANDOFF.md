@@ -84,7 +84,7 @@ all forced by the data or the hardware:
    GBSR is a measured no-op on this graph at every bottleneck strength tested; the denoised
    control is at `groups_social_denoised/` and every count moves by ≤ 0.21%
    (`LLMGPR_GOWALLA.md` §5). Cite it as the control.
-3. **RotH hyperparameters — the one open parity gap.** See below.
+3. **RotH hyperparameters — the one open parity gap, five settings not three.** See below.
 4. **D1 ρ = +0.8683 STRONG** against FSQ's +0.3245, and `IS_NEAR_TO` covers 100% of POIs here
    (FSQ: 43%). So if the hyperbolic-vs-random ablation comes out flat, the weak-hierarchy
    explanation the FSQ handoff offered does **not** apply — look elsewhere.
@@ -93,25 +93,48 @@ all forced by the data or the hardware:
 
 ### a. RotH hyperparameters are not yet at parity
 
-The FSQ/LBSN arm used `--epochs 120 --batch-size 512 --n-neg 128`; the committed Gowalla
-embeddings used `--epochs 50 --batch-size 4096 --n-neg 32`. This was forced by wall clock and is
-**measured, not estimated**: FSQ's exact settings run at **15.3 min/epoch = 30.7 h** for 120
-epochs on an M-series laptop (the batch-4096 variant is 3.2 min/epoch). The FSQ arm itself trained
-on Kaggle CUDA, where the exact settings are ~2–3 h, so **running the command below on a GPU is
-both faithful and cheap** and is the recommended way to close this gap:
+**Corrected 2026-09-19.** The settings the Foursquare arm *actually* used are recorded in its
+committed `data/llmgpr/kg_denoised/roth_results.json` (now also on this branch), and they are not
+the ones this section originally quoted. **Five** settings differ, not three:
+
+| setting | Foursquare (committed) | Gowalla (committed) |
+|---|---|---|
+| `--epochs` | 150 | 50 |
+| `--batch-size` | 512 | 4096 |
+| `--n-neg` | 128 | 32 |
+| `--depth-weight` | **1.0** | 5.0 |
+| `--depth-margin` | **0.1** | 0.3 |
+| dim 64 · lr 1e-3 · γ 6 · α 1 · root-pull 0.01 · curvature 1 · typed-negatives all · seed 42 | same | same |
+
+(`--max-eval` was 2000 there and 4000 here; it only sizes the link-prediction validation sample.)
+The epochs / batch / negatives divergence was forced by wall clock — FSQ's exact settings run at
+**15.3 min/epoch** on an M-series laptop (the batch-4096 variant at 3.2 min/epoch). The depth-term
+values were copied from a reproduce command in `LLMGPR_FINETUNE_HANDOFF.md` that did not match
+the committed artefact (fixed there too). Note that the `dw = 1` probe in (b) below independently
+found `--depth-weight 1.0` to be the better operating point: it is also what Foursquare used.
+
+The faithful parity command — the same 2–3 h CUDA job the Foursquare arm ran on Kaggle — is:
 
 ```bash
 python src/train_roth.py --kg-dir ./data/gowalla/kg_raw --data-dir ./data/gowalla \
-    --dataset GOWALLA --out-dir ./data/gowalla/kg_parity --epochs 120 \
-    --batch-size 512 --n-neg 128 --log-every 10 --max-eval 4000 \
-    --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01 --device cuda
+    --dataset GOWALLA --out-dir ./data/gowalla/kg_parity --epochs 150 \
+    --batch-size 512 --n-neg 128 --log-every 10 --max-eval 2000 \
+    --depth-weight 1.0 --depth-margin 0.1 --root-pull 0.01 --device cuda
 ```
 
+Adopting its output needs no stage-4 re-run (the alignment triples come from the KG, not from
+RotH): move `kg_raw/poi_hyperbolic_embs_GOWALLA.npy` **out of `data/`** (stage 5's `find()`
+matches by exact filename anywhere under `data/` and would silently pick whichever of two copies
+it walks first), drop the parity `.npy` + `roth_results.json` into `kg_raw/`, and confirm the
+`[D1]` line still clears the gate (ρ > 0.30, monotone).
+
 **Decision taken (2026-09-01): keep the committed embeddings and do NOT run the parity job.**
-This is a parameter-parity gap, not a correctness one — RotH is fully trained (50/50 epochs),
-D1 ρ = +0.8683 STRONG, and stage 5 can consume it as-is. The 120/512/128 run is optional, belongs
-on the GPU box if anyone wants strict comparability with the Foursquare numbers, and is **not** a
-prerequisite for the fine-tune. Do not treat its absence as an unfinished stage.
+That decision was taken believing only epochs / batch / negatives differed and that Foursquare
+had used `dw = 5.0, margin = 0.3`. Both premises were wrong, so it should be re-taken with the
+table above in hand. What still holds: RotH is fully trained (50/50 epochs), D1 ρ = +0.8683
+STRONG, and stage 5 consumes the committed embeddings as-is — a fine-tune already running on
+them is not invalid, it is just not at RotH parity with Foursquare, and a paper that says the
+embedding stage "runs identically on all three" cannot yet say so for this one.
 
 ### b. The depth weight may be mistuned
 
@@ -156,7 +179,7 @@ PYTORCH_ENABLE_MPS_FALLBACK=1 python src/train_roth.py --kg-dir ./data/gowalla/k
     --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01 --device mps      # stage 3, ~4.5 h
 PYTHONHASHSEED=0 python src/build_poi_poi_triples.py --kg-dir ./data/gowalla/kg_raw \
     --meta ./data/gowalla/poi_metadata_GOWALLA.csv --out-dir ./data/gowalla/kg_raw \
-    --dataset GOWALLA --derive taxonomy --max-per-relation 40000              # stage 4, ~1 min
+    --dataset GOWALLA --derive none          # stage 4, ~1 min -- matches the committed vocab (derived none, no cap)
 ```
 
 `PYTHONHASHSEED=0` on the KG builds: `build_kg.py`'s modal-category tie-break iterates a dict,
