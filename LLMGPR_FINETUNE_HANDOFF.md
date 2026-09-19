@@ -148,9 +148,15 @@ prompts are unaffected — `collate` pads to the batch max, not to `MAX_LEN`.
    the manifest is still missing and the threshold/edge-count/mask-separation provenance is lost),
    or the committed graph is pre-denoising and the description is ahead of the artifact.
    **Ask the author to commit `gbsr_denoise_manifest.json` before this is reported as a
-   GBSR result.** Same for `kg_denoised/roth_results.json` and `roth_best.pt`, which the LBSN
-   track ships and this one does not — the D1 number above was recomputed from the `.npy` with
-   `src/train_roth.py`'s own `d1_radial_hierarchy` to stand in.
+   GBSR result.** `kg_denoised/roth_results.json` and `kg_manifest.json` ARE committed (2026-08-26 on
+   `llmgpr-pipeline`, copied onto `llmgpr-gowalla` 2026-09-19); `roth_best.pt` ships on
+   `llmgpr-pipeline` and the branches cut from it, not on `llmgpr-gowalla`. `roth_results.json` confirms ρ = +0.3245 and records the RotH settings
+   actually used — **150 epochs, batch 512, 128 negatives, depth weight 1.0, depth margin 0.1**
+   (the reproduce command in this file used to say 120 / 5.0 / 0.3; corrected). Its
+   `kg_manifest.json` also records that the KG was built from a `groups_social_denoised/`
+   directory with 13,478 groups that is not committed anywhere — the committed `groups_social/`
+   has 4,804 real groups and rebuilds a 26,467-entity KG, not the committed 35,141-entity one.
+   Ask the author for that directory before claiming the embedding chain is reproducible.
 
    **2b. And when GBSR *is* run here, it does nothing.** Smoke run on the real
    `friendship_old_LLMGPR.csv` (10 epochs; BPR converged, train AUC 0.977):
@@ -252,9 +258,10 @@ python src/build_groups.py --data-dir ./data/llmgpr --dataset LLMGPR \
 python src/build_kg_lbsn.py --csv-dir ./data/llmgpr --dataset LLMGPR \
         --groups-dir ./data/llmgpr/groups_social --out-dir ./data/llmgpr/kg_denoised   # stage 2b
 python src/train_roth.py --kg-dir ./data/llmgpr/kg_denoised --data-dir ./data/llmgpr \
-        --dataset LLMGPR --epochs 120 --log-every 10 --max-eval 4000 \
-        --depth-weight 5.0 --depth-margin 0.3 --root-pull 0.01                # stage 3 (GPU: --device cuda)
+        --dataset LLMGPR --epochs 150 --batch-size 512 --n-neg 128 --log-every 10 --max-eval 2000 \
+        --depth-weight 1.0 --depth-margin 0.1 --root-pull 0.01   # stage 3 (GPU: --device cuda) -- the settings
+                                                                 # recorded in the committed roth_results.json
 python src/build_poi_poi_triples.py --kg-dir ./data/llmgpr/kg_denoised \
         --meta ./data/llmgpr/poi_metadata_LLMGPR.csv --out-dir ./data/llmgpr/kg_denoised \
-        --dataset LLMGPR --derive taxonomy --max-per-relation 40000            # stage 4
+        --dataset LLMGPR --derive none          # stage 4 -- matches the committed vocab (derived none, no cap)
 ```
