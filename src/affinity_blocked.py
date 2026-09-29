@@ -328,7 +328,7 @@ def _self_check():
             t = base + pd.Timedelta(minutes=int(rng.integers(0, 60 * 24 * 40)))
             rows.append((u, p, t))
     df = pd.DataFrame(rows, columns=["user_id", "poi_idx", "utc_time"])
-    df["ts"] = df["utc_time"].astype("int64") // (60 * 10 ** 9)
+    df["ts"] = df["utc_time"].dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
     df["day"] = df["utc_time"].dt.floor("D")
     cat_of = {p: f"L1>L2_{p % 7}" for p in range(n_pois)}
     loc_of = {p: ["New York", "Chicago", "Los Angeles"][p % 3] for p in range(n_pois)}

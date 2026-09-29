@@ -286,7 +286,7 @@ def d3_group_feasibility(df, windows=(15, 30, 60, 120), min_shared=2,
 
 def _to_epoch_minutes(s):
     import pandas as pd
-    return pd.to_datetime(s, errors="coerce", utc=True).astype("int64") // (60 * 10 ** 9)
+    return pd.to_datetime(s, errors="coerce", utc=True).dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
 
 
 def _covisit_events(d, window_min, max_group):

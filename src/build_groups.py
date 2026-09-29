@@ -131,7 +131,10 @@ def load_checkins(data_dir, dataset="NYC"):
     df = pd.concat(frames, ignore_index=True)
     df["utc_time"] = pd.to_datetime(df["utc_time"], utc=True, errors="coerce")
     df = df.dropna(subset=["utc_time"]).copy()
-    df["ts"] = df["utc_time"].astype("int64") // (60 * 10 ** 9)     # epoch minutes
+    # as_unit("ns") first: pandas >= 3 parses these strings at MICROsecond resolution, and without it
+    # int64 // 6e10 yields epoch-minutes / 1000 -- every 180-min co-presence bucket silently becomes
+    # ~125 days and the social groups nearly triple. A no-op on pandas 2 (already ns).
+    df["ts"] = df["utc_time"].dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)     # epoch minutes
     df["hour"] = df["utc_time"].dt.hour.astype(int)
     df["dow"] = df["utc_time"].dt.day_name()
     if "venue_id" not in df.columns:
@@ -1009,7 +1012,7 @@ def _self_check():
 
     df = pd.DataFrame(rows)
     df["utc_time"] = pd.to_datetime(df["utc_time"], utc=True)
-    df["ts"] = df["utc_time"].astype("int64") // (60 * 10 ** 9)
+    df["ts"] = df["utc_time"].dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
     df["hour"] = df["utc_time"].dt.hour.astype(int)
     df["dow"] = df["utc_time"].dt.day_name()
     cat_of = {10: "Dining and Drinking > Bar", 11: "Dining and Drinking > Bar",
@@ -1116,7 +1119,7 @@ def _self_check_social():
 
     df = pd.DataFrame(rows)
     df["utc_time"] = pd.to_datetime(df["utc_time"], utc=True)
-    df["ts"] = df["utc_time"].astype("int64") // (60 * 10 ** 9)
+    df["ts"] = df["utc_time"].dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
 
     G = nx.Graph()
     G.add_edge(1, 2)
