@@ -20,10 +20,17 @@ Foursquare taxonomy paths. Per-user chronological 70/10/20 already applied
 
 - **Social layer:** `friendship_old_LLMGPR.csv` — 8,640 before-period edges over 4,872 users.
   `friendship_new_only_LLMGPR.csv` — 5,528 pairs, **EVAL ONLY** (see rule 1).
-- **Hyperbolic embeddings:** `data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR.npy`
-  (14,402 × 64, rows in `poi_idx` order). **D1 ρ = +0.3245, STRONG, radii monotone** over
-  taxonomy depths 1–4 (1.014 / 1.017 / 1.055 / 1.073). See the risk note below — this is a
-  *weak* pass.
+- **Hyperbolic embeddings:** `data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR_refh.npy`
+  (14,402 × 64, rows in `poi_idx` order) — **RefH**, Foursquare's winning hyperbolic KGE in the
+  RotH / RefH / AttH model-selection comparison (MRR 0.1627 vs AttH 0.1541 vs RotH 0.1415 on one
+  shared 2,000-triple split; AttH excluded by the D1 gate). **D1 ρ = +0.3203, STRONG, radii
+  monotone** over taxonomy depths 1–4. Checkpoint `refh_best.pt` (reproduces the `.npy` to
+  6e-8) and `refh_results.json` sit beside it; the comparison evidence is
+  `roth_vs_atth_vs_refh_comparison.json` / `kge_variant_comparison.csv` /
+  `atth_vs_refh_per_relation.csv`. The notebook picks the file through `KGE_WINNER` in its config
+  cell; `STAGE6B_KGE_MODEL=roth` re-runs the previous RotH embeddings
+  (`poi_hyperbolic_embs_LLMGPR.npy`, ρ = +0.3245), which stay committed. See the risk note
+  below — either way this is a *weak* pass.
 - **Alignment triples:** 254,265 triples / **2 relations** (`IS_NEAR_TO` 76,666,
   `FOLLOWED_BY` 177,599).
 - **Group task:** LLMGPR's own social-group rule, 71,933 / 16,164 / 33,193 examples.
@@ -36,7 +43,7 @@ Foursquare taxonomy paths. Per-user chronological 70/10/20 already applied
 | `data/llmgpr/poi_metadata_LLMGPR.csv` | `poi_idx` 0–14,401, venue hex id, full taxonomy path, lat/lon, locality/region |
 | `data/llmgpr/friendship_old_LLMGPR.csv` | 8,640 edges, 0-based user ids — the only friendship file training may touch |
 | `data/llmgpr/friendship_new_only_LLMGPR.csv` | 5,528 pairs — **EVAL ONLY, never in training data or prompts** (rule 1) |
-| `data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR.npy` | `EMB_FILE` (14,402 × 64) |
+| `data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR_refh.npy` | `EMB_FILE` (14,402 × 64, RefH — the winner) |
 | `data/llmgpr/kg_denoised/poi_poi_triples_LLMGPR.pt` + `poi_relation_vocab_LLMGPR.json` | §6b `ALIGN_TRIPLES_FILE` / `ALIGN_RELVOCAB_FILE` |
 | `data/llmgpr/groups_social/` | §9b group task: CSVs + manifest committed, `group_examples_*.jsonl` gitignored (self-built, ~2 min) |
 | `data/llmgpr/groups_social/samples/` | 200 records per split + schema README |
@@ -52,7 +59,7 @@ CPU with nothing else present. It reads **seven** files:
 ```
 data/llmgpr/{train,val,test}_LLMGPR.csv        check-in splits
 data/llmgpr/poi_metadata_LLMGPR.csv           N_POI, taxonomy paths, poi_cat
-data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR.npy    EMB_FILE  (§2, §7)
+data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR_refh.npy    EMB_FILE  (§2, §7; RefH)
 data/llmgpr/kg_denoised/poi_poi_triples_LLMGPR.pt         ALIGN_TRIPLES_FILE  (§6b)
 data/llmgpr/kg_denoised/poi_relation_vocab_LLMGPR.json    ALIGN_RELVOCAB_FILE (§6b)
 ```
@@ -61,7 +68,7 @@ plus `friendship_{old,new_only}_LLMGPR.csv` when `USE_SOCIAL_CONTEXT=True`, and 
 `groups_social/group_examples_*.jsonl` it builds itself for §9b.
 
 `kg_triples.pt`, `kg_entities.json`, `kg_hierarchy.pt`, `kg_relations.json`, `kg_poi_rows.json`,
-`kg_manifest.json` and `roth_best.pt` are **not referenced anywhere in the notebook**. The full
+`kg_manifest.json`, `roth_best.pt` and `refh_best.pt` are **not referenced anywhere in the notebook**. The full
 knowledge graph is an *intermediate* — `train_roth.py` consumes it to produce the embeddings, and
 `build_poi_poi_triples.py` distils its POI→POI subset into the two alignment files. Only those
 outputs cross into stage 5, and all of them are committed. Nothing is missing.
@@ -94,7 +101,7 @@ Verify these lines, then leave it:
 RUN_PROFILE=full  SUBSAMPLE_FRAC=1.0  VAL_MAX=None  TEST_MAX=None
 [hw] 80 GB VRAM -> QUANTIZE=False BATCH_SIZE=16 GRAD_ACCUM=2 GRAD_CKPT=False
 POIs: 14402 | emb dim: 64 | condition: hyperbolic
-[D1] emb file=poi_hyperbolic_embs_LLMGPR.npy  rho=+0.3245  monotonic=True
+[D1] emb file=poi_hyperbolic_embs_LLMGPR_refh.npy  rho=+0.3203  monotonic=True
 POI-POI triples: 254,265  relations: 2
 [group-task] examples  train=71933  val=16164  test=33193
 [group-prompt] tokens over 2000 examples: mean~2015 max<4085  (MAX_LEN=4096)
