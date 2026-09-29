@@ -16,7 +16,8 @@ huggingface_hub
 # The notebook re-pins whatever torch it finds so this file cannot downgrade a working build.
 
 numpy
-pandas
+pandas<3                # the committed groups/KGs were built on pandas 2.x; pandas 3 changes datetime
+                        # resolution and string dtypes (see src/build_groups.py load_checkins)
 scipy
 networkx                # build_groups.py --group-source social
 python-dotenv           # optional: lets the notebook read HF_TOKEN from a .env file
