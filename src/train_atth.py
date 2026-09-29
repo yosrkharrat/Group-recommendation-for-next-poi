@@ -1,42 +1,35 @@
 """
-RotH (rotation-based hyperbolic KG embedding) on the merged POI + group graph, WITH a depth
-regulariser.
+AttH (attention-combined rotation/reflection hyperbolic KG embedding) on the merged POI +
+group graph, WITH the same depth regulariser as `train_roth.py`.
 
-Why the regulariser exists
---------------------------
-The previously shipped `poi_hyperbolic_embs.npy` has essentially no radial hierarchy. Diagnostic
-D1 over all 5,120 POIs:
+This is `train_roth.py`'s sibling for the model-selection comparison (RotH vs AttH vs RefH):
+same data pipeline, same NSSA loss, same type-restricted negatives, same depth regulariser,
+same link-prediction eval, same D1 diagnostic and CLI -- the only thing that changes is the
+per-relation geometric transform applied to the head entity before scoring against the tail.
 
-    Spearman(taxonomy depth, hyperbolic radius) = +0.0189      VERDICT: ABSENT
-    depth 1 mean radius 1.2557    depth 3 mean radius 1.2577
-    depth 2 mean radius 1.2529    depth 5 mean radius 1.2732      (all norms in [0.465, 0.638])
+RotH rotates; AttH additionally learns a per-relation reflection and an attention context
+vector, and blends rotation vs reflection per (head, relation) pair:
 
-Every POI sits in the same thin shell, so "general categories near the origin, specific ones near
-the boundary" -- the entire premise of using hyperbolic space, and the substrate any
-consensus-by-generalisation argument needs -- is simply not there. That is not a bug in RotH: RotH
-optimises link prediction, and nothing in a link-prediction loss asks the radial coordinate to
-encode depth. It is a hoped-for by-product, and here it did not happen.
+    x'      = mobius_add(expmap0(e_h), expmap0(r_trans), c)      # same as RotH up to here
+    x_rot   = givens_rotation(theta_rot_r, x')
+    x_ref   = givens_reflection(theta_ref_r, x')
+    a_rot   = <x_rot, context_r>,  a_ref = <x_ref, context_r>    # dot with a per-relation vector
+    (w_rot, w_ref) = softmax([a_rot, a_ref])
+    q       = w_rot * x_rot + w_ref * x_ref
+    score   = -geodesic_dist(q, x_t)^2 + bias_h + bias_t
 
-The fix is one extra term over the graph's parent->child edges:
-
-    L_depth = mean over (parent, child) of  relu( margin - (r(child) - r(parent)) )
-    with r(z) = 2 * artanh(||z||)         -- the same quantity D1 reports
-
-i.e. a child must sit at least `margin` further from the origin than its parent, or it is
-penalised. Cheap, differentiable, and it targets exactly the coordinate the link-prediction loss
-ignores. Everything else follows the recipe that produced the project's best RotH run
-(HAS_CATEGORY MRR 0.120 -> 0.191): d=64, learnable per-relation curvature, NSSA self-adversarial
-loss, type-restricted negatives for the hierarchical relations, inverse-frequency relation
-weighting, cosine LR.
-
-Type-restricted negatives are not optional. The Stage-2 audit found that under uniform sampling
-only 7.0-7.4% of negatives for the hierarchical relations were even the correct node type, so the
-model was rewarded for separating types rather than for learning hierarchy.
+This attends on the ball points (not the tangent-space entity embedding as in the original
+AttH paper) so it composes with the rest of this repo's ball-based pipeline (mobius_add,
+depth loss, D1) without a second tangent/ball round-trip. `ball_points()` -- what the depth
+regulariser and the saved embedding artifact both use -- is untouched: it is just the raw
+entity embedding mapped onto the ball, identical to RotH, since neither the hierarchy loss nor
+the exported embedding cares which relation-specific transform training used.
 
 Usage
 -----
-    python train_roth.py --kg-dir ./data/kg --out-dir ./data/kg --epochs 150
-    python train_roth.py --self-check
+    python train_atth.py --kg-dir ./data/kg_weeplace --data-dir ./data/Weeplace \\
+        --out-dir ./data/kg_weeplace --dataset WEEPLACE --epochs 150
+    python train_atth.py --self-check
 """
 
 from __future__ import annotations
@@ -54,10 +47,11 @@ import torch.nn as nn
 
 EPS = 1e-15
 MAX_NORM = 1.0 - 1e-5
+TAG = "atth"
 
 
 # --------------------------------------------------------------------------
-# Poincare-ball ops (mirrors stage2-hyperbolic-ops)
+# Poincare-ball ops (identical to train_roth.py)
 # --------------------------------------------------------------------------
 
 def project(x, c):
@@ -88,12 +82,26 @@ def geodesic_dist(x, y, c):
 
 
 def givens_rotation(theta, x):
-    """Block-diagonal 2x2 rotations -- the 'Rot' in RotH, and an isometry of the ball."""
+    """Block-diagonal 2x2 rotations (det +1) -- the 'Rot' half of AttH."""
     d = x.shape[-1]
     x = x.view(*x.shape[:-1], d // 2, 2)
     cos, sin = torch.cos(theta).unsqueeze(-1), torch.sin(theta).unsqueeze(-1)
     x0, x1 = x[..., 0:1], x[..., 1:2]
     out = torch.cat([cos * x0 - sin * x1, sin * x0 + cos * x1], dim=-1)
+    return out.view(*out.shape[:-2], d)
+
+
+def givens_reflection(theta, x):
+    """Block-diagonal 2x2 reflections (det -1) -- the 'Ref' half of AttH.
+
+    [[cos, sin], [sin, -cos]] is orthogonal and an involution (applying it twice is
+    identity), unlike the rotation block above which composes.
+    """
+    d = x.shape[-1]
+    x = x.view(*x.shape[:-1], d // 2, 2)
+    cos, sin = torch.cos(theta).unsqueeze(-1), torch.sin(theta).unsqueeze(-1)
+    x0, x1 = x[..., 0:1], x[..., 1:2]
+    out = torch.cat([cos * x0 + sin * x1, sin * x0 - cos * x1], dim=-1)
     return out.view(*out.shape[:-2], d)
 
 
@@ -107,21 +115,24 @@ def hyp_radius(z, c=1.0):
 # model
 # --------------------------------------------------------------------------
 
-class RotH(nn.Module):
+class AttH(nn.Module):
     def __init__(self, n_ent, n_rel, dim=64, init_scale=1e-3):
         super().__init__()
-        assert dim % 2 == 0, "RotH needs an even dim for its 2x2 rotation blocks"
+        assert dim % 2 == 0, "AttH needs an even dim for its 2x2 rotation/reflection blocks"
         self.dim = dim
         self.ent = nn.Embedding(n_ent, dim)
-        self.rel = nn.Embedding(n_rel, dim)            # translation, in tangent space
-        self.theta = nn.Embedding(n_rel, dim // 2)     # rotation angles
+        self.rel = nn.Embedding(n_rel, dim)                # translation, in tangent space
+        self.theta_rot = nn.Embedding(n_rel, dim // 2)
+        self.theta_ref = nn.Embedding(n_rel, dim // 2)
+        self.context = nn.Embedding(n_rel, dim)            # attention context vector
         self.bh = nn.Embedding(n_ent, 1)
         self.bt = nn.Embedding(n_ent, 1)
-        # learnable per-relation curvature via softplus, so c stays strictly positive
         self.c_logit = nn.Parameter(torch.zeros(n_rel))
         nn.init.normal_(self.ent.weight, std=init_scale)
         nn.init.normal_(self.rel.weight, std=init_scale)
-        nn.init.uniform_(self.theta.weight, -0.1, 0.1)
+        nn.init.uniform_(self.theta_rot.weight, -0.1, 0.1)
+        nn.init.uniform_(self.theta_ref.weight, -0.1, 0.1)
+        nn.init.normal_(self.context.weight, std=init_scale)
         nn.init.zeros_(self.bh.weight)
         nn.init.zeros_(self.bt.weight)
 
@@ -139,22 +150,31 @@ class RotH(nn.Module):
         x_h = expmap0(self.ent(h), c)
         x_t = expmap0(self.ent(t), c)
         trans = expmap0(self.rel(r_exp), c)
-        q = givens_rotation(self.theta(r_exp), mobius_add(x_h, trans, c))
+        x_translated = mobius_add(x_h, trans, c)
+
+        x_rot = givens_rotation(self.theta_rot(r_exp), x_translated)
+        x_ref = givens_reflection(self.theta_ref(r_exp), x_translated)
+        ctx = self.context(r_exp)
+        a_rot = (x_rot * ctx).sum(-1, keepdim=True)
+        a_ref = (x_ref * ctx).sum(-1, keepdim=True)
+        w = torch.softmax(torch.cat([a_rot, a_ref], dim=-1), dim=-1)
+        q = w[..., 0:1] * x_rot + w[..., 1:2] * x_ref
+
         d = geodesic_dist(q, x_t, c)
         return -(d ** 2) + self.bh(h).squeeze(-1) + self.bt(t).squeeze(-1)
 
     def ball_points(self, c=1.0):
         """All entity embeddings as Poincare-ball points at a common reference curvature.
 
-        The saved artifact must be at one curvature, not each relation's own -- the downstream
-        LLaDA pipeline applies logmap0 with c=CURVATURE_C=1.0.
+        Identical convention to RotH: the saved artifact must be at one curvature, not each
+        relation's own -- the downstream LLaDA pipeline applies logmap0 with c=CURVATURE_C=1.0.
         """
         cc = torch.full((1,), float(c), device=self.ent.weight.device)
         return expmap0(self.ent.weight, cc)
 
 
 # --------------------------------------------------------------------------
-# training
+# training (identical to train_roth.py: negative sampling, NSSA loss, depth loss, eval, D1)
 # --------------------------------------------------------------------------
 
 def build_type_pools(ent_types, id_of_type):
@@ -192,19 +212,7 @@ def nssa_loss(pos, neg, gamma, alpha, weights=None):
 
 
 def depth_loss(model, hier, margin, c=1.0, rel_groups=None, root_pull=0.0):
-    """relu(margin - (r_child - r_parent)) over parent->child pairs. THE fix for D1.
-
-    Averaged PER RELATION, not per pair. A flat mean is dominated by whichever hierarchy relation
-    happens to be largest: HAS_CATEGORY contributes 5,120 pairs and SUBCATEGORY_OF only 417, so a
-    flat mean gives the taxonomy spine 2.9% of the gradient. Measured consequence of that -- the
-    cross-type ordering came out right (REGION 0.31 < LOCALITY 0.59 < CATEGORY 0.66 < POI 0.76)
-    while the category chain itself stayed unordered (depth1 0.708 > depth2 0.617), and D1 is
-    precisely a statement about that chain.
-
-    `root_pull` adds a weak penalty on every entity's radius. The relu is one-sided, so on its own
-    it can be satisfied by inflating all radii together; pulling everything toward the origin makes
-    the margin the binding constraint and is how Poincare embeddings get their hierarchy for free.
-    """
+    """relu(margin - (r_child - r_parent)) over parent->child pairs, averaged per relation."""
     if len(hier) == 0:
         return torch.zeros((), dtype=torch.float32)
     z = model.ball_points(c)
@@ -266,7 +274,6 @@ def d1_radial_hierarchy(z_poi, depths):
         order = np.argsort(a, kind="mergesort")
         rk = np.empty(len(a), dtype=float)
         rk[order] = np.arange(len(a), dtype=float)
-        # average ties
         _, inv, cnt = np.unique(a, return_inverse=True, return_counts=True)
         sums = np.zeros(len(cnt))
         np.add.at(sums, inv, rk)
@@ -286,10 +293,8 @@ def d1_radial_hierarchy(z_poi, depths):
 def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None, depths=None):
     device = torch.device(getattr(a, "device", None) or "cpu")
     torch.manual_seed(a.seed)
-    gen = torch.Generator().manual_seed(a.seed)      # kept on CPU: randperm/randint stay CPU-side,
-                                                      # only the small per-batch slices move to device
+    gen = torch.Generator().manual_seed(a.seed)
 
-    # held-out triples for link prediction
     perm = torch.randperm(len(triples), generator=gen)
     n_val = max(1, int(len(triples) * a.val_frac))
     val_t, train_t = triples[perm[:n_val]], triples[perm[n_val:]]
@@ -298,18 +303,10 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
     for h, r, t in triples.tolist():
         filt.setdefault((h, r), []).append(t)
 
-    # type-restricted negatives for the hierarchical relations
     name_of = {v: k for k, v in rel_names.items()}
     tail_types = {}
     for h, r, t in train_t.tolist():
         tail_types.setdefault(r, set()).add(ent_type_ids[t])
-    # Type-restricted negatives. `hierarchy` (the original setting) leaves the flat relations
-    # sampling uniformly over all entities -- but FOLLOWED_BY and IS_NEAR_TO are POI->POI and
-    # only 54% of the graph is POI, so 46% of their negatives are wrong by node type alone and
-    # teach nothing. Measured on the trained model: a positive beats a uniform negative 100.0%
-    # of the time and a HARD negative only 43.2%, and with n_neg=25 the expected number of
-    # actually-competitive negatives per batch item is 0.22 -- i.e. ~78% of steps carry no
-    # learning signal at all, which is why the loss plateaus by epoch 20 at Hits@1 = 0.056.
     pools = {}
     if a.typed_negatives != "none":
         for r, types in tail_types.items():
@@ -323,16 +320,14 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
     else:
         print("negatives: uniform over all entities")
 
-    # inverse-frequency relation weights (IS_NEAR_TO is 36% of edges on its own)
     cnt = torch.bincount(train_t[:, 1], minlength=n_rel).float().clamp_min(1)
     rel_w = (cnt.sum() / cnt)
     rel_w = (rel_w / rel_w.mean()).clamp(max=a.max_rel_weight)
 
-    model = RotH(n_ent, n_rel, a.dim).to(device)
+    model = AttH(n_ent, n_rel, a.dim).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=a.lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=a.epochs, eta_min=a.lr * 0.02)
 
-    # boolean mask per hierarchy relation, so the depth loss weights each type equally
     rel_groups = []
     hier = hier.to(device)
     if hier.numel() and hier.shape[1] == 3:
@@ -415,7 +410,6 @@ def run(a):
     for name, rec in ents.items():
         ent_type_ids[rec["id"]] = rec["type"]
 
-    # POI rows in poi_idx order + their taxonomy depths, for D1
     meta = None
     depths = poi_rows = None
     mp = os.path.join(a.data_dir, f"poi_metadata_{a.dataset}.csv")
@@ -442,34 +436,35 @@ def run(a):
     torch.save({"state_dict": {k: v.cpu() for k, v in model.state_dict().items()}, "dim": a.dim,
                 "curvature_per_relation": torch.nn.functional.softplus(
                     model.c_logit.detach()).tolist()},
-               os.path.join(a.out_dir, "roth_best.pt"))
-    np.save(os.path.join(a.out_dir, "entity_hyperbolic_embs.npy"), z_all)
+               os.path.join(a.out_dir, f"{TAG}_best.pt"))
+    np.save(os.path.join(a.out_dir, f"entity_hyperbolic_embs_{TAG}.npy"), z_all)
 
     result = dict(link_prediction=lp, history=history, config=vars(a))
     if poi_rows is not None:
         z_poi = z_all[poi_rows]
-        np.save(os.path.join(a.out_dir, f"poi_hyperbolic_embs_{a.dataset}.npy"), z_poi)
+        np.save(os.path.join(a.out_dir, f"poi_hyperbolic_embs_{a.dataset}_{TAG}.npy"), z_poi)
         d1 = d1_radial_hierarchy(z_poi, depths)
         result["d1"] = d1
         print(f"\nD1  Spearman(taxonomy depth, hyperbolic radius) = {d1['spearman']:+.4f}   "
-              f"VERDICT: {d1['verdict']}   (was +0.0189 ABSENT)")
+              f"VERDICT: {d1['verdict']}")
         print(f"  norms in [{d1['norm_min']:.4f}, {d1['norm_max']:.4f}]")
         for d, v in d1["by_depth"].items():
             print(f"    depth {d}: n={v['n']:>5}  mean radius = {v['mean_radius']:.4f}")
-        print(f"\n  saved poi_hyperbolic_embs_{a.dataset}.npy {z_poi.shape} "
-              f"(rows in poi_idx order -- drop-in for EMB_FILE)")
+        print(f"\n  saved poi_hyperbolic_embs_{a.dataset}_{TAG}.npy {z_poi.shape} "
+              f"(rows in poi_idx order)")
 
-    with open(os.path.join(a.out_dir, "roth_results.json"), "w") as f:
+    with open(os.path.join(a.out_dir, f"{TAG}_results.json"), "w") as f:
         json.dump(result, f, indent=2)
-    print(f"  saved roth_best.pt, entity_hyperbolic_embs.npy, roth_results.json -> {a.out_dir}")
+    print(f"  saved {TAG}_best.pt, entity_hyperbolic_embs_{TAG}.npy, {TAG}_results.json -> "
+          f"{a.out_dir}")
 
 
 def _self_check():
-    """Synthetic 3-level tree. The depth regulariser must recover a radial ordering that plain
-    link-prediction training does not."""
-    print("SELF-CHECK: does the depth regulariser create a radial hierarchy?")
+    """Synthetic 3-level tree, same fixture as train_roth.py's self-check. The depth
+    regulariser must recover a radial ordering that plain link-prediction training does not,
+    and the attention-blended rot/ref transform must not break that."""
+    print("SELF-CHECK: does the depth regulariser create a radial hierarchy? (AttH)")
     torch.manual_seed(0)
-    # tree: 1 root -> 4 mid -> 16 leaf, plus flat sibling edges to give the KGE something else
     ents, depth = {}, {}
     ents["root"] = 0; depth[0] = 1
     tri, hier = [], []
@@ -480,7 +475,7 @@ def _self_check():
         for l in range(4):
             ents[f"l{m}_{l}"] = nid; depth[nid] = 3
             tri.append((nid, 0, mid)); hier.append((mid, nid)); nid += 1
-    for i in range(1, nid):                          # flat relation
+    for i in range(1, nid):
         tri.append((i, 1, 1 + (i % (nid - 1))))
     triples = torch.tensor([(h, r, t) for h, r, t in tri], dtype=torch.long)
     hier_t = torch.tensor([(p_, c_, 0) for p_, c_ in hier], dtype=torch.long)
@@ -532,31 +527,21 @@ def main():
     p.add_argument("--dim", type=int, default=64)
     p.add_argument("--epochs", type=int, default=150)
     p.add_argument("--batch-size", type=int, default=512)
-    p.add_argument("--n-neg", type=int, default=128,
-                   help="negatives per positive. 25 leaves ~78%% of steps with no competitive "
-                        "negative at all (measured); 128 raises the expected count to ~1.1")
-    p.add_argument("--typed-negatives", choices=["none", "hierarchy", "all"], default="all",
-                   help="'hierarchy' was the original setting and lets POI->POI relations draw "
-                        "46%% of their negatives from the wrong node type")
+    p.add_argument("--n-neg", type=int, default=128)
+    p.add_argument("--typed-negatives", choices=["none", "hierarchy", "all"], default="all")
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--gamma", type=float, default=6.0, help="NSSA margin")
     p.add_argument("--alpha", type=float, default=1.0, help="NSSA adversarial temperature")
-    p.add_argument("--depth-weight", type=float, default=1.0,
-                   help="weight on the hierarchy depth regulariser (0 reproduces the old run)")
-    p.add_argument("--depth-margin", type=float, default=0.1,
-                   help="minimum radius gap a child must keep from its parent")
-    p.add_argument("--root-pull", type=float, default=0.01,
-                   help="weak penalty on every entity radius; makes the depth margin binding "
-                        "instead of satisfiable by inflating all radii together")
+    p.add_argument("--depth-weight", type=float, default=1.0)
+    p.add_argument("--depth-margin", type=float, default=0.1)
+    p.add_argument("--root-pull", type=float, default=0.01)
     p.add_argument("--max-rel-weight", type=float, default=5.0)
-    p.add_argument("--curvature", type=float, default=1.0,
-                   help="reference curvature for the saved ball points (must match CURVATURE_C)")
+    p.add_argument("--curvature", type=float, default=1.0)
     p.add_argument("--val-frac", type=float, default=0.05)
     p.add_argument("--max-eval", type=int, default=2000)
     p.add_argument("--log-every", type=int, default=10)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--device", default=None,
-                   help="'cuda' or 'cpu'; default auto-picks cuda if torch.cuda.is_available()")
+    p.add_argument("--device", default=None)
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:
