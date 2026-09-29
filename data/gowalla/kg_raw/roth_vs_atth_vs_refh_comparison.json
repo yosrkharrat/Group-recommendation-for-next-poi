@@ -1,0 +1,97 @@
+{
+  "dataset": "GOWALLA",
+  "comparison": {
+    "RotH": {
+      "mrr": 0.08396214195064322,
+      "hits@1": 0.03175,
+      "hits@3": 0.0845,
+      "hits@10": 0.19475,
+      "mr": 4173.6915,
+      "n": 4000,
+      "d1_spearman": 0.8683170438557348,
+      "d1_verdict": "STRONG"
+    },
+    "RefH": {
+      "mrr": 0.07643478666106256,
+      "hits@1": 0.03025,
+      "hits@3": 0.07225,
+      "hits@10": 0.171,
+      "mr": 4592.84775,
+      "n": 4000,
+      "d1_spearman": 0.8683527524566079,
+      "d1_verdict": "STRONG"
+    },
+    "AttH": {
+      "mrr": 0.07492338298992937,
+      "hits@1": 0.02625,
+      "hits@3": 0.0725,
+      "hits@10": 0.17825,
+      "mr": 4552.091,
+      "n": 4000,
+      "d1_spearman": 0.8681036645926087,
+      "d1_verdict": "STRONG"
+    }
+  },
+  "winner": "RotH",
+  "decision_rule": "max filtered MRR on a shared held-out split, among variants clearing the D1 radial-hierarchy gate (Spearman(taxonomy depth, hyperbolic radius) >= 0.3). PROVISIONAL: post-alignment structure preservation is not measured here -- it needs a trained alignment adapter per variant, and none is committed. If that stage later disagrees, it is the one that decides, because it is what the LLM head consumes",
+  "d1_gate": 0.3,
+  "symmetric_edge_share": 0.41710635255155804,
+  "relation_symmetry": {
+    "HAS_CATEGORY": {
+      "count": 47783,
+      "symmetry": 0.0
+    },
+    "SUBCATEGORY_OF": {
+      "count": 224,
+      "symmetry": 0.0
+    },
+    "LOCATED_IN": {
+      "count": 47786,
+      "symmetry": 0.0
+    },
+    "IS_NEAR_TO": {
+      "count": 587154,
+      "symmetry": 1.0
+    },
+    "FOLLOWED_BY": {
+      "count": 464672,
+      "symmetry": 0.18115573996281248
+    },
+    "VISITED": {
+      "count": 468597,
+      "symmetry": 0.0
+    },
+    "PREFERS_CATEGORY": {
+      "count": 55377,
+      "symmetry": 0.0
+    },
+    "FRIEND_OF": {
+      "count": 235898,
+      "symmetry": 1.0
+    },
+    "OCCURRED_AT": {
+      "count": 36621,
+      "symmetry": 0.0
+    },
+    "GROUP_PREFERS": {
+      "count": 36621,
+      "symmetry": 0.0
+    },
+    "MEMBER_OF": {
+      "count": 81411,
+      "symmetry": 0.0
+    },
+    "CO_ATTENDED": {
+      "count": 63616,
+      "symmetry": 1.0
+    }
+  },
+  "eval_config": {
+    "seed": 42,
+    "val_frac": 0.05,
+    "max_eval": 4000,
+    "n_held_out": 106288,
+    "shared_split": true
+  },
+  "skipped": {}
+}

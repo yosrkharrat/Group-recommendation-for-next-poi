@@ -4,8 +4,18 @@ Audience: whoever executes the fine-tune on a GPU. Written 2026-09-01. The Gowal
 `LLMGPR_FINETUNE_HANDOFF.md`; read `LLMGPR_GOWALLA.md` first for how the dataset and the
 upstream stages were built and what was measured.
 
-Notebook: `notebooks/stage5_lbsn_finetune.ipynb` — the same notebook as the Foursquare arm. It is
-parameterised by environment variables, so **no notebook edits are needed**.
+Notebook: `notebooks/stage5_lbsn_finetune.ipynb` — the same notebook as the Foursquare arm. **On
+this branch it defaults to `DATASET=GOWALLA` and regenerates the split CSVs itself on first run**
+(updated 2026-09-29), so a fresh clone runs top to bottom with no env vars and no manual step. The
+env vars below still override.
+
+**Embeddings = RotH, the winning hyperbolic KGE for Gowalla** in the RotH / RefH / AttH
+model-selection comparison (MRR 0.0840 vs RefH 0.0764 vs AttH 0.0749 on one shared 4,000-triple
+split, all three at identical hyperparameters, all clearing D1). The config cell's `KGE_WINNER`
+table selects each dataset's winner; for Gowalla that is the committed
+`poi_hyperbolic_embs_GOWALLA.npy`. Its checkpoint `kg_raw/roth_best.pt` is now committed beside it
+(reproduces the `.npy` to 3e-8), with the comparison evidence (`roth_vs_atth_vs_refh_comparison.json`,
+`kge_variant_comparison.csv`, `atth_vs_refh_per_relation.csv`, `{refh,atth}_results.json`).
 
 ## Run it
 
@@ -29,7 +39,10 @@ jupyter lab notebooks/stage5_lbsn_finetune.ipynb
 alignment files recursively under it, so all three exports are belt-and-braces: the groups
 directory is now `groups_social`, which is also the notebook's default.
 
-## One preparation step (5 seconds)
+## One preparation step (5 seconds) — now automatic
+
+The notebook's config cell runs the command below itself when it cannot find the CSVs (verified
+on a clean checkout: all five outputs byte-identical). Running it by hand still works.
 
 Five of the eight stage-5 inputs are **not committed** — 83 MB of derived CSVs that regenerate
 byte-identically (verified by md5 on all six files) from the committed 13 MB
@@ -52,7 +65,7 @@ Everything `prepare_gowalla_csvs.py` reads is committed.
 | `data/gowalla/test_GOWALLA.csv` | §2 (168,493) | regenerate |
 | `data/gowalla/poi_metadata_GOWALLA.csv` | §2, `N_POI` = 47,783 | regenerate |
 | `data/gowalla/friendship_old_GOWALLA.csv` | §9b group build (117,949 edges) | regenerate |
-| `data/gowalla/kg_raw/poi_hyperbolic_embs_GOWALLA.npy` | `EMB_FILE` (47,783 × 64) | **committed** |
+| `data/gowalla/kg_raw/poi_hyperbolic_embs_GOWALLA.npy` | `EMB_FILE` (47,783 × 64, RotH — the winner) | **committed** |
 | `data/gowalla/kg_raw/poi_poi_triples_GOWALLA.pt` | `ALIGN_TRIPLES_FILE` (1,051,826 × 3) | **committed** |
 | `data/gowalla/kg_raw/poi_relation_vocab_GOWALLA.json` | `ALIGN_RELVOCAB_FILE` (2 relations) | **committed** |
 

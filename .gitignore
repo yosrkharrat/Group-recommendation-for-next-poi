@@ -34,9 +34,16 @@ data/gowalla/groups_social*/group_examples_*.jsonl
 data/gowalla/kg_*/kg_triples.pt
 data/gowalla/kg_*/kg_hierarchy.pt
 data/gowalla/kg_*/roth_best.pt
+# Same for the RefH/AttH variants trained by the model-selection comparison. The small
+# *_results.json and the comparison artifacts ARE committed -- they are the evidence.
+data/gowalla/kg_*/refh_best.pt
+data/gowalla/kg_*/atth_best.pt
 # 30 MB of all-entity embeddings; stage 5 consumes poi_hyperbolic_embs_<DS>.npy, which IS
 # committed. Rerun train_roth.py (config in roth_results.json) to regenerate.
-data/gowalla/kg_*/entity_hyperbolic_embs.npy
+data/gowalla/kg_*/entity_hyperbolic_embs*.npy
+# ...except the WINNING model's checkpoint (RotH on Gowalla), so stage 5 ships with the exact
+# model behind poi_hyperbolic_embs_GOWALLA.npy. Other datasets' winners live beside their .npy too.
+!data/gowalla/kg_raw/roth_best.pt
 data/gowalla/_depth_probe/
 
 # ── Check-in data: COMMITTED on purpose ────────────────────────────────────
