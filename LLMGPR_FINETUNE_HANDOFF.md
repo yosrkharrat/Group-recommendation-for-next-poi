@@ -8,6 +8,9 @@ about **running the fine-tune**.
 Notebook: `notebooks/stage5_lbsn_finetune.ipynb` (the filename is historical — it is the LLMGPR
 run on this branch).
 
+> **No social denoising on this branch.** Despite the `kg_denoised/` directory name, GBSR was never
+> applied here — this is the no-denoise (control) arm. See risk 2.
+
 > This is a separate track from the LBSN pipeline in `docs/LBSN_HANDOFF.md`. Different dataset,
 > different group rule, different POI id space. Nothing carries over numerically.
 
@@ -146,16 +149,15 @@ prompts are unaffected — `collate` pads to the batch max, not to `MAX_LEN`.
    covers ~43% of visited venues so `IS_NEAR_TO` is built over that subset only. Treat +0.32 as
    a baseline to beat. **If the hyperbolic-vs-random ablation comes out flat, suspect this first.**
 
-2. **The GBSR denoising is not evidenced in the repo.** The notebook describes the social layer as
-   GBSR-denoised, but `src/denoise_social_gbsr.py` writes
-   `friendship_old_denoised_<DS>.csv`, `social_edge_weights_<DS>.csv` and
-   `gbsr_denoise_manifest.json`, and **none of those three are committed**. What *is* committed is
-   `friendship_old_LLMGPR.csv` — the exact filename `src/prepare_llmgpr_csvs.py` writes for the
-   raw before-period snapshot. So either the denoiser's output was renamed over it (in which case
-   the manifest is still missing and the threshold/edge-count/mask-separation provenance is lost),
-   or the committed graph is pre-denoising and the description is ahead of the artifact.
-   **Ask the author to commit `gbsr_denoise_manifest.json` before this is reported as a
-   GBSR result.** `kg_denoised/roth_results.json` and `kg_manifest.json` ARE committed (2026-08-26 on
+2. **This branch is NOT GBSR-denoised — settled 2026-08-28, wording corrected 2026-09-30.** Earlier
+   notebook text called the social layer "GBSR-denoised"; it never was. `friendship_old_LLMGPR.csv`
+   holds **8,640** edges = GBSR's *input* count, none of `src/denoise_social_gbsr.py`'s three
+   outputs (`friendship_old_denoised_<DS>.csv`, `social_edge_weights_<DS>.csv`,
+   `gbsr_denoise_manifest.json`) exist in the tree or in git history, and the KG's `FRIEND_OF` =
+   17,280 = 2 × 8,640. **Report this arm as the no-denoise control.** The directory name
+   `kg_denoised/` is historical; `llmgpr-no-denoise` carries byte-identical artifacts under
+   `kg_nodenoise/` plus `src/verify_no_denoise.py` and `LLMGPR_NODENOISE_ARM.md` (the evidence,
+   and what a real denoised arm still needs). `kg_denoised/roth_results.json` and `kg_manifest.json` ARE committed (2026-08-26 on
    `llmgpr-pipeline`, copied onto `llmgpr-gowalla` 2026-09-19); `roth_best.pt` ships on
    `llmgpr-pipeline` and the branches cut from it, not on `llmgpr-gowalla`. `roth_results.json` confirms ρ = +0.3245 and records the RotH settings
    actually used — **150 epochs, batch 512, 128 negatives, depth weight 1.0, depth margin 0.1**
@@ -212,7 +214,7 @@ Then on the **real** LLMGPR data:
 |---|---|
 | 0 · preprocessing | fixture only — inputs not in repo, see risk 3 |
 | 1 · group construction | **PASS** — 4,804 social groups → 71,933/16,164/33,193 examples, ~2 min, all causality/clique/recurrence asserts green |
-| 2 · GBSR denoising | **RUNS, but is a no-op on this graph** — see risk 2b |
+| 2 · GBSR denoising | **not applied on this branch** (control arm); when run it is a no-op on this graph — see risks 2 / 2b |
 | 2b · KG build | **PASS** — 26,467 entities / 466,589 triples / 12 relations, `FRIEND_OF` 17,280, leakage guard verified 5,528 new-only pairs absent |
 | 3 · RotH | not re-run — the trained `.npy` is committed and verified to load and pass the D1 gate |
 | 4 · alignment triples | consistent: the committed 254,265-triple file = `IS_NEAR_TO` 76,666 + `FOLLOWED_BY` 177,599, exactly the POI→POI subset of the rebuilt KG |
