@@ -9,13 +9,26 @@ this branch it defaults to `DATASET=GOWALLA` and regenerates the split CSVs itse
 (updated 2026-09-29), so a fresh clone runs top to bottom with no env vars and no manual step. The
 env vars below still override.
 
-**Embeddings = RotH, the winning hyperbolic KGE for Gowalla** in the RotH / RefH / AttH
-model-selection comparison (MRR 0.0840 vs RefH 0.0764 vs AttH 0.0749 on one shared 4,000-triple
-split, all three at identical hyperparameters, all clearing D1). The config cell's `KGE_WINNER`
-table selects each dataset's winner; for Gowalla that is the committed
-`poi_hyperbolic_embs_GOWALLA.npy`. Its checkpoint `kg_raw/roth_best.pt` is now committed beside it
-(reproduces the `.npy` to 3e-8), with the comparison evidence (`roth_vs_atth_vs_refh_comparison.json`,
-`kge_variant_comparison.csv`, `atth_vs_refh_per_relation.csv`, `{refh,atth}_results.json`).
+**Embeddings = RotH, retrained at the shared KGE config (2026-09-30).** RotH was chosen as
+Gowalla's KGE in the RotH / RefH / AttH comparison (MRR 0.0840 vs RefH 0.0764 vs AttH 0.0749) —
+but that comparison ran on the *old* Gowalla recipe (50 epochs, batch 4096, 32 negatives,
+depth weight 5.0, margin 0.3), whose evidence files (`roth_vs_atth_vs_refh_comparison.json`,
+`kge_variant_comparison.csv`, `atth_vs_refh_per_relation.csv`, `{refh,atth}_results.json`) stay
+committed as the record of that choice. The shipped `kg_raw/poi_hyperbolic_embs_GOWALLA.npy` +
+`roth_best.pt` + `roth_results.json` are now the **same code and the exact config** of every
+other dataset's model: `src/train_roth.py --model roth --dim 64 --epochs 150 --batch-size 512
+--n-neg 128 --depth-weight 1.0 --depth-margin 0.1 --lr 0.001 --seed 42` (full args in
+`roth_results.json`). 150/150 epochs, filtered MRR 0.0580 (n = 2,000), the checkpoint reproduces
+the `.npy` to 4e-8. **The winner was not re-compared under the shared config** (a time decision);
+the old-recipe embeddings are in git history (`7789eca` and earlier).
+
+**D1 = +0.4618 STRONG, with depths 1 and 2 tied.** Mean radius d1 = 0.2345, d2 = 0.2340,
+d3 = 0.2609 (medians 0.2257 / 0.2257 / 0.2573): depth 3 sits clearly outward but the 7,926 depth-1
+POIs are not separated from depth 2 at the shared depth weight — the old dw = 5 recipe separated
+them (0.159 / 0.292 / 0.422). The notebook's gate therefore treats adjacent depths within 1 %
+(`D1_TIE_TOL`) as tied and prints a WARNING instead of aborting; rho > 0.30 stays a hard
+requirement, and a real inversion still aborts. **Report the tie; do not describe Gowalla's
+radii as monotone.**
 
 ## Run it
 
@@ -97,77 +110,21 @@ all forced by the data or the hardware:
    GBSR is a measured no-op on this graph at every bottleneck strength tested; the denoised
    control is at `groups_social_denoised/` and every count moves by ≤ 0.21%
    (`LLMGPR_GOWALLA.md` §5). Cite it as the control.
-3. **RotH hyperparameters — the one open parity gap, five settings not three.** See below.
-4. **D1 ρ = +0.8683 STRONG** against FSQ's +0.3245, and `IS_NEAR_TO` covers 100% of POIs here
-   (FSQ: 43%). So if the hyperbolic-vs-random ablation comes out flat, the weak-hierarchy
-   explanation the FSQ handoff offered does **not** apply — look elsewhere.
+3. **RotH hyperparameters — now at parity** (2026-09-30): same code and config as Foursquare.
+4. **D1 ρ = +0.4618 STRONG** against FSQ's +0.3203 (RefH), with depths 1–2 tied (see top), and
+   `IS_NEAR_TO` covers 100% of POIs here (FSQ: 43%).
 
 ## Open items, stated plainly
 
-### a. RotH hyperparameters are not yet at parity
+### a. RotH hyperparameters — RESOLVED 2026-09-30
 
-**Corrected 2026-09-19.** The settings the Foursquare arm *actually* used are recorded in its
-committed `data/llmgpr/kg_denoised/roth_results.json` (now also on this branch), and they are not
-the ones this section originally quoted. **Five** settings differ, not three:
-
-| setting | Foursquare (committed) | Gowalla (committed) |
-|---|---|---|
-| `--epochs` | 150 | 50 |
-| `--batch-size` | 512 | 4096 |
-| `--n-neg` | 128 | 32 |
-| `--depth-weight` | **1.0** | 5.0 |
-| `--depth-margin` | **0.1** | 0.3 |
-| dim 64 · lr 1e-3 · γ 6 · α 1 · root-pull 0.01 · curvature 1 · typed-negatives all · seed 42 | same | same |
-
-(`--max-eval` was 2000 there and 4000 here; it only sizes the link-prediction validation sample.)
-The epochs / batch / negatives divergence was forced by wall clock — FSQ's exact settings run at
-**15.3 min/epoch** on an M-series laptop (the batch-4096 variant at 3.2 min/epoch). The depth-term
-values were copied from a reproduce command in `LLMGPR_FINETUNE_HANDOFF.md` that did not match
-the committed artefact (fixed there too). Note that the `dw = 1` probe in (b) below independently
-found `--depth-weight 1.0` to be the better operating point: it is also what Foursquare used.
-
-The faithful parity command — the same 2–3 h CUDA job the Foursquare arm ran on Kaggle — is:
-
-```bash
-python src/train_roth.py --kg-dir ./data/gowalla/kg_raw --data-dir ./data/gowalla \
-    --dataset GOWALLA --out-dir ./data/gowalla/kg_parity --epochs 150 \
-    --batch-size 512 --n-neg 128 --log-every 10 --max-eval 2000 \
-    --depth-weight 1.0 --depth-margin 0.1 --root-pull 0.01 --device cuda
-```
-
-Adopting its output needs no stage-4 re-run (the alignment triples come from the KG, not from
-RotH): move `kg_raw/poi_hyperbolic_embs_GOWALLA.npy` **out of `data/`** (stage 5's `find()`
-matches by exact filename anywhere under `data/` and would silently pick whichever of two copies
-it walks first), drop the parity `.npy` + `roth_results.json` into `kg_raw/`, and confirm the
-`[D1]` line still clears the gate (ρ > 0.30, monotone).
-
-**Decision taken (2026-09-01): keep the committed embeddings and do NOT run the parity job.**
-That decision was taken believing only epochs / batch / negatives differed and that Foursquare
-had used `dw = 5.0, margin = 0.3`. Both premises were wrong, so it should be re-taken with the
-table above in hand. What still holds: RotH is fully trained (50/50 epochs), D1 ρ = +0.8683
-STRONG, and stage 5 consumes the committed embeddings as-is — a fine-tune already running on
-them is not invalid, it is just not at RotH parity with Foursquare, and a paper that says the
-embedding stage "runs identically on all three" cannot yet say so for this one.
-
-### b. The depth weight may be mistuned
-
-The committed embeddings were trained at `--depth-weight 5.0`, where the depth term is **55.9% of
-the objective** at epoch 50. The matched probe (`data/gowalla/roth_depth_weight_probe.json`) says
-`--depth-weight 1.0` is likely a better operating point: at equal budget it gives 2.3× the
-`HAS_CATEGORY` MRR (0.0861 vs 0.0378) while holding D1 STRONG (+0.8055), and at `dw = 5` more
-training makes that relation *worse* (0.0378 at 6 epochs → 0.0105 at 50). A 50-epoch `dw = 1` arm
-was started and did not finish, so **it is not committed and the numbers above are the 6-epoch
-matched ones, not a 50-epoch result.** To produce the candidate:
-
-```bash
-PYTORCH_ENABLE_MPS_FALLBACK=1 python src/train_roth.py --kg-dir ./data/gowalla/kg_raw \
-    --data-dir ./data/gowalla --dataset GOWALLA --out-dir ./data/gowalla/kg_raw_dw1 \
-    --epochs 50 --batch-size 4096 --n-neg 32 --log-every 10 --max-eval 4000 \
-    --depth-weight 1.0 --depth-margin 0.3 --root-pull 0.01 --device mps   # --device cuda on a GPU box
-```
-
-The committed `dw = 5` embeddings are valid and clear the D1 gate comfortably; this is a possible
-improvement, not a blocker. Do not swap them mid-experiment without re-running the ablation.
+Earlier revisions of this file documented a five-setting gap between Gowalla's RotH (50 / 4096 /
+32 / dw 5.0 / m 0.3) and Foursquare's (150 / 512 / 128 / dw 1.0 / m 0.1), plus an open question
+about the depth weight. Both are closed: the shipped RotH was retrained with Foursquare's exact
+config on Kaggle (two sessions, resumed from a mid-run checkpoint that restores model, optimiser,
+LR schedule and RNG), so `roth_results.json`'s `config` block now matches
+`data/llmgpr/kg_denoised/roth_results.json` field for field. The cost of parity is the depth-1/2
+tie described at the top.
 
 ## Reproducing stages 0–4 from scratch
 
