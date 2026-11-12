@@ -1,7 +1,27 @@
-# HyGro-POI — group next-POI recommendation with a diffusion LLM and hyperbolic embeddings
+# HyGro-POI: group next-POI recommendation with a diffusion LLM and hyperbolic embeddings
 
-Extends the individual next-POI pipeline (LLaDA-MoE + RotH hyperbolic embeddings, `docs/PROJECT_DOCUMENTATION.md`)
-to **group** next-POI recommendation on Foursquare NYC.
+When a group of friends picks where to go next, the members often disagree. HyGro-POI models the group's consensus as the **hyperbolic midpoint** of the members' embeddings in a Poincaré ball. When members disagree, that midpoint moves toward the centre of the ball, where the more general categories sit (for example, "food" rather than "ramen"). This replaces hand-designed aggregation rules such as averaging or least-misery. It builds on an individual next-POI recommender: **LLaDA-MoE-7B**, a masked-diffusion LLM fine-tuned with 4-bit QLoRA, which scores all 5,120 POIs in a single denoising step. The group fine-tune is the next stage (status below).
+
+> **Paper:** Z. Hamdani, **Y. Kharrat**, E. Mhamdi, S. Ben Yahia. *HyGro-POI: Hyperbolic Consensus over a Masked Diffusion LLM for Group Next-POI Recommendation.* In preparation for SIGIR 2027.
+> Research internship at the University of Southern Denmark (SDU), 2026.
+
+## Key result
+
+The midpoint only means "more general" if the ball is organised by depth: general categories near the centre, specific venues near the edge. The original RotH embeddings had no such structure. A **depth regulariser** added to knowledge-graph training creates it:
+
+| Embeddings | Spearman ρ (radius vs. taxonomy depth) | Mean radius, depth 1 → 5 |
+| --- | --- | --- |
+| RotH (baseline) | +0.03 (no hierarchy) | 1.256 · 1.253 · 1.258 · 1.256 · 1.273 |
+| **RotH + depth regulariser** | **+0.85** | 0.767 · 0.868 · 0.978 · 1.241 · 1.501 |
+
+The effect holds on a second dataset with a real friendship graph (Foursquare LBSN2Vec++): ρ = +0.71, with radii increasing at every depth.
+
+| | |
+| --- | --- |
+| **Knowledge graph** | 9,445 entities, 175,727 triples (POIs, categories, users, groups) |
+| **Group data** | 34,644 / 6,486 / 13,420 train / val / test examples mined from Foursquare NYC check-ins |
+| **Reproducibility** | every script has a `--self-check` against synthetic data (96 checks); stages 1–4 run on a CPU-only Kaggle kernel in about 50 minutes |
+| **Stack** | PyTorch, Hugging Face, QLoRA, hyperbolic KG embeddings (RotH / RefH / AttH), Kaggle |
 
 ---
 
