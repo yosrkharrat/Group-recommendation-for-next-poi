@@ -29,7 +29,8 @@ pipeline's ids). WEEPLACE = the llmgpr-Weeplace branch CSVs. LLMGPR (Foursquare)
 whose user_id equals the pipeline's data/llmgpr user_id (rank of the raw id) but whose poi_idx
 indexes ALL venues of the users' whole histories; join to the pipeline's POIs on venue_id.
 
-    python src/build_llmgpr_match_groups.py                 # all three
+    python src/build_llmgpr_match_groups.py                 # all of them
+    python src/build_llmgpr_match_groups.py --datasets LLMGPR_3CITY   # Foursquare, three cities only
     python src/build_llmgpr_match_groups.py --datasets GOWALLA
 """
 
@@ -60,6 +61,17 @@ CONFIGS = {
                      window_s=3600, identity="anchor", min_checkins=1, min_size=2),
     # Chosen 2026-11-19 over "+-3 h, >=3 members" (match8 0.856, groups barely recur after the
     # counting fix): best match8 0.941, check-ins per group exactly theirs (3.54), size 2.07.
+    # Option B (2026-11-19, the user's choice): the same Foursquare rule on THREE-CITY check-ins only
+    # (house8 = every check-in of the pipeline's users inside the NY / Chicago / LA boxes), which is
+    # what LLMGPR §4.1 says its datasets contain. The whole-history set above matches Table 1 better
+    # but 54% of its test targets are venues outside our POI catalogue, 75% of them outside the
+    # three cities. Compared against the same LLMGPR Table-1 column. Rule = the best three-city
+    # reading in the sweep (data/group_rule_sweep/match_fsq_o8_bbox_oldnew, GROUP_RULE_SWEEP.md
+    # §2.9): +-1 day, anchor, >=2 group check-ins -> match 0.836. The whole-history rule (+-1 h, >=1)
+    # scores only 0.650 on three-city data (1,290 groups / 6,319 group check-ins).
+    "LLMGPR_3CITY": dict(data_dir="./data/llmgpr_full/house8", file_ds="LLMGPR", targets="LLMGPR",
+                         friends=["friendship_old_LLMGPR.csv", "friendship_new_only_LLMGPR.csv"],
+                         window_s=86400, identity="anchor", min_checkins=2, min_size=2),
     "GOWALLA":  dict(data_dir="./data/gowalla",
                      friends=["friendship_old_GOWALLA.csv"],
                      window_s=30, identity="member_set", min_checkins=1, min_size=2),
@@ -120,7 +132,7 @@ def leaked_targets(cks, window_s):
 
 def build(ds, cfg):
     t0 = time.time()
-    df = load_checkins(cfg["data_dir"], ds)
+    df = load_checkins(cfg["data_dir"], cfg.get("file_ds", ds))
     df["ts"] = df["utc_time"].dt.as_unit("ns").astype("int64") // 10 ** 9
     venue_of = df.drop_duplicates("poi_idx").set_index("poi_idx")["venue_id"].to_dict()
     G = load_friend_graph([os.path.join(cfg["data_dir"], f) for f in cfg["friends"]])
@@ -167,7 +179,7 @@ def build(ds, cfg):
 
     stats = dict(groups=len(groups), group_checkins=len(cks),
                  ck_per_group=len(cks) / len(groups), users_per_group=float(groups["size"].mean()))
-    score, parts = match(stats, TARGETS[ds])
+    score, parts = match(stats, TARGETS[cfg.get("targets", ds)])
     try:
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
                                 text=True).stdout.strip()
@@ -193,7 +205,7 @@ def build(ds, cfg):
                     leakage=dict(test_targets_leaking_before_mask=leaks_before,
                                  train_rows_masked=n_masked, test_targets_leaking_after=leaks_after),
                     groups_with_train_history=int((groups["n_checkins"] >= 3).sum())),
-        llmgpr_table1=TARGETS[ds], match=round(score, 4),
+        llmgpr_table1=TARGETS[cfg.get("targets", ds)], match=round(score, 4),
         match_parts=dict(zip(["groups", "group_checkins", "ck_per_group", "users_per_group"],
                              [round(x, 3) for x in parts])),
         reference="GROUP_RULE_SWEEP.md §2.7-2.10")
