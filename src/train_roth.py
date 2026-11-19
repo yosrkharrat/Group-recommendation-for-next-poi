@@ -36,7 +36,15 @@ model was rewarded for separating types rather than for learning hierarchy.
 Usage
 -----
     python train_roth.py --kg-dir ./data/kg --out-dir ./data/kg --epochs 150
+    python train_roth.py --kg-dir ./data/kg --out-dir ./data/kg --model atth --epochs 150
     python train_roth.py --self-check
+
+Picking a variant per dataset
+-----------------------------
+`--model` selects the relation isometry: `roth` (rotation, the default and what every committed
+embedding file was trained with), `refh` (reflection) or `atth` (attention over both). Nothing
+else changes, so the three are directly comparable. `compare_kge_models.py` assembles the three
+runs' `*_results.json` into the per-dataset decision.
 """
 
 from __future__ import annotations
@@ -72,6 +80,14 @@ def expmap0(v, c):
     return project(torch.tanh(sqrt_c * norm) * v / (sqrt_c * norm), c)
 
 
+def logmap0(y, c):
+    """Inverse of expmap0. AttH averages its two candidate points in the tangent space at the
+    origin, which is where a convex combination is well defined."""
+    sqrt_c = c.clamp_min(EPS).sqrt()
+    norm = y.norm(dim=-1, keepdim=True).clamp_min(EPS)
+    return torch.atanh((sqrt_c * norm).clamp(max=MAX_NORM)) * y / (sqrt_c * norm)
+
+
 def mobius_add(x, y, c):
     x2 = (x * x).sum(-1, keepdim=True)
     y2 = (y * y).sum(-1, keepdim=True)
@@ -97,6 +113,26 @@ def givens_rotation(theta, x):
     return out.view(*out.shape[:-2], d)
 
 
+def givens_reflection(phi, x):
+    """Block-diagonal 2x2 reflections -- the 'Ref' in RefH.
+
+        [ cos phi   sin phi ]
+        [ sin phi  -cos phi ]
+
+    Determinant -1, so unlike a rotation it is orientation-reversing; it is still an isometry of
+    the ball fixing the origin, which is what makes it interchangeable with `givens_rotation`
+    here. Chami et al. (2020) motivate it as the operator that can model SYMMETRIC relations
+    exactly: a reflection is its own inverse, so r(h)=t and r(t)=h are satisfiable by one map,
+    which no non-trivial rotation can do.
+    """
+    d = x.shape[-1]
+    x = x.view(*x.shape[:-1], d // 2, 2)
+    cos, sin = torch.cos(phi).unsqueeze(-1), torch.sin(phi).unsqueeze(-1)
+    x0, x1 = x[..., 0:1], x[..., 1:2]
+    out = torch.cat([cos * x0 + sin * x1, sin * x0 - cos * x1], dim=-1)
+    return out.view(*out.shape[:-2], d)
+
+
 def hyp_radius(z, c=1.0):
     """Hyperbolic distance from the origin -- the quantity D1 reports as 'radius'."""
     n = z.norm(dim=-1).clamp(max=MAX_NORM)
@@ -107,24 +143,56 @@ def hyp_radius(z, c=1.0):
 # model
 # --------------------------------------------------------------------------
 
-class RotH(nn.Module):
+class HyperbolicKGE(nn.Module):
+    """Shared skeleton for RotH / RefH / AttH.
+
+    All three score a triple as  -d_c(Q(h, r), t)^2 + b_h + b_t  with the SAME entity table,
+    the SAME tangent-space translation and the SAME learnable per-relation curvature. The only
+    thing that varies is the relation isometry applied to the translated head:
+
+        RotH   Q = Rot(theta_r) . (h (+)_c r)
+        RefH   Q = Ref(phi_r)   . (h (+)_c r)
+        AttH   Q = attention-weighted combination of the two
+
+    Keeping the composition order identical across variants is deliberate. Chami et al. apply
+    the isometry BEFORE the translation; we apply it after, which is what the already-trained
+    RotH run did. Matching their ordering would have meant retraining RotH, invalidating every
+    committed embedding file, and comparing the three variants against a moved baseline. The
+    ordering is a fixed constant of the comparison, so it cannot favour any one variant.
+    """
+
     def __init__(self, n_ent, n_rel, dim=64, init_scale=1e-3):
         super().__init__()
-        assert dim % 2 == 0, "RotH needs an even dim for its 2x2 rotation blocks"
+        assert dim % 2 == 0, "the 2x2 Givens blocks need an even dim"
         self.dim = dim
         self.ent = nn.Embedding(n_ent, dim)
         self.rel = nn.Embedding(n_rel, dim)            # translation, in tangent space
-        self.theta = nn.Embedding(n_rel, dim // 2)     # rotation angles
+        # Constructed HERE, between `rel` and `bh`, because nn.Embedding draws from the global
+        # RNG in its own __init__. Moving the relation parameters would shift every later draw
+        # and RotH at --seed 42 would stop reproducing the committed run.
+        self._init_relation_params(n_rel, dim)
         self.bh = nn.Embedding(n_ent, 1)
         self.bt = nn.Embedding(n_ent, 1)
         # learnable per-relation curvature via softplus, so c stays strictly positive
         self.c_logit = nn.Parameter(torch.zeros(n_rel))
         nn.init.normal_(self.ent.weight, std=init_scale)
         nn.init.normal_(self.rel.weight, std=init_scale)
-        nn.init.uniform_(self.theta.weight, -0.1, 0.1)
+        self._reset_relation_params()
         nn.init.zeros_(self.bh.weight)
         nn.init.zeros_(self.bt.weight)
 
+    # --- the two hooks each variant fills in ---------------------------------
+    def _init_relation_params(self, n_rel, dim):
+        raise NotImplementedError
+
+    def _reset_relation_params(self):
+        raise NotImplementedError
+
+    def isometry(self, u, r_exp, c):
+        """Map the translated head point `u` (a ball point) to the query point."""
+        raise NotImplementedError
+
+    # --- shared ---------------------------------------------------------------
     def curvature(self, r_id):
         return nn.functional.softplus(self.c_logit[r_id]).unsqueeze(-1) + 1e-4
 
@@ -139,7 +207,7 @@ class RotH(nn.Module):
         x_h = expmap0(self.ent(h), c)
         x_t = expmap0(self.ent(t), c)
         trans = expmap0(self.rel(r_exp), c)
-        q = givens_rotation(self.theta(r_exp), mobius_add(x_h, trans, c))
+        q = self.isometry(mobius_add(x_h, trans, c), r_exp, c)
         d = geodesic_dist(q, x_t, c)
         return -(d ** 2) + self.bh(h).squeeze(-1) + self.bt(t).squeeze(-1)
 
@@ -153,6 +221,73 @@ class RotH(nn.Module):
         # crashed every non-CPU run (mps/cuda) at the first depth_loss call
         cc = torch.full((1,), float(c), device=self.ent.weight.device)
         return expmap0(self.ent.weight, cc)
+
+
+class RotH(HyperbolicKGE):
+    """Rotation only. State-dict keys are unchanged from the pre-refactor class, so every
+    committed `roth_best.pt` still loads."""
+
+    def _init_relation_params(self, n_rel, dim):
+        self.theta = nn.Embedding(n_rel, dim // 2)     # rotation angles
+
+    def _reset_relation_params(self):
+        nn.init.uniform_(self.theta.weight, -0.1, 0.1)
+
+    def isometry(self, u, r_exp, c):
+        return givens_rotation(self.theta(r_exp), u)
+
+
+class RefH(HyperbolicKGE):
+    """Reflection only. Expected to win where the relation mix is dominated by symmetric
+    relations -- here IS_NEAR_TO, FRIEND_OF and CO_ATTENDED, which between them are 41% of
+    Gowalla's edges and 33% of Foursquare's."""
+
+    def _init_relation_params(self, n_rel, dim):
+        self.phi = nn.Embedding(n_rel, dim // 2)       # reflection angles
+
+    def _reset_relation_params(self):
+        nn.init.uniform_(self.phi.weight, -0.1, 0.1)
+
+    def isometry(self, u, r_exp, c):
+        return givens_reflection(self.phi(r_exp), u)
+
+
+class AttH(HyperbolicKGE):
+    """Both, combined per relation by attention in the tangent space at the origin.
+
+    Rotation and reflection are both norm-preserving, so a convex combination of them is not
+    itself an isometry and cannot be taken on the ball. It is taken on log-maps instead and
+    pushed back with expmap0 -- Chami et al.'s hyperbolic attention, and the reason AttH can
+    interpolate rather than having to choose.
+    """
+
+    def _init_relation_params(self, n_rel, dim):
+        self.theta = nn.Embedding(n_rel, dim // 2)
+        self.phi = nn.Embedding(n_rel, dim // 2)
+        self.att = nn.Embedding(n_rel, dim)            # per-relation attention query vector
+
+    def _reset_relation_params(self):
+        nn.init.uniform_(self.theta.weight, -0.1, 0.1)
+        nn.init.uniform_(self.phi.weight, -0.1, 0.1)
+        # small, so attention starts near-uniform and the two candidates are weighted ~50/50
+        nn.init.normal_(self.att.weight, std=1e-3)
+
+    def isometry(self, u, r_exp, c):
+        t_rot = logmap0(givens_rotation(self.theta(r_exp), u), c)
+        t_ref = logmap0(givens_reflection(self.phi(r_exp), u), c)
+        a = self.att(r_exp)
+        logits = torch.stack([(a * t_rot).sum(-1), (a * t_ref).sum(-1)], dim=-1)
+        w = torch.softmax(logits, dim=-1).unsqueeze(-1)
+        return expmap0(w[..., 0, :] * t_rot + w[..., 1, :] * t_ref, c)
+
+
+MODELS = {"roth": RotH, "refh": RefH, "atth": AttH}
+
+
+def build_model(name, n_ent, n_rel, dim=64):
+    if name not in MODELS:
+        raise ValueError(f"unknown model {name!r}; choose from {sorted(MODELS)}")
+    return MODELS[name](n_ent, n_rel, dim)
 
 
 # --------------------------------------------------------------------------
@@ -247,12 +382,18 @@ def link_prediction(model, triples, n_ent, filt, per_relation=None, max_eval=300
         ranks.append(rank)
         by_rel.setdefault(r, []).append(rank)
     ranks = np.array(ranks, dtype=float)
+    # hits3 and mr are carried so a variant comparison can report the same columns the
+    # supervisor's model-selection notebook reads; nothing upstream consumed them before.
     out = dict(mrr=float((1.0 / ranks).mean()), hits1=float((ranks <= 1).mean()),
-               hits10=float((ranks <= 10).mean()), n=len(ranks))
+               hits3=float((ranks <= 3).mean()), hits10=float((ranks <= 10).mean()),
+               mr=float(ranks.mean()), n=len(ranks))
     if per_relation is not None:
         out["per_relation"] = {
             per_relation[r]: dict(mrr=float(np.mean(1.0 / np.array(v))),
-                                  hits1=float(np.mean(np.array(v) <= 1)), n=len(v))
+                                  hits1=float(np.mean(np.array(v) <= 1)),
+                                  hits3=float(np.mean(np.array(v) <= 3)),
+                                  hits10=float(np.mean(np.array(v) <= 10)),
+                                  mr=float(np.mean(v)), n=len(v))
             for r, v in sorted(by_rel.items())}
     return out
 
@@ -330,9 +471,43 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
     rel_w = (cnt.sum() / cnt)
     rel_w = (rel_w / rel_w.mean()).clamp(max=a.max_rel_weight)
 
-    model = RotH(n_ent, n_rel, a.dim).to(device)
+    model_name = getattr(a, "model", "roth")
+    model = build_model(model_name, n_ent, n_rel, a.dim).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=a.lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=a.epochs, eta_min=a.lr * 0.02)
+
+    # Mid-run checkpointing. A 150-epoch run can outlast a hosted session's wall-clock cap, and
+    # without this the session dies and every hour of it is lost. The generator state is saved
+    # too, so a resumed run draws the same shuffles and negatives it would have drawn if it had
+    # never stopped -- `gen` is restored AFTER the val split above has re-consumed its draws,
+    # which is what keeps the held-out split identical across resumes.
+    save_every = int(getattr(a, "save_every", 0) or 0)
+    state_path = os.path.join(getattr(a, "out_dir", "."), f"{model_name}_train_state.pt")
+    start_epoch, history = 1, []
+    if getattr(a, "resume", False) and os.path.exists(state_path):
+        # map to CPU, NOT to `device`: the file holds `gen`'s state, and a CPU generator's
+        # set_state refuses a CUDA ByteTensor. load_state_dict copies into the model's existing
+        # CUDA params, and Adam casts its state to each param's device, so nothing is lost.
+        st = torch.load(state_path, map_location="cpu")
+        # CosineAnnealingLR updates its LR recursively from the optimiser's CURRENT lr, so it is
+        # only correct if T_max is unchanged. Resuming a 150-epoch run with --epochs 50 would
+        # silently produce a schedule that is neither, and in testing the LR jumped back UP to
+        # base_lr at the final epoch. Refuse rather than train on a wrong schedule.
+        saved_epochs = st.get("total_epochs")
+        if saved_epochs is not None and saved_epochs != a.epochs:
+            raise SystemExit(
+                f"--resume: {state_path} was saved by a run with --epochs {saved_epochs}, but "
+                f"this run asks for {a.epochs}. The cosine LR schedule is defined over the "
+                f"total epoch count, so resuming across a change would corrupt it. Either use "
+                f"--epochs {saved_epochs}, or delete that state file to start over.")
+        model.load_state_dict(st["model"])
+        opt.load_state_dict(st["opt"])
+        sched.load_state_dict(st["sched"])
+        gen.set_state(st["gen"].cpu())
+        start_epoch, history = st["epoch"] + 1, st["history"]
+        print(f"RESUMED {model_name} at epoch {st['epoch']}/{a.epochs} from {state_path}")
+    elif getattr(a, "resume", False):
+        print(f"--resume given but no state at {state_path} -- starting from scratch")
 
     # boolean mask per hierarchy relation, so the depth loss weights each type equally
     rel_groups = []
@@ -344,14 +519,16 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
             f"{name_of[r]}={int((hier[:,2]==r).sum()):,}" for r in sorted(set(hier[:, 2].tolist()))))
 
     n_batches = math.ceil(len(train_t) / a.batch_size)
+    print(f"model={model_name.upper()}")
     print(f"device={device}  entities={n_ent:,} relations={n_rel} dim={a.dim}  "
           f"train triples={len(train_t):,} val={len(val_t):,}  hierarchy pairs={len(hier):,}")
     print(f"epochs={a.epochs} batch={a.batch_size} negatives={a.n_neg} "
           f"depth_weight={a.depth_weight} margin={a.depth_margin}\n")
 
-    history = []
+    if start_epoch > a.epochs:
+        print(f"{model_name} already at {a.epochs} epochs -- nothing to train")
     t0 = time.time()
-    for epoch in range(1, a.epochs + 1):
+    for epoch in range(start_epoch, a.epochs + 1):
         model.train()
         order = torch.randperm(len(train_t), generator=gen)
         tot = tot_kge = tot_depth = 0.0
@@ -388,7 +565,16 @@ def train(triples, hier, n_ent, n_rel, rel_names, ent_type_ids, a, poi_rows=None
                 msg += f"  D1_rho={d1['spearman']:+.4f} ({d1['verdict']})"
                 history.append(dict(epoch=epoch, loss=tot / n_batches,
                                     depth=tot_depth / n_batches, d1=d1["spearman"]))
-            print(msg)
+            print(msg, flush=True)
+
+        if save_every and (epoch % save_every == 0 or epoch == a.epochs):
+            os.makedirs(os.path.dirname(state_path) or ".", exist_ok=True)
+            # write-then-rename: a session killed mid-write cannot leave a truncated state file
+            torch.save(dict(model=model.state_dict(), opt=opt.state_dict(),
+                            sched=sched.state_dict(), gen=gen.get_state(),
+                            epoch=epoch, total_epochs=a.epochs, history=history),
+                       state_path + ".tmp")
+            os.replace(state_path + ".tmp", state_path)
 
     model.eval()
     lp = link_prediction(model, val_t, n_ent, filt, per_relation=name_of,
@@ -439,18 +625,24 @@ def run(a):
         print(f"  {r:<20} {v['mrr']:>7.4f} {v['hits1']:>7.4f} {v['n']:>6}")
 
     os.makedirs(a.out_dir, exist_ok=True)
+    # RotH keeps the historical filenames -- stage 5, the paper's artifact table and every
+    # committed path resolve through them. The two new variants are suffixed, so a comparison
+    # run can never overwrite the embeddings a trained checkpoint was fitted against.
+    model_name = getattr(a, "model", "roth")
+    suffix = "" if model_name == "roth" else f"_{model_name}"
     with torch.no_grad():
         z_all = model.ball_points(a.curvature).cpu().numpy().astype(np.float32)
     torch.save({"state_dict": {k: v.cpu() for k, v in model.state_dict().items()}, "dim": a.dim,
+                "model": model_name,
                 "curvature_per_relation": torch.nn.functional.softplus(
                     model.c_logit.detach()).tolist()},
-               os.path.join(a.out_dir, "roth_best.pt"))
-    np.save(os.path.join(a.out_dir, "entity_hyperbolic_embs.npy"), z_all)
+               os.path.join(a.out_dir, f"{model_name}_best.pt"))
+    np.save(os.path.join(a.out_dir, f"entity_hyperbolic_embs{suffix}.npy"), z_all)
 
-    result = dict(link_prediction=lp, history=history, config=vars(a))
+    result = dict(model=model_name, link_prediction=lp, history=history, config=vars(a))
     if poi_rows is not None:
         z_poi = z_all[poi_rows]
-        np.save(os.path.join(a.out_dir, f"poi_hyperbolic_embs_{a.dataset}.npy"), z_poi)
+        np.save(os.path.join(a.out_dir, f"poi_hyperbolic_embs_{a.dataset}{suffix}.npy"), z_poi)
         d1 = d1_radial_hierarchy(z_poi, depths)
         result["d1"] = d1
         print(f"\nD1  Spearman(taxonomy depth, hyperbolic radius) = {d1['spearman']:+.4f}   "
@@ -458,12 +650,80 @@ def run(a):
         print(f"  norms in [{d1['norm_min']:.4f}, {d1['norm_max']:.4f}]")
         for d, v in d1["by_depth"].items():
             print(f"    depth {d}: n={v['n']:>5}  mean radius = {v['mean_radius']:.4f}")
-        print(f"\n  saved poi_hyperbolic_embs_{a.dataset}.npy {z_poi.shape} "
+        print(f"\n  saved poi_hyperbolic_embs_{a.dataset}{suffix}.npy {z_poi.shape} "
               f"(rows in poi_idx order -- drop-in for EMB_FILE)")
 
-    with open(os.path.join(a.out_dir, "roth_results.json"), "w") as f:
+    with open(os.path.join(a.out_dir, f"{model_name}_results.json"), "w") as f:
         json.dump(result, f, indent=2)
-    print(f"  saved roth_best.pt, entity_hyperbolic_embs.npy, roth_results.json -> {a.out_dir}")
+    print(f"  saved {model_name}_best.pt, entity_hyperbolic_embs{suffix}.npy, "
+          f"{model_name}_results.json -> {a.out_dir}")
+
+
+def _variant_check():
+    """RotH / RefH / AttH: are the isometries what they claim to be, and does each variant
+    actually train? Cheap -- a synthetic graph, seconds, no data needed."""
+    print("VARIANT-CHECK: RotH / RefH / AttH")
+    ok = lambda n, c: (print(f"  {'PASS' if c else 'FAIL'}  {n}"), c)[1]
+    res = []
+    torch.manual_seed(0)
+
+    x = torch.randn(64, 16)
+    ang = torch.randn(64, 8)
+    rot, ref = givens_rotation(ang, x), givens_reflection(ang, x)
+    res.append(ok("rotation preserves the norm (it is an isometry fixing the origin)",
+                  torch.allclose(rot.norm(dim=-1), x.norm(dim=-1), atol=1e-5)))
+    res.append(ok("reflection preserves the norm",
+                  torch.allclose(ref.norm(dim=-1), x.norm(dim=-1), atol=1e-5)))
+    res.append(ok("reflection is an involution (ref . ref = identity) -- this is the property "
+                  "that lets RefH model symmetric relations exactly",
+                  torch.allclose(givens_reflection(ang, ref), x, atol=1e-5)))
+    res.append(ok("rotation and reflection are genuinely different maps",
+                  not torch.allclose(rot, ref, atol=1e-3)))
+
+    # AttH must be able to reproduce either of its two candidates, or the attention is
+    # decorative. One point, because the attention logits depend on the point: a single query
+    # vector cannot be made to favour the same branch for a whole batch of different points.
+    m = AttH(8, 2, 16)
+    c = torch.full((1, 1), 1.0)
+    u = expmap0(torch.randn(1, 16) * 0.1, c)
+    r = torch.zeros(1, dtype=torch.long)
+    with torch.no_grad():
+        rot_only = givens_rotation(m.theta(r), u)
+        m.att.weight.zero_()
+        mid = m.isometry(u, r, c)
+        # a query vector parallel to the rotation branch's log-map maximises its logit, since
+        # both branches preserve the norm and <t_rot, t_rot> >= <t_rot, t_ref> by Cauchy-Schwarz
+        m.att.weight[0] = logmap0(rot_only, c)[0] * 1e4
+        skew = m.isometry(u, r, c)
+    d_mid = float((mid - rot_only).norm())
+    d_skew = float((skew - rot_only).norm())
+    res.append(ok(f"AttH with a zero attention vector sits between its two candidates "
+                  f"(distance to the rotation branch {d_mid:.4f} > 0)", d_mid > 1e-6))
+    res.append(ok(f"AttH attention can be driven onto the rotation branch "
+                  f"({d_mid:.4f} -> {d_skew:.4f})", d_skew < 0.01 * d_mid))
+
+    # every variant has to train, and its state dict has to round-trip
+    ents = torch.randint(0, 40, (600, 3))
+    ents[:, 1] = torch.randint(0, 3, (600,))
+    for name in ("roth", "refh", "atth"):
+        mdl = build_model(name, 40, 3, 16)
+        sc = mdl.score(ents[:, 0], ents[:, 1], ents[:, 2])
+        sc.sum().backward()
+        grads_ok = all(p.grad is not None and torch.isfinite(p.grad).all()
+                       for p in mdl.parameters())
+        finite = bool(torch.isfinite(sc).all())
+        rt = build_model(name, 40, 3, 16)
+        rt.load_state_dict(mdl.state_dict())
+        res.append(ok(f"{name}: finite scores, finite grads on every parameter, state dict "
+                      f"round-trips", finite and grads_ok))
+
+    # RotH's parameter names must not have drifted, or committed checkpoints stop loading
+    res.append(ok("RotH state-dict keys unchanged by the refactor",
+                  sorted(RotH(40, 3, 16).state_dict()) ==
+                  ["bh.weight", "bt.weight", "c_logit", "ent.weight", "rel.weight",
+                   "theta.weight"]))
+    print()
+    return all(res)
 
 
 def _self_check():
@@ -531,6 +791,10 @@ def main():
     p.add_argument("--data-dir", default="./data")
     p.add_argument("--out-dir", default="./data/kg")
     p.add_argument("--dataset", default="NYC")
+    p.add_argument("--model", choices=sorted(MODELS), default="roth",
+                   help="relation isometry: roth (rotation), refh (reflection) or atth "
+                        "(attention over both). Everything else about the run is identical, "
+                        "which is what makes the three comparable")
     p.add_argument("--dim", type=int, default=64)
     p.add_argument("--epochs", type=int, default=150)
     p.add_argument("--batch-size", type=int, default=512)
@@ -559,10 +823,15 @@ def main():
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--device", default=None,
                    help="'cuda' or 'cpu'; default auto-picks cuda if torch.cuda.is_available()")
+    p.add_argument("--save-every", type=int, default=0,
+                   help="checkpoint model+optimiser+RNG every N epochs so a run can survive a "
+                        "capped session. 0 disables it")
+    p.add_argument("--resume", action="store_true",
+                   help="continue from {model}_train_state.pt in --out-dir if it exists")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:
-        sys.exit(0 if _self_check() else 1)
+        sys.exit(0 if (_variant_check() and _self_check()) else 1)
     a.device = a.device or ("cuda" if torch.cuda.is_available() else "cpu")
     run(a)
 
