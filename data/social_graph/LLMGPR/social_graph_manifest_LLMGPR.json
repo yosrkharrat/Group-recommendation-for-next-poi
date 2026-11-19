@@ -1,0 +1,180 @@
+{
+  "dataset": "LLMGPR",
+  "built": "2026-11-19T13:25:49+00:00",
+  "git_head": "c20b91f",
+  "script": "src/build_social_graph.py",
+  "undirected": true,
+  "storage": "one row per pair and relation, u1 < u2",
+  "config": {
+    "window_min": 60,
+    "max_group_size": 8,
+    "min_meetings": 2,
+    "co_weight": "idf",
+    "co_weight_arg": "auto",
+    "guard_min": 120,
+    "heldout_repro_splits": [
+      "val",
+      "test",
+      "masked"
+    ],
+    "friendship": "old only"
+  },
+  "inputs": {
+    "./data/llmgpr/friendship_old_LLMGPR.csv": "eb8994628e9bc83758625bd3c6b03d02f65243ff731c92902116468366422f69",
+    "./data/llmgpr/friendship_new_only_LLMGPR.csv": "4758d34a041c43a7c419304fcf90e6803f9907ffeba302cc5f6f69123680703d",
+    "./data/llmgpr/train_LLMGPR.csv": "cf5a00c8172a1036a4d6715c1c68b3ce3d3a7703f1a5a361b195f6a1bcdaebd0",
+    "./data/llmgpr/val_LLMGPR.csv": "dea35e73cce5969d93377d176c738700fe870f77d5846e2fd54ca22d5dcff1f4",
+    "./data/llmgpr/test_LLMGPR.csv": "05e62f3d787a6fabada96d13352c35de40187db7c533dbff6c155c6a7a3d4f35",
+    "./data/groups_llmgpr_match/LLMGPR/group_checkins.csv": "27753f40ab3899087538d8300d0fff948820038006429b6eba43e6e6c786f509"
+  },
+  "counts": {
+    "train_checkins": 299451,
+    "dropped_repro_outing_checkins": 1134,
+    "train_checkins_used": 298317,
+    "train_users": 6889,
+    "copresent_pairs_any": 15603,
+    "edges": 10843,
+    "by_relation": {
+      "FRIEND_OF": 8640,
+      "CO_PRESENT": 2203
+    }
+  },
+  "weighting_selection": {
+    "label": "pairs co-present in the validation split (\u00b160 min, val check-ins of both users)",
+    "n_users": 6889,
+    "n_pairs": 23725716,
+    "n_positive": 432,
+    "candidates": {
+      "idf_min1": {
+        "n_edges": 15603,
+        "positives_covered": 57,
+        "auc_all_pairs": 0.56567,
+        "auc_within_edges": 0.81684
+      },
+      "count_min1": {
+        "n_edges": 15603,
+        "positives_covered": 57,
+        "auc_all_pairs": 0.56566,
+        "auc_within_edges": 0.73215
+      },
+      "idf_min2": {
+        "n_edges": 2203,
+        "positives_covered": 32,
+        "auc_all_pairs": 0.53699,
+        "auc_within_edges": 0.83007
+      },
+      "count_min2": {
+        "n_edges": 2203,
+        "positives_covered": 32,
+        "auc_all_pairs": 0.53699,
+        "auc_within_edges": 0.77128
+      }
+    },
+    "reference_friend_of": {
+      "n_edges": 8640,
+      "positives_covered": 28,
+      "auc_all_pairs": 0.53223
+    },
+    "chosen_by": "auc_within_edges",
+    "chosen": "idf"
+  },
+  "audit": {
+    "checkins_used_all_train": true,
+    "friend_of_subset_of_old": true,
+    "new_only_pairs_in_friend_of": 0,
+    "co_present_pairs_that_are_new_only_friends": 39,
+    "note_new_only": "allowed: those CO_PRESENT edges come from train check-ins, not from the friendship file. Co-presence predicting a later friendship is expected.",
+    "heldout_repro_outings_left": 0
+  },
+  "stats": {
+    "CO_PRESENT": {
+      "edges": 2203,
+      "users": 1503,
+      "share_of_train_users": 0.2182,
+      "degree": {
+        "min": 1.0,
+        "p25": 1.0,
+        "p50": 2.0,
+        "p75": 4.0,
+        "p90": 7.0,
+        "p99": 14.98,
+        "max": 23.0
+      },
+      "weight": {
+        "min": 0.2839,
+        "p25": 0.3971,
+        "p50": 0.5314,
+        "p75": 0.7053,
+        "p90": 1.1789,
+        "p99": 5.4528,
+        "max": 39.7842
+      },
+      "n_meetings": {
+        "min": 2.0,
+        "p25": 2.0,
+        "p50": 2.0,
+        "p75": 3.0,
+        "p90": 4.0,
+        "p99": 12.0,
+        "max": 124.0
+      }
+    },
+    "FRIEND_OF": {
+      "edges": 8640,
+      "users": 4872,
+      "share_of_train_users": 0.7072,
+      "degree": {
+        "min": 1.0,
+        "p25": 1.0,
+        "p50": 2.0,
+        "p75": 3.0,
+        "p90": 8.0,
+        "p99": 29.0,
+        "max": 167.0
+      },
+      "weight": {
+        "min": 1.0,
+        "p25": 1.0,
+        "p50": 1.0,
+        "p75": 1.0,
+        "p90": 1.0,
+        "p99": 1.0,
+        "max": 1.0
+      },
+      "n_meetings": {
+        "min": 0.0,
+        "p25": 0.0,
+        "p50": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p99": 4.0,
+        "max": 124.0
+      }
+    },
+    "overlap": {
+      "friend_and_copresent": 201,
+      "copresent_only": 2002,
+      "friend_only": 8439,
+      "union": 10642,
+      "friends_who_met_at_least_once": 322
+    },
+    "isolated_train_users": 1750,
+    "group_member_coverage": {
+      "repro_LLMGPR_match": {
+        "groups": 1817,
+        "members": 4689,
+        "member_has_any_edge": 0.9755,
+        "member_has_edge_inside_group": 0.7995,
+        "groups_every_member_tied_inside": 0.7122
+      },
+      "groups_social_180min_5hop": {
+        "groups": 4804,
+        "members": 10925,
+        "member_has_any_edge": 1.0,
+        "member_has_edge_inside_group": 0.4053,
+        "groups_every_member_tied_inside": 0.3693
+      }
+    }
+  },
+  "seconds": 25.6
+}
