@@ -322,12 +322,18 @@ def build(df, meta, cat_of, friends_old, groups, members, co, a):
     else:
         print("no coordinates -> skipping LOCATED_IN and IS_NEAR_TO")
     add_transitions(kg, train_df, a.max_followed_by)
-    add_visits(kg, train_df)
-    pref = prefers_category(train_df, cat_of, a.tau)
-    add_prefers_category(kg, pref, hierarchy)
-    n_friend = add_friendships(kg, friends_old)
-    if groups is not None and len(groups):
-        add_group_layer(kg, groups, members, co, cat_of, hierarchy)
+    if getattr(a, "poi_only", False):
+        # POI KG only (decision 2026-11-19): POI / CATEGORY / LOCALITY / REGION with HAS_CATEGORY,
+        # SUBCATEGORY_OF, LOCATED_IN, IS_NEAR_TO, FOLLOWED_BY. Users, groups and social relations
+        # live in the separate social graph (build_social_graph.py) and the user tokens.
+        pref, n_friend = [], 0
+    else:
+        add_visits(kg, train_df)
+        pref = prefers_category(train_df, cat_of, a.tau)
+        add_prefers_category(kg, pref, hierarchy)
+        n_friend = add_friendships(kg, friends_old)
+        if groups is not None and len(groups):
+            add_group_layer(kg, groups, members, co, cat_of, hierarchy)
 
     print(f"\nentities {len(kg.ent_id):,}  triples {len(kg.triples):,}  "
           f"relations {len(kg.rel_id)}  (FRIEND_OF directed edges: {n_friend:,})")
@@ -407,7 +413,7 @@ def run_csv(a):
     print("split sizes: " + "  ".join(f"{k}={v:,}" for k, v in
                                       df["split"].value_counts().items()))
 
-    groups, members, co = load_groups(a.groups_dir)
+    groups, members, co = (None, None, None) if a.poi_only else load_groups(a.groups_dir)
     kg, hierarchy, pref = build(df, meta, cat_of, friends_old, groups, members, co, a)
     all_friends = np.vstack([friends_old, new_only]) if len(new_only) else friends_old
     eval_pairs = assert_no_new_friendship_leak(kg, friends_old, all_friends)
@@ -632,6 +638,8 @@ def main():
     p.add_argument("--knn", type=int, default=10)
     p.add_argument("--max-followed-by", type=int, default=None)
     p.add_argument("--tau", type=float, default=0.4)
+    p.add_argument("--poi-only", action="store_true",
+                   help="POI KG only: taxonomy, LOCATED_IN, IS_NEAR_TO, FOLLOWED_BY (no users/groups/social)")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:

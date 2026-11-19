@@ -1,0 +1,40 @@
+type-restricted negatives (all): HAS_CATEGORY<-374  SUBCATEGORY_OF<-374  LOCATED_IN<-6  IS_NEAR_TO<-15,315  FOLLOWED_BY<-15,315
+--resume given but no state at out\refh_train_state.pt -- starting from scratch
+depth-loss hierarchy relations: HAS_CATEGORY=15,315  SUBCATEGORY_OF=355  LOCATED_IN=15,318
+model=REFH
+device=cuda  entities=15,695 relations=5 dim=64  train triples=380,155 val=20,008  hierarchy pairs=30,988
+epochs=150 batch=512 negatives=128 depth_weight=1.0 margin=0.1
+
+epoch    1/150  loss=0.0397 kge=0.0376 depth=0.0021 lr=1.00e-03  20s  D1_rho=+0.5516 (STRONG)
+epoch   10/150  loss=0.0239 kge=0.0195 depth=0.0044 lr=9.89e-04  182s  D1_rho=+0.5796 (STRONG)
+epoch   20/150  loss=0.0234 kge=0.0191 depth=0.0043 lr=9.58e-04  378s  D1_rho=+0.6210 (STRONG)
+epoch   30/150  loss=0.0232 kge=0.0191 depth=0.0041 lr=9.06e-04  601s  D1_rho=+0.6296 (STRONG)
+epoch   40/150  loss=0.0229 kge=0.0189 depth=0.0040 lr=8.38e-04  900s  D1_rho=+0.6422 (STRONG)
+epoch   50/150  loss=0.0228 kge=0.0189 depth=0.0039 lr=7.55e-04  1208s  D1_rho=+0.6544 (STRONG)
+epoch   60/150  loss=0.0225 kge=0.0188 depth=0.0038 lr=6.61e-04  1528s  D1_rho=+0.6583 (STRONG)
+epoch   70/150  loss=0.0223 kge=0.0186 depth=0.0036 lr=5.61e-04  1746s  D1_rho=+0.6643 (STRONG)
+epoch   80/150  loss=0.0222 kge=0.0186 depth=0.0035 lr=4.59e-04  1954s  D1_rho=+0.6800 (STRONG)
+epoch   90/150  loss=0.0219 kge=0.0185 depth=0.0034 lr=3.59e-04  2139s  D1_rho=+0.6765 (STRONG)
+epoch  100/150  loss=0.0217 kge=0.0184 depth=0.0033 lr=2.65e-04  2332s  D1_rho=+0.6758 (STRONG)
+epoch  110/150  loss=0.0215 kge=0.0183 depth=0.0032 lr=1.82e-04  2539s  D1_rho=+0.6839 (STRONG)
+epoch  120/150  loss=0.0214 kge=0.0182 depth=0.0032 lr=1.14e-04  2731s  D1_rho=+0.6825 (STRONG)
+epoch  130/150  loss=0.0212 kge=0.0181 depth=0.0032 lr=6.24e-05  2908s  D1_rho=+0.6787 (STRONG)
+epoch  140/150  loss=0.0213 kge=0.0182 depth=0.0031 lr=3.07e-05  3112s  D1_rho=+0.6778 (STRONG)
+epoch  150/150  loss=0.0213 kge=0.0181 depth=0.0031 lr=2.00e-05  3313s  D1_rho=+0.6778 (STRONG)
+
+link prediction (filtered, n=2000): MRR=0.1525  Hits@1=0.0355  Hits@10=0.4905
+  relation                 MRR  Hits@1      n
+  LOCATED_IN            1.0000  1.0000     70
+  IS_NEAR_TO            0.2055  0.0000    985
+  FOLLOWED_BY           0.0370  0.0012    862
+  HAS_CATEGORY          0.0083  0.0000     83
+
+D1  Spearman(taxonomy depth, hyperbolic radius) = +0.6778   VERDICT: STRONG   (was +0.0189 ABSENT)
+  norms in [0.2529, 0.4210]
+    depth 1: n=  453  mean radius = 0.5267
+    depth 2: n=11154  mean radius = 0.5347
+    depth 3: n= 3632  mean radius = 0.6283
+    depth 4: n=   76  mean radius = 0.7176
+
+  saved poi_hyperbolic_embs_LLMGPR_refh.npy (15315, 64) (rows in poi_idx order -- drop-in for EMB_FILE)
+  saved refh_best.pt, entity_hyperbolic_embs_refh.npy, refh_results.json -> out

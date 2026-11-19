@@ -1,0 +1,23 @@
+{
+  "relation_to_id": {
+    "HAS_CATEGORY": 0,
+    "SUBCATEGORY_OF": 1,
+    "LOCATED_IN": 2,
+    "IS_NEAR_TO": 3,
+    "FOLLOWED_BY": 4
+  },
+  "counts": {
+    "IS_NEAR_TO": 191576,
+    "FOLLOWED_BY": 177599,
+    "LOCATED_IN": 15318,
+    "HAS_CATEGORY": 15315,
+    "SUBCATEGORY_OF": 355
+  },
+  "hierarchy_relations": [
+    "HAS_CATEGORY",
+    "SUBCATEGORY_OF",
+    "LOCATED_IN",
+    "PREFERS_CATEGORY",
+    "GROUP_PREFERS"
+  ]
+}

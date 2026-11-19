@@ -20,7 +20,39 @@ Design decisions (2026-11-19):
 |---|---|---|
 | Weighted user–user social graph | `src/build_social_graph.py` → `data/social_graph/LLMGPR/` | built, audited |
 | User tokens + social smoothing | `src/user_tokens.py`, stage 5 section 6c | built, CPU-tested; opt-in |
-| RefH embeddings (Foursquare's winning KGE) | `data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR_refh.npy` | copied from `llmgpr-pipeline` @ `d8b3f48`; same KG, byte-identical inputs |
+| Three-city reproduction groups | `data/groups_llmgpr_match/LLMGPR_3CITY/` | built (match 0.836) |
+| Extended POI catalogue | `data/llmgpr/poi_metadata_LLMGPR.csv` (15,315 POIs) | built |
+| POI-only KG + retrained RefH | `data/llmgpr/kg_poi/` | built; D1 +0.678 STRONG |
+
+### Catalogue extension for the LLMGPR comparison (option B)
+The first LLMGPR-matched Foursquare groups were built from whole check-in histories. 54% of their
+test targets were venues outside our 14,402-POI catalogue, so the model could not output them, and
+75% of those venues were outside NY/LA/Chicago. Extending the catalogue to every venue of those
+histories would mean 430k POIs, which is too large. Instead:
+
+1. **Groups rebuilt on three-city check-ins only** (what LLMGPR §4.1 says its data contains):
+   `python src/build_llmgpr_match_groups.py --datasets LLMGPR_3CITY`. The best three-city reading
+   in the sweep is anchor + friends within ±1 day, with ≥2 group check-ins. That gives 1,251 groups,
+   9,575 group check-ins, 7.65 check-ins and 3.33 members per group (LLMGPR: 1,715 / 12,594 / 7.34
+   / 3.72), match 0.836. The whole-history set (0.895) stays in `data/groups_llmgpr_match/LLMGPR/`
+   for the record.
+2. **Catalogue extended** (`python src/extend_llmgpr_catalogue.py`). It appends the 913 venues those
+   groups use but the catalogue lacked: ids 14402–15314, so old ids are unchanged, and categories
+   and localities follow the same conventions. It also fills coordinates for every POI (43% → 100%)
+   from the raw venue file, which agrees exactly where both exist. Every group test target is now a
+   POI the model can output.
+3. **POI-only KG** (`python src/build_kg_lbsn.py --csv-dir ./data/llmgpr --dataset LLMGPR --out-dir
+   ./data/llmgpr/kg_poi --poi-only`, then `build_poi_poi_triples.py` for the alignment triples).
+   It has 15,695 entities and 400,163 triples (IS_NEAR_TO 191,576 now that every POI has
+   coordinates). On the old catalogue the same builder reproduces the earlier POI-only KG exactly
+   (14,774 / 283,420).
+4. **RefH retrained on it** with the shipped RefH's exact config (dim 64, 150 epochs, seed 42, on a
+   CUDA GPU): MRR 0.1525, **D1 +0.678 STRONG and monotone** (the shipped RefH had +0.320).
+   `data/llmgpr/kg_denoised/` (14,402-row embeddings of the old user/group KG) is removed from this
+   branch, since its files would also clash with these names in stage 5's `find()`.
+
+The new 913 POIs have no individual check-ins in the 10 km pipeline data. They are learned through
+the KG (category, location, proximity) and the group sequences.
 
 ### Social graph
 Two relations, both from **train-split** check-ins only:
@@ -46,14 +78,16 @@ Each user becomes one `<user_i>` token in the POI token space:
 The notebook asserts that POI points pushed through the user path reproduce `W_POI`. Prompts
 gain `[user] <user_i>` and `[member N] <user_i>`.
 
-Offline check (`python src/user_tokens.py --diagnose`, no LLM): pulling users towards their real
-ties moves them +35% MRR closer to their next new POI at beta 2. Shuffled ties give −12%. The
-gain is largest for low-history users.
+Offline check (`python src/user_tokens.py --diagnose`, no LLM): on this branch's embeddings,
+pulling users towards **co-presence** ties moves them +18% MRR closer to their next new POI
+(beta 1). Declared **friendship** moves them further away, though less than shuffled ties do. On
+the old embeddings both helped, so the stage 5 ablation decides. Recommended:
+`STAGE6B_SOCIAL_SMOOTHING=copresence`.
 
 ## Running stage 5
 
 ```bash
-STAGE6B_USER_TOKENS=1 STAGE6B_SOCIAL_SMOOTHING=both   # + STAGE6B_SOCIAL_BETA (default 2.0)
+STAGE6B_USER_TOKENS=1 STAGE6B_SOCIAL_SMOOTHING=copresence   # + STAGE6B_SOCIAL_BETA (default 1.0)
 STAGE6B_RUN_PROFILE=smoke                             # full | probe | smoke (full needs >= 40 GB)
 ```
 
@@ -62,7 +96,11 @@ The ablation grid is `STAGE6B_USER_TOKENS=0`, then `1` with `STAGE6B_SOCIAL_SMOO
 
 ## Not done yet
 
-- **No GPU run of the user tokens yet.** The first Kaggle smoke run is pending.
+- **No GPU run on the extended catalogue yet.** The first Kaggle smoke run (old catalogue, user
+  tokens + smoothing `both`) completed on 2026-11-19.
+- **Stage 5 does not yet evaluate on the three-city reproduction groups** (it still uses
+  `groups_social`). Join them on `venue_id`, because their `poi_idx` is the house8 id space.
+- **RotH / AttH have not been re-compared on the new KG.** RefH was kept from the old selection.
 - **The group model is not trained on groups** (`TRAIN_ON_GROUPS=False`). The main-results group
   rule is undecided: one strict rule gives about 210 Foursquare groups on this subset. That
   question is with the supervisor.

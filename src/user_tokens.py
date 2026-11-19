@@ -27,22 +27,30 @@ How a user's vector is built (no new training, nothing new to align)
    batch's statistics instead. Check: a user whose only POI is p gets exactly W_POI[p]
    (`_self_test`, and asserted in the notebook).
 
-Does smoothing carry a social signal? (offline, `--diagnose`, LLMGPR, 2026-11-19)
---------------------------------------------------------------------------------
-Proxy task with no LLM: rank all 14,402 POIs by geodesic distance to the user's point, target =
-the user's first VALIDATION POI not visited in train (5,386 users). MRR for the users smoothing
-moves, unsmoothed -> smoothed; `both_random` = the same edges with partners shuffled (control):
+Does smoothing carry a social signal? (offline, `--diagnose`, LLMGPR)
+--------------------------------------------------------------------
+Proxy task with no LLM: rank every POI by geodesic distance to the user's point, target = the
+user's first VALIDATION POI not visited in train (5,386 users). MRR for the users smoothing moves,
+unsmoothed -> smoothed; `both_random` = the same edges with partners shuffled (control).
+
+foursquare-v2 embeddings (RefH on the POI-only KG of the extended catalogue, data/llmgpr/kg_poi,
+15,315 POIs, every POI with coordinates), 2026-11-19:
 
     beta   friends          copresence       both             both_random      low-history, both
-    0.25   .0103 -> .0109   .0080 -> .0085   .0104 -> .0110   .0104 -> .0105   .0180 -> .0197
-    1.0    .0103 -> .0128   .0080 -> .0099   .0104 -> .0128   .0104 -> .0099   .0180 -> .0256
-    2.0    .0103 -> .0143   .0080 -> .0105   .0104 -> .0140   .0104 -> .0092   .0180 -> .0271
-    4.0    .0103 -> .0145   .0080 -> .0102   .0104 -> .0143   .0104 -> .0090   .0180 -> .0272
+    0.1    .0131 -> .0126   .0107 -> .0117   .0127 -> .0123   .0127 -> .0119   .0158 -> .0142
+    0.5    .0131 -> .0123   .0107 -> .0124   .0127 -> .0121   .0127 -> .0108   .0158 -> .0116
+    1.0    .0131 -> .0118   .0107 -> .0126   .0127 -> .0120   .0127 -> .0089   .0158 -> .0138
+    2.0    .0131 -> .0109   .0107 -> .0105   .0127 -> .0118   .0127 -> .0059   .0158 -> .0125
 
-Real ties help (+35% at beta 2) and random ties do not (-12%), so the gain is social, not
-shrinkage towards general taste. It is largest for the quarter of users with the least history.
-`both` plateaus from beta 2 and co-presence alone declines past it, so the notebook default is
-SOCIAL_BETA = 2.0. Only a proxy: the stage 5 ablation (none / friends / copresence / both) decides.
+Co-presence helps at every beta (+18% at beta 1, all-user MRR .0138 -> .0143). Declared friendship
+now HURTS at every beta, though always less than random ties. Ties carry signal, but declared
+friends live elsewhere on this more geographic map. So the notebook recommends
+SOCIAL_SMOOTHING=copresence with SOCIAL_BETA=1.0.
+
+On the OLD embeddings (kg_denoised RefH, 14,402 POIs, 43% with coordinates), friendship helped too
+(both: .0104 -> .0140 at beta 2, random .0104 -> .0092). The finding depends on the embedding
+geometry, which is why the stage 5 ablation (none / friends / copresence / both) decides, not this
+proxy.
 
 Leakage
 -------
@@ -340,7 +348,7 @@ def main():
     p.add_argument("--diagnose", action="store_true")
     p.add_argument("--data-dir", default="./data/llmgpr")
     p.add_argument("--dataset", default="LLMGPR")
-    p.add_argument("--emb", default="./data/llmgpr/kg_denoised/poi_hyperbolic_embs_LLMGPR.npy")
+    p.add_argument("--emb", default="./data/llmgpr/kg_poi/poi_hyperbolic_embs_LLMGPR_refh.npy")
     p.add_argument("--edges", default="./data/social_graph/LLMGPR/social_edges_LLMGPR.csv")
     p.add_argument("--beta", type=float, default=0.5)
     p.add_argument("--top-k", type=int, default=10)

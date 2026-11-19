@@ -1,0 +1,45 @@
+{
+  "config": {
+    "csv_dir": "./data/llmgpr",
+    "mat": null,
+    "poi_meta": null,
+    "taxonomy": "./data/lbsn/fsq_category_paths_2014.json",
+    "groups_dir": null,
+    "friendship_old": null,
+    "out_dir": "./data/llmgpr/kg_poi",
+    "export_dir": null,
+    "dataset": "LLMGPR",
+    "split": "user",
+    "train_frac": 0.7,
+    "val_frac": 0.1,
+    "wrap_tol": 24,
+    "cell_deg": 0.01,
+    "knn": 10,
+    "max_followed_by": null,
+    "tau": 0.4,
+    "poi_only": true,
+    "self_check": false
+  },
+  "source": "./data/llmgpr",
+  "dataset": "LLMGPR",
+  "n_entities": 15695,
+  "n_triples": 400163,
+  "n_relations": 5,
+  "node_types": {
+    "CATEGORY": 374,
+    "LOCALITY": 3,
+    "POI": 15315,
+    "REGION": 3
+  },
+  "relation_counts": {
+    "IS_NEAR_TO": 191576,
+    "FOLLOWED_BY": 177599,
+    "LOCATED_IN": 15318,
+    "HAS_CATEGORY": 15315,
+    "SUBCATEGORY_OF": 355
+  },
+  "n_hierarchy_pairs": 30988,
+  "n_prefers_category": 0,
+  "n_friendship_old": 8640,
+  "n_friendship_new_only": 5528
+}
