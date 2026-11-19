@@ -1,0 +1,23 @@
+{
+ "inputs": {
+  "meta": "./data/llmgpr/poi_metadata_LLMGPR.csv",
+  "venues": "./data/llmgpr_full/house8_whole/train_LLMGPR.csv",
+  "groups": "./data/groups_llmgpr_match/LLMGPR_3CITY/group_checkins.csv",
+  "taxonomy": "./data/lbsn/fsq_category_paths_2014.json"
+ },
+ "old_pois": 14402,
+ "added_pois": 913,
+ "new_pois": 15315,
+ "added_by_city": {
+  "Los Angeles": 393,
+  "New York": 372,
+  "Chicago": 148
+ },
+ "added_category_in_taxonomy": 0.9803,
+ "coords_before": 0.4315,
+ "coords_after": 1.0,
+ "coords_filled_for_old_pois": 8188,
+ "group_test_targets_in_catalogue_before": 0.8106,
+ "group_test_targets_in_catalogue_after": 1.0,
+ "note": "new poi_idx = old N + rank of venue_id among the added venues; old ids unchanged"
+}
