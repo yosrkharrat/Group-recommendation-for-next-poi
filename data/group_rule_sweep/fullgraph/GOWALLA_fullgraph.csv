@@ -1,0 +1,10 @@
+rule,copresence,scope,min_events,groups,group_checkins,ck_per_group,ck_per_group_median,users_per_group,share_pairs,users_in_groups,groups_vs_llmgpr,ck_vs_llmgpr
+direct,bucket1,all,1,2030,7010,3.453,1.0,2.061,0.946,3179,0.929,0.906
+direct,bucket1,all,2,876,5856,6.685,3.0,2.041,0.966,1513,0.401,0.757
+direct,bucket1,all,3,534,5172,9.685,5.0,2.024,0.981,959,0.244,0.668
+full_2hop,bucket1,all,1,2238,7342,3.281,1.0,2.059,0.948,3441,1.024,0.949
+full_2hop,bucket1,all,2,898,6002,6.684,3.0,2.04,0.967,1545,0.411,0.776
+full_2hop,bucket1,all,3,543,5292,9.746,5.0,2.024,0.982,973,0.248,0.684
+full_comp,bucket1,all,1,2728,7833,2.871,1.0,2.061,0.947,4111,1.248,1.012
+full_comp,bucket1,all,2,903,6008,6.653,3.0,2.04,0.967,1554,0.413,0.776
+full_comp,bucket1,all,3,544,5290,9.724,5.0,2.024,0.982,975,0.249,0.684

@@ -1,0 +1,10 @@
+scope,copresence,friend_rule,min_events,candidates,groups,group_checkins,ck_per_group,ck_per_group_median,group_pois,pois_per_group,users_per_group,share_pairs,users_in_groups,groups_vs_llmgpr,ck_vs_llmgpr
+all,bucket1,hops5_cc,1,632,189,390,2.063,1.0,337,1.783,2.021,0.984,344,0.11,0.031
+all,bucket1,hops5_cc,2,632,46,247,5.37,2.0,194,4.217,2.0,1.0,92,0.027,0.02
+all,bucket1,hops5_cc,3,632,21,197,9.381,4.0,148,7.048,2.0,1.0,42,0.012,0.016
+all,bucket1,hops1_cc,1,632,119,312,2.622,1.0,259,2.176,2.017,0.983,225,0.069,0.025
+all,bucket1,hops1_cc,2,632,43,236,5.488,2.0,183,4.256,2.0,1.0,86,0.025,0.019
+all,bucket1,hops1_cc,3,632,18,186,10.333,4.0,137,7.611,2.0,1.0,36,0.01,0.015
+all,bucket1,clique,1,632,119,312,2.622,1.0,259,2.176,2.017,0.983,225,0.069,0.025
+all,bucket1,clique,2,632,43,236,5.488,2.0,183,4.256,2.0,1.0,86,0.025,0.019
+all,bucket1,clique,3,632,18,186,10.333,4.0,137,7.611,2.0,1.0,36,0.01,0.015

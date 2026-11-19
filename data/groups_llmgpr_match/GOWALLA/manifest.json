@@ -1,0 +1,66 @@
+{
+ "dataset": "GOWALLA",
+ "built": "2026-11-19T09:44:46+00:00",
+ "git_head": "559fa01",
+ "script": "src/build_llmgpr_match_groups.py",
+ "rule": {
+  "copresence": "anchor check-in + direct friends at the same POI within +-window",
+  "window_seconds": 30,
+  "identity": "member_set",
+  "min_checkins": 1,
+  "min_size": 2
+ },
+ "source": {
+  "data_dir": "./data/gowalla",
+  "friendship_files": [
+   "friendship_old_GOWALLA.csv"
+  ],
+  "friendship_edges": 117949,
+  "n_checkins": 903045,
+  "n_users": 31667
+ },
+ "counts": {
+  "groups": 2101,
+  "group_checkins": 7130,
+  "ck_per_group": 3.394,
+  "users_per_group": 2.072,
+  "users_in_groups": 3165,
+  "size_hist": {
+   "2": 1964,
+   "3": 124,
+   "4": 12,
+   "5": 1
+  },
+  "split": {
+   "train": 4076,
+   "test": 2101,
+   "val": 911,
+   "masked": 42
+  },
+  "max_seq_cap": {
+   "cap": 200,
+   "groups_truncated": 2,
+   "checkins_dropped": 304
+  },
+  "leakage": {
+   "test_targets_leaking_before_mask": 26,
+   "train_rows_masked": 42,
+   "test_targets_leaking_after": 0
+  },
+  "groups_with_train_history": 543
+ },
+ "llmgpr_table1": {
+  "groups": 2186,
+  "group_checkins": 7738,
+  "ck_per_group": 3.54,
+  "users_per_group": 2.95
+ },
+ "match": 0.8859,
+ "match_parts": {
+  "groups": 0.961,
+  "group_checkins": 0.921,
+  "ck_per_group": 0.959,
+  "users_per_group": 0.702
+ },
+ "reference": "GROUP_RULE_SWEEP.md \u00a72.7-2.10"
+}

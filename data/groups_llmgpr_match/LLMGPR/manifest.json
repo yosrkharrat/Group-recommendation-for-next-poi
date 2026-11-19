@@ -1,0 +1,76 @@
+{
+ "dataset": "LLMGPR",
+ "built": "2026-11-19T09:44:37+00:00",
+ "git_head": "559fa01",
+ "script": "src/build_llmgpr_match_groups.py",
+ "rule": {
+  "copresence": "anchor check-in + direct friends at the same POI within +-window",
+  "window_seconds": 3600,
+  "identity": "anchor",
+  "min_checkins": 1,
+  "min_size": 2
+ },
+ "source": {
+  "data_dir": "./data/llmgpr_full/house8_whole",
+  "friendship_files": [
+   "friendship_old_LLMGPR.csv",
+   "friendship_new_only_LLMGPR.csv"
+  ],
+  "friendship_edges": 14168,
+  "n_checkins": 1515518,
+  "n_users": 6889
+ },
+ "counts": {
+  "groups": 1817,
+  "group_checkins": 13052,
+  "ck_per_group": 7.183,
+  "users_per_group": 2.581,
+  "users_in_groups": 1817,
+  "size_hist": {
+   "2": 1252,
+   "3": 344,
+   "4": 117,
+   "5": 41,
+   "6": 23,
+   "7": 17,
+   "8": 12,
+   "9": 4,
+   "10": 2,
+   "11": 1,
+   "12": 1,
+   "14": 1,
+   "17": 2
+  },
+  "split": {
+   "train": 9497,
+   "test": 1817,
+   "val": 1186,
+   "masked": 552
+  },
+  "max_seq_cap": {
+   "cap": 200,
+   "groups_truncated": 2,
+   "checkins_dropped": 206
+  },
+  "leakage": {
+   "test_targets_leaking_before_mask": 242,
+   "train_rows_masked": 552,
+   "test_targets_leaking_after": 0
+  },
+  "groups_with_train_history": 927
+ },
+ "llmgpr_table1": {
+  "groups": 1715,
+  "group_checkins": 12594,
+  "ck_per_group": 7.34,
+  "users_per_group": 3.72
+ },
+ "match": 0.8953,
+ "match_parts": {
+  "groups": 0.944,
+  "group_checkins": 0.965,
+  "ck_per_group": 0.979,
+  "users_per_group": 0.694
+ },
+ "reference": "GROUP_RULE_SWEEP.md \u00a72.7-2.10"
+}

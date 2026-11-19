@@ -77,3 +77,10 @@ venv/
 
 # ── OS ─────────────────────────────────────────────────────────────────────
 .DS_Store
+
+# ── Group-construction inputs (2026-11-19) ──────────────────────────────────
+# Kaggle downloads used to rebuild the LLMGPR-matched Foursquare groups (~2.5 GB, includes the
+# raw Yang WWW'19 dump) and a local copy of the llmgpr-Weeplace branch CSVs. Regenerable: see
+# GROUP_RULE_SWEEP.md §2.7-2.8 and src/prepare_llmgpr_fsq_output8_full.py.
+data/llmgpr_full/
+data/weeplace_from_branch/
