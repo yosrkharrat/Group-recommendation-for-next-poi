@@ -62,6 +62,10 @@ Outputs (--out-dir)
                                     find() resolves files by exact name anywhere under data/.
     social_graph_manifest_<DS>.json inputs (+ sha256), every config value, counts, sanity stats, weighting AUCs,
                                     audit results, git head
+    user_graph_{triples,entities,groups,relations,manifest}_<DS>.*
+                                    heterogeneous graph: existing ties + MEMBER_OF (including one-off
+                                    outings), PREFERS_CATEGORY, ACTIVE_DURING, FREQUENTS_AREA.
+                                    Does not train or replace user embeddings; see build_user_graph.py.
 
 Usage
 -----
@@ -342,7 +346,7 @@ def run(a):
     train_used, n_dropped = drop_outing_checkins(train, outings, a.guard)
     print(f"train check-ins {len(train):,}  dropped as held-out reproduction outings {n_dropped:,}")
 
-    co, _ = co_presence(train_used, a.window, a.max_size)
+    co, observed_groups = co_presence(train_used, a.window, a.max_size)
     print(f"co-present pairs (>=1 meeting) {len(co):,}  (>= {a.min_meetings}: "
           f"{int((co['n_groups'] >= a.min_meetings).sum()):,})")
 
@@ -374,6 +378,15 @@ def run(a):
     if a.repro_dir:
         p = os.path.join(a.repro_dir, "group_checkins.csv")
         inputs[p] = sha256(p)
+    from build_user_graph import export_user_graph
+    meta_path = os.path.join(a.data_dir, f"poi_metadata_{ds}.csv")
+    user_manifest = export_user_graph(
+        train_used, pd.read_csv(meta_path), edges, observed_groups, users_train,
+        a.out_dir, ds, cell_deg=a.area_cell_deg,
+        provenance=dict(inputs={**inputs, meta_path: sha256(meta_path)}, git_head=git_head(),
+                        window_min=a.window, max_group_size=a.max_size, guard_min=a.guard,
+                        repro_dir=a.repro_dir, dropped_repro_outing_checkins=n_dropped))
+    print(f"[user graph] {user_manifest['counts']}")
     manifest = dict(
         dataset=ds, built=pd.Timestamp.now(tz="UTC").isoformat(timespec="seconds"), git_head=git_head(),
         script="src/build_social_graph.py", undirected=True, storage="one row per pair and relation, u1 < u2",
@@ -500,6 +513,8 @@ def main():
     p.add_argument("--min-meetings", type=int, default=2)
     p.add_argument("--co-weight", choices=("auto", "idf", "count"), default="auto")
     p.add_argument("--guard", type=int, default=120, help="± minutes around a held-out outing")
+    p.add_argument("--area-cell-deg", type=float, default=0.01,
+                   help="angular grid cell size for user FREQUENTS_AREA (default 0.01 degrees)")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:

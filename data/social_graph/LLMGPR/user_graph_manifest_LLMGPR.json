@@ -1,0 +1,70 @@
+{
+  "dataset": "LLMGPR",
+  "script": "src/build_user_graph.py",
+  "files": {
+    "triples": "user_graph_triples_LLMGPR.csv",
+    "entities": "user_graph_entities_LLMGPR.csv",
+    "groups": "user_graph_groups_LLMGPR.csv",
+    "relations": "user_graph_relations_LLMGPR.json"
+  },
+  "counts": {
+    "n_entities": 21405,
+    "n_triples": 301380,
+    "n_groups": 10107,
+    "node_types": {
+      "GROUP": 10107,
+      "USER": 6889,
+      "AREA": 4036,
+      "CATEGORY": 365,
+      "TIME_BIN": 8
+    },
+    "relation_counts": {
+      "PREFERS_CATEGORY": 136049,
+      "FREQUENTS_AREA": 82857,
+      "ACTIVE_DURING": 37153,
+      "MEMBER_OF": 23635,
+      "FRIEND_OF": 17280,
+      "CO_PRESENT": 4406
+    },
+    "checkins_used": 298317,
+    "missing_category_checkins": 0,
+    "missing_area_checkins": 0,
+    "missing_time_checkins": 0,
+    "timezone_utc_fallback_checkins": 0
+  },
+  "config": {
+    "area_cell_deg": 0.01,
+    "membership": "one node per observed co-presence outing; single occurrences included",
+    "category_weight": "visit share normalized separately at each taxonomy depth",
+    "time_weight": "visit share in local weekday/weekend x morning/afternoon/evening/night",
+    "time_boundaries": "night [00,06), morning [06,12), afternoon [12,18), evening [18,24)",
+    "area_weight": "visit share among check-ins with valid catalogue coordinates",
+    "coordinates": "floor(latitude / cell_deg), floor(longitude / cell_deg); angular grid, not equal-area",
+    "social_edges": "both directions; original weights",
+    "new_relations": "directed"
+  },
+  "provenance": {
+    "inputs": {
+      "./data/llmgpr\\friendship_old_LLMGPR.csv": "c6517553402345b4b2a4571e3b89d94e132072f281ff75cc0be2a97d24edb0b7",
+      "./data/llmgpr\\friendship_new_only_LLMGPR.csv": "35db5f9ed729a7e6650adf5db6db5ffa3fa6c11eabdf2af18a5831df9f45d065",
+      "./data/llmgpr\\train_LLMGPR.csv": "5693705c794edd92d4396de41fddcf0f4ad9129e624e94d04c01b04db821a361",
+      "./data/llmgpr\\val_LLMGPR.csv": "20a37ae2e952fc5f4ef42f17d5d09a660fbda296f2a61ca977cf4b02ad4e89a0",
+      "./data/llmgpr\\test_LLMGPR.csv": "f1dab41a15ec80bb7d08bc575cb9b8198bfd9d248dde218a1ce2d4e1561e822c",
+      "./data/groups_llmgpr_match/LLMGPR\\group_checkins.csv": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0",
+      "./data/llmgpr\\poi_metadata_LLMGPR.csv": "d18e97fa0bc65cd5b56d35204c23d9e6a5739bd1ab857393ff68f3432285ab21"
+    },
+    "git_head": null,
+    "window_min": 60,
+    "max_group_size": 8,
+    "guard_min": 120,
+    "repro_dir": "./data/groups_llmgpr_match/LLMGPR",
+    "dropped_repro_outing_checkins": 1134
+  },
+  "audit": {
+    "train_only": true,
+    "unique_triples": true,
+    "positive_finite_weights": true,
+    "preference_activity_area_weights_normalized": true
+  },
+  "embeddings": "not trained; current user-token consumer still uses the user-user social CSV"
+}

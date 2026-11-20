@@ -1,0 +1,14 @@
+{
+  "relation_to_id": {
+    "ACTIVE_DURING": 0,
+    "CO_PRESENT": 1,
+    "FREQUENTS_AREA": 2,
+    "FRIEND_OF": 3,
+    "MEMBER_OF": 4,
+    "PREFERS_CATEGORY": 5
+  },
+  "symmetric_relations": [
+    "FRIEND_OF",
+    "CO_PRESENT"
+  ]
+}

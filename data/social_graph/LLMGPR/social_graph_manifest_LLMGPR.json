@@ -1,7 +1,7 @@
 {
   "dataset": "LLMGPR",
-  "built": "2026-11-19T13:25:49+00:00",
-  "git_head": "c20b91f",
+  "built": "2026-11-20T15:06:32+00:00",
+  "git_head": null,
   "script": "src/build_social_graph.py",
   "undirected": true,
   "storage": "one row per pair and relation, u1 < u2",
@@ -20,12 +20,12 @@
     "friendship": "old only"
   },
   "inputs": {
-    "./data/llmgpr/friendship_old_LLMGPR.csv": "eb8994628e9bc83758625bd3c6b03d02f65243ff731c92902116468366422f69",
-    "./data/llmgpr/friendship_new_only_LLMGPR.csv": "4758d34a041c43a7c419304fcf90e6803f9907ffeba302cc5f6f69123680703d",
-    "./data/llmgpr/train_LLMGPR.csv": "cf5a00c8172a1036a4d6715c1c68b3ce3d3a7703f1a5a361b195f6a1bcdaebd0",
-    "./data/llmgpr/val_LLMGPR.csv": "dea35e73cce5969d93377d176c738700fe870f77d5846e2fd54ca22d5dcff1f4",
-    "./data/llmgpr/test_LLMGPR.csv": "05e62f3d787a6fabada96d13352c35de40187db7c533dbff6c155c6a7a3d4f35",
-    "./data/groups_llmgpr_match/LLMGPR/group_checkins.csv": "27753f40ab3899087538d8300d0fff948820038006429b6eba43e6e6c786f509"
+    "./data/llmgpr\\friendship_old_LLMGPR.csv": "c6517553402345b4b2a4571e3b89d94e132072f281ff75cc0be2a97d24edb0b7",
+    "./data/llmgpr\\friendship_new_only_LLMGPR.csv": "35db5f9ed729a7e6650adf5db6db5ffa3fa6c11eabdf2af18a5831df9f45d065",
+    "./data/llmgpr\\train_LLMGPR.csv": "5693705c794edd92d4396de41fddcf0f4ad9129e624e94d04c01b04db821a361",
+    "./data/llmgpr\\val_LLMGPR.csv": "20a37ae2e952fc5f4ef42f17d5d09a660fbda296f2a61ca977cf4b02ad4e89a0",
+    "./data/llmgpr\\test_LLMGPR.csv": "f1dab41a15ec80bb7d08bc575cb9b8198bfd9d248dde218a1ce2d4e1561e822c",
+    "./data/groups_llmgpr_match/LLMGPR\\group_checkins.csv": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0"
   },
   "counts": {
     "train_checkins": 299451,
@@ -176,5 +176,5 @@
       }
     }
   },
-  "seconds": 25.6
+  "seconds": 33.1
 }

@@ -19,6 +19,7 @@ Design decisions (2026-11-19):
 | Piece | Where | Status |
 |---|---|---|
 | Weighted user–user social graph | `src/build_social_graph.py` → `data/social_graph/LLMGPR/` | built, audited |
+| Enriched user graph | `src/build_user_graph.py`, exported by the social builder | membership, category, time and area relations; no new embedding training |
 | User tokens + social smoothing | `src/user_tokens.py`, stage 5 section 6c | built, CPU-tested; opt-in |
 | Three-city reproduction groups | `data/groups_llmgpr_match/LLMGPR_3CITY/` | built (match 0.836) |
 | Extended POI catalogue | `data/llmgpr/poi_metadata_LLMGPR.csv` (15,315 POIs) | built |
@@ -86,6 +87,44 @@ The two relations barely overlap (201 pairs). The validation and test outings of
 reproduction set (`data/groups_llmgpr_match/LLMGPR`) were 1,134 of our train check-ins. They are
 removed before co-presence is computed, and the build asserts that none remain.
 Rebuild: `python src/build_social_graph.py` (~40 s; `--self-check` first).
+
+### Enriched user graph
+
+`python src/build_social_graph.py` also exports a heterogeneous user graph in the same
+directory. The original `social_edges_LLMGPR.csv` schema and pairwise construction rules stay
+unchanged, so existing user-token smoothing continues to use that file.
+
+The new graph uses the same guarded training check-ins as co-presence and includes:
+
+| Relation | Endpoints | Weight |
+|---|---|---|
+| `FRIEND_OF` | user → user (both directions) | original friendship weight |
+| `CO_PRESENT` | user → user (both directions) | original co-presence weight |
+| `MEMBER_OF` | user → observed outing group | 1; single-occurrence groups included |
+| `PREFERS_CATEGORY` | user → category, including ancestors | visit share, normalized separately at each taxonomy depth |
+| `ACTIVE_DURING` | user → time bin | visit share in that bin |
+| `FREQUENTS_AREA` | user → geographic cell | visit share among check-ins with valid coordinates |
+
+Each retained co-presence window gets its own group node with actual members, venue and start/end
+epoch minutes; there is no repeat requirement for membership and no union of companions over
+the full history. Existing 60-minute windows, maximum size 8 and nested-window handling remain.
+Category keys are `cat:<full taxonomy path>`, matching the POI KG's naming convention.
+
+Time bins use `utc_time + timezone_offset` (minutes), with UTC fallback counted in the manifest:
+weekday/weekend × night [00,06), morning [06,12), afternoon [12,18), evening [18,24).
+Areas use `floor(latitude / cell_deg), floor(longitude / cell_deg)` with a default angular
+cell size of 0.01 degrees (`--area-cell-deg`); these are not equal-area cells. Coordinates and
+category paths come from the POI catalogue. Missing attributes are skipped and counted.
+
+Outputs are `user_graph_triples_LLMGPR.csv` (named head/relation/tail, weight, observation count,
+category depth), `user_graph_entities_LLMGPR.csv` (numeric ID, typed key, JSON attributes),
+`user_graph_groups_LLMGPR.csv`, `user_graph_relations_LLMGPR.json`, and
+`user_graph_manifest_LLMGPR.json` (configuration, counts, input hashes and audits).
+Rebuild with `python src/build_social_graph.py`; check the new graph logic with
+`python src/build_user_graph.py --self-check`.
+
+This creates graph data only. The current user-token encoder still consumes the pairwise
+social CSV; using the new relation families in embeddings requires a separate encoder change.
 
 ### User tokens
 Each user becomes one `<user_i>` token in the POI token space:
