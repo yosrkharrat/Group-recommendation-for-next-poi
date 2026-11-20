@@ -22,7 +22,7 @@ Design decisions (2026-11-19):
 | User tokens + social smoothing | `src/user_tokens.py`, stage 5 section 6c | built, CPU-tested; opt-in |
 | Three-city reproduction groups | `data/groups_llmgpr_match/LLMGPR_3CITY/` | built (match 0.836) |
 | Extended POI catalogue | `data/llmgpr/poi_metadata_LLMGPR.csv` (15,315 POIs) | built |
-| POI-only KG + retrained RefH | `data/llmgpr/kg_poi/` | built; D1 +0.678 STRONG |
+| POI-only KG + KGE comparison | `data/llmgpr/kg_poi/` | **MuRP** wins on the new KG (2026-11-20) |
 
 ### Catalogue extension for the LLMGPR comparison (option B)
 The first LLMGPR-matched Foursquare groups were built from whole check-in histories. 54% of their
@@ -50,6 +50,25 @@ histories would mean 430k POIs, which is too large. Instead:
    CUDA GPU): MRR 0.1525, **D1 +0.678 STRONG and monotone** (the shipped RefH had +0.320).
    `data/llmgpr/kg_denoised/` (14,402-row embeddings of the old user/group KG) is removed from this
    branch, since its files would also clash with these names in stage 5's `find()`.
+5. **Four-model comparison on this KG** (2026-11-20, the supervisor's two-stage selection with MuRP
+   added at the reviewer's suggestion). `src/kge_bench.py` trains RotH / RefH / AttH / MuRP on one
+   leak-free split, seeds 42–44. `src/kge_alignment_eval.py` then runs Stage 2: the stage-5 alignment
+   adapter and the per-dimension affine to LLaDA-MoE's embedding statistics, scored by leaf-category
+   purity@10 (random = 0.014). Three-seed means:
+
+   | Model | Test MRR | D1 | purity_aligned@10 |
+   |---|---|---|---|
+   | **MuRP** | **0.2305** | +0.498 | **0.0927** |
+   | RefH | 0.2023 | +0.454 | 0.0654 |
+   | RotH | 0.1774 | +0.487 | 0.0670 |
+   | AttH | 0.1768 | +0.386 | 0.0605 |
+
+   All pass the D1 gate. MuRP wins both stages, so stage 5 now uses it (`KGE_WINNER["LLMGPR"] =
+   "murp"`). The shipped file is seed 43, the best Stage-2 seed: MRR 0.2189, D1 +0.488, purity 0.111.
+   MuRP seed 42 trained to epoch 144 and lands at purity 0.061: longer training buys MRR (0.252) and
+   costs category structure. The previous RefH file (150 epochs) scores purity 0.068, the same as the
+   benchmark RefH. All per-run results are in `data/llmgpr/kg_poi/kge_comparison/`;
+   `STAGE6B_KGE_MODEL=refh` re-runs the old embedding.
 
 The new 913 POIs have no individual check-ins in the 10 km pipeline data. They are learned through
 the KG (category, location, proximity) and the group sequences.
@@ -78,11 +97,11 @@ Each user becomes one `<user_i>` token in the POI token space:
 The notebook asserts that POI points pushed through the user path reproduce `W_POI`. Prompts
 gain `[user] <user_i>` and `[member N] <user_i>`.
 
-Offline check (`python src/user_tokens.py --diagnose`, no LLM): on this branch's embeddings,
-pulling users towards **co-presence** ties moves them +18% MRR closer to their next new POI
-(beta 1). Declared **friendship** moves them further away, though less than shuffled ties do. On
-the old embeddings both helped, so the stage 5 ablation decides. Recommended:
-`STAGE6B_SOCIAL_SMOOTHING=copresence`.
+Offline check (`python src/user_tokens.py --diagnose`, no LLM). On the MuRP embeddings, every
+relation moves users closer to their next new POI and shuffled ties move them away, so the gain is
+social. **Co-presence** gains most per moved user (+25% MRR at beta 1); friendship helps a little;
+`both` has the best all-user MRR. On RefH, friendship hurt, so the stage 5 ablation decides.
+Recommended: `STAGE6B_SOCIAL_SMOOTHING=copresence`.
 
 ## Running stage 5
 
@@ -100,7 +119,6 @@ The ablation grid is `STAGE6B_USER_TOKENS=0`, then `1` with `STAGE6B_SOCIAL_SMOO
   tokens + smoothing `both`) completed on 2026-11-19.
 - **Stage 5 does not yet evaluate on the three-city reproduction groups** (it still uses
   `groups_social`). Join them on `venue_id`, because their `poi_idx` is the house8 id space.
-- **RotH / AttH have not been re-compared on the new KG.** RefH was kept from the old selection.
 - **The group model is not trained on groups** (`TRAIN_ON_GROUPS=False`). The main-results group
   rule is undecided: one strict rule gives about 210 Foursquare groups on this subset. That
   question is with the supervisor.

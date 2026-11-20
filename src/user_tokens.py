@@ -33,8 +33,22 @@ Proxy task with no LLM: rank every POI by geodesic distance to the user's point,
 user's first VALIDATION POI not visited in train (5,386 users). MRR for the users smoothing moves,
 unsmoothed -> smoothed; `both_random` = the same edges with partners shuffled (control).
 
-foursquare-v2 embeddings (RefH on the POI-only KG of the extended catalogue, data/llmgpr/kg_poi,
-15,315 POIs, every POI with coordinates), 2026-11-19:
+MuRP on the POI-only KG of the extended catalogue (stage 5's Foursquare embedding since the
+2026-11-20 four-model comparison; data/llmgpr/kg_poi/poi_hyperbolic_embs_LLMGPR_murp.npy):
+
+    beta   friends          copresence       both             both_random      low-history, both
+    0.1    .0113 -> .0113   .0081 -> .0086   .0111 -> .0112   .0111 -> .0106   .0182 -> .0182
+    0.5    .0113 -> .0117   .0081 -> .0098   .0111 -> .0118   .0111 -> .0094   .0182 -> .0213
+    1.0    .0113 -> .0117   .0081 -> .0101   .0111 -> .0118   .0111 -> .0073   .0182 -> .0202
+    2.0    .0113 -> .0112   .0081 -> .0099   .0111 -> .0111   .0111 -> .0046   .0182 -> .0176
+
+On MuRP every relation helps at beta 0.5-1 and shuffled ties hurt, so the gain is social signal,
+not shrinkage. Co-presence gains most per moved user (+25% at beta 1); friendship helps too here
+(unlike RefH below); `both` has the best all-user MRR (.0117 -> .0123 at beta 1). The
+recommendation SOCIAL_SMOOTHING=copresence, SOCIAL_BETA=1.0 still holds, with `both` as the
+strongest alternative for the stage 5 ablation.
+
+RefH on the same KG (stage 5's embedding until 2026-11-20), 2026-11-19:
 
     beta   friends          copresence       both             both_random      low-history, both
     0.1    .0131 -> .0126   .0107 -> .0117   .0127 -> .0123   .0127 -> .0119   .0158 -> .0142
@@ -348,7 +362,7 @@ def main():
     p.add_argument("--diagnose", action="store_true")
     p.add_argument("--data-dir", default="./data/llmgpr")
     p.add_argument("--dataset", default="LLMGPR")
-    p.add_argument("--emb", default="./data/llmgpr/kg_poi/poi_hyperbolic_embs_LLMGPR_refh.npy")
+    p.add_argument("--emb", default="./data/llmgpr/kg_poi/poi_hyperbolic_embs_LLMGPR_murp.npy")
     p.add_argument("--edges", default="./data/social_graph/LLMGPR/social_edges_LLMGPR.csv")
     p.add_argument("--beta", type=float, default=0.5)
     p.add_argument("--top-k", type=int, default=10)
