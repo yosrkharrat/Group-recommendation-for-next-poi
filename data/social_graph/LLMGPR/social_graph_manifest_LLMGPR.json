@@ -1,7 +1,7 @@
 {
   "dataset": "LLMGPR",
-  "built": "2026-11-20T15:06:32+00:00",
-  "git_head": null,
+  "built": "2026-11-20T09:12:58+00:00",
+  "git_head": "3c0fa02",
   "script": "src/build_social_graph.py",
   "undirected": true,
   "storage": "one row per pair and relation, u1 < u2",
@@ -20,23 +20,24 @@
     "friendship": "old only"
   },
   "inputs": {
-    "./data/llmgpr\\friendship_old_LLMGPR.csv": "c6517553402345b4b2a4571e3b89d94e132072f281ff75cc0be2a97d24edb0b7",
-    "./data/llmgpr\\friendship_new_only_LLMGPR.csv": "35db5f9ed729a7e6650adf5db6db5ffa3fa6c11eabdf2af18a5831df9f45d065",
-    "./data/llmgpr\\train_LLMGPR.csv": "5693705c794edd92d4396de41fddcf0f4ad9129e624e94d04c01b04db821a361",
-    "./data/llmgpr\\val_LLMGPR.csv": "20a37ae2e952fc5f4ef42f17d5d09a660fbda296f2a61ca977cf4b02ad4e89a0",
-    "./data/llmgpr\\test_LLMGPR.csv": "f1dab41a15ec80bb7d08bc575cb9b8198bfd9d248dde218a1ce2d4e1561e822c",
-    "./data/groups_llmgpr_match/LLMGPR\\group_checkins.csv": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0"
+    "./data/llmgpr/friendship_old_LLMGPR.csv": "eb8994628e9bc83758625bd3c6b03d02f65243ff731c92902116468366422f69",
+    "./data/llmgpr/friendship_new_only_LLMGPR.csv": "4758d34a041c43a7c419304fcf90e6803f9907ffeba302cc5f6f69123680703d",
+    "./data/llmgpr/train_LLMGPR.csv": "cf5a00c8172a1036a4d6715c1c68b3ce3d3a7703f1a5a361b195f6a1bcdaebd0",
+    "./data/llmgpr/val_LLMGPR.csv": "dea35e73cce5969d93377d176c738700fe870f77d5846e2fd54ca22d5dcff1f4",
+    "./data/llmgpr/test_LLMGPR.csv": "05e62f3d787a6fabada96d13352c35de40187db7c533dbff6c155c6a7a3d4f35",
+    "./data/groups_llmgpr_match/LLMGPR_3CITY/group_checkins.csv": "90c53232b9589454eaa8e8093ed3a7d08aeefc1c9ae8a50d0c1d82c1227e6593",
+    "./data/groups_llmgpr_match/LLMGPR/group_checkins.csv": "27753f40ab3899087538d8300d0fff948820038006429b6eba43e6e6c786f509"
   },
   "counts": {
     "train_checkins": 299451,
-    "dropped_repro_outing_checkins": 1134,
-    "train_checkins_used": 298317,
+    "dropped_repro_outing_checkins": 2220,
+    "train_checkins_used": 297231,
     "train_users": 6889,
-    "copresent_pairs_any": 15603,
-    "edges": 10843,
+    "copresent_pairs_any": 15201,
+    "edges": 10796,
     "by_relation": {
       "FRIEND_OF": 8640,
-      "CO_PRESENT": 2203
+      "CO_PRESENT": 2156
     }
   },
   "weighting_selection": {
@@ -46,28 +47,28 @@
     "n_positive": 432,
     "candidates": {
       "idf_min1": {
-        "n_edges": 15603,
+        "n_edges": 15201,
         "positives_covered": 57,
-        "auc_all_pairs": 0.56567,
-        "auc_within_edges": 0.81684
+        "auc_all_pairs": 0.56568,
+        "auc_within_edges": 0.81779
       },
       "count_min1": {
-        "n_edges": 15603,
+        "n_edges": 15201,
         "positives_covered": 57,
-        "auc_all_pairs": 0.56566,
-        "auc_within_edges": 0.73215
+        "auc_all_pairs": 0.56567,
+        "auc_within_edges": 0.73188
       },
       "idf_min2": {
-        "n_edges": 2203,
+        "n_edges": 2156,
         "positives_covered": 32,
         "auc_all_pairs": 0.53699,
-        "auc_within_edges": 0.83007
+        "auc_within_edges": 0.83081
       },
       "count_min2": {
-        "n_edges": 2203,
+        "n_edges": 2156,
         "positives_covered": 32,
         "auc_all_pairs": 0.53699,
-        "auc_within_edges": 0.77128
+        "auc_within_edges": 0.77061
       }
     },
     "reference_friend_of": {
@@ -82,41 +83,41 @@
     "checkins_used_all_train": true,
     "friend_of_subset_of_old": true,
     "new_only_pairs_in_friend_of": 0,
-    "co_present_pairs_that_are_new_only_friends": 39,
+    "co_present_pairs_that_are_new_only_friends": 35,
     "note_new_only": "allowed: those CO_PRESENT edges come from train check-ins, not from the friendship file. Co-presence predicting a later friendship is expected.",
     "heldout_repro_outings_left": 0
   },
   "stats": {
     "CO_PRESENT": {
-      "edges": 2203,
-      "users": 1503,
-      "share_of_train_users": 0.2182,
+      "edges": 2156,
+      "users": 1461,
+      "share_of_train_users": 0.2121,
       "degree": {
         "min": 1.0,
         "p25": 1.0,
         "p50": 2.0,
         "p75": 4.0,
         "p90": 7.0,
-        "p99": 14.98,
+        "p99": 13.4,
         "max": 23.0
       },
       "weight": {
-        "min": 0.2839,
-        "p25": 0.3971,
-        "p50": 0.5314,
-        "p75": 0.7053,
-        "p90": 1.1789,
-        "p99": 5.4528,
-        "max": 39.7842
+        "min": 0.2842,
+        "p25": 0.3995,
+        "p50": 0.5317,
+        "p75": 0.7003,
+        "p90": 1.1208,
+        "p99": 5.5464,
+        "max": 39.5263
       },
       "n_meetings": {
         "min": 2.0,
         "p25": 2.0,
         "p50": 2.0,
         "p75": 3.0,
-        "p90": 4.0,
+        "p90": 3.0,
         "p99": 12.0,
-        "max": 124.0
+        "max": 122.0
       }
     },
     "FRIEND_OF": {
@@ -148,33 +149,40 @@
         "p75": 0.0,
         "p90": 0.0,
         "p99": 4.0,
-        "max": 124.0
+        "max": 122.0
       }
     },
     "overlap": {
-      "friend_and_copresent": 201,
-      "copresent_only": 2002,
-      "friend_only": 8439,
-      "union": 10642,
-      "friends_who_met_at_least_once": 322
+      "friend_and_copresent": 189,
+      "copresent_only": 1967,
+      "friend_only": 8451,
+      "union": 10607,
+      "friends_who_met_at_least_once": 303
     },
-    "isolated_train_users": 1750,
+    "isolated_train_users": 1754,
     "group_member_coverage": {
-      "repro_LLMGPR_match": {
+      "repro_LLMGPR_3CITY": {
+        "groups": 1251,
+        "members": 4168,
+        "member_has_any_edge": 0.9827,
+        "member_has_edge_inside_group": 0.8088,
+        "groups_every_member_tied_inside": 0.6355
+      },
+      "repro_LLMGPR": {
         "groups": 1817,
         "members": 4689,
-        "member_has_any_edge": 0.9755,
-        "member_has_edge_inside_group": 0.7995,
-        "groups_every_member_tied_inside": 0.7122
+        "member_has_any_edge": 0.9746,
+        "member_has_edge_inside_group": 0.7985,
+        "groups_every_member_tied_inside": 0.7111
       },
       "groups_social_180min_5hop": {
         "groups": 4804,
         "members": 10925,
         "member_has_any_edge": 1.0,
-        "member_has_edge_inside_group": 0.4053,
-        "groups_every_member_tied_inside": 0.3693
+        "member_has_edge_inside_group": 0.4015,
+        "groups_every_member_tied_inside": 0.368
       }
     }
   },
-  "seconds": 33.1
+  "seconds": 6.4
 }

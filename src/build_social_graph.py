@@ -103,10 +103,13 @@ def load_pairs(path):
     return {(min(a, b), max(a, b)) for a, b in zip(e["u1"], e["u2"]) if a != b}
 
 
-def holdout_outings(repro_dir, splits=("val", "test", "masked")):
-    """Held-out outings of the reproduction set: one row per (outing, member) with
-    venue_id, user_id and the outing time in epoch minutes."""
-    g = pd.read_csv(os.path.join(repro_dir, "group_checkins.csv"))
+def holdout_outings(repro_dirs, splits=("val", "test", "masked")):
+    """Held-out outings of the reproduction set(s): one row per (outing, member) with
+    venue_id, user_id and the outing time in epoch minutes. Several sets are unioned."""
+    if isinstance(repro_dirs, str):
+        repro_dirs = [repro_dirs]
+    g = pd.concat([pd.read_csv(os.path.join(d, "group_checkins.csv")).assign(repro=os.path.basename(d.rstrip("/")))
+                   for d in repro_dirs], ignore_index=True)
     g = g[g["split"].isin(splits)].copy()
     t = pd.to_datetime(g["utc_time"], utc=True)
     g["ev_ts"] = t.dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
@@ -342,6 +345,7 @@ def run(a):
     friends_old, friends_new = load_pairs(f_old), load_pairs(f_new)
     users_train = sorted(train["user_id"].unique())
 
+    a.repro_dir = [d for d in (a.repro_dir or []) if d]
     outings = holdout_outings(a.repro_dir) if a.repro_dir else None
     train_used, n_dropped = drop_outing_checkins(train, outings, a.guard)
     print(f"train check-ins {len(train):,}  dropped as held-out reproduction outings {n_dropped:,}")
@@ -364,8 +368,9 @@ def run(a):
     aud = audit(edges, train_used, friends_old, friends_new, outings, a.window, a.max_size)
 
     member_sets = {}
-    for name, p in (("repro_LLMGPR_match", os.path.join(a.repro_dir or "", "group_members.csv")),
-                    ("groups_social_180min_5hop", os.path.join(a.data_dir, "groups_social", "group_members.csv"))):
+    for name, p in ([(f"repro_{os.path.basename(d.rstrip('/'))}", os.path.join(d, "group_members.csv"))
+                     for d in a.repro_dir]
+                    + [("groups_social_180min_5hop", os.path.join(a.data_dir, "groups_social", "group_members.csv"))]):
         ms = read_member_sets(p)
         if ms is not None:
             member_sets[name] = ms
@@ -375,8 +380,8 @@ def run(a):
     edges.to_csv(os.path.join(a.out_dir, f"social_edges_{ds}.csv"), index=False)
     inputs = {p: sha256(p) for p in (f_old, f_new, *(os.path.join(a.data_dir, f"{s}_{ds}.csv")
                                                     for s in ("train", "val", "test")))}
-    if a.repro_dir:
-        p = os.path.join(a.repro_dir, "group_checkins.csv")
+    for d in a.repro_dir:
+        p = os.path.join(d, "group_checkins.csv")
         inputs[p] = sha256(p)
     from build_user_graph import export_user_graph
     meta_path = os.path.join(a.data_dir, f"poi_metadata_{ds}.csv")
@@ -505,8 +510,11 @@ def main():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     p.add_argument("--data-dir", default="./data/llmgpr")
     p.add_argument("--dataset", default="LLMGPR")
-    p.add_argument("--repro-dir", default="./data/groups_llmgpr_match/LLMGPR",
-                   help="reproduction group set whose held-out outings are removed from train ('' = none)")
+    p.add_argument("--repro-dir", nargs="*",
+                   default=["./data/groups_llmgpr_match/LLMGPR_3CITY", "./data/groups_llmgpr_match/LLMGPR"],
+                   help="reproduction group set(s) whose held-out outings are removed from train "
+                        "(none given = no guard). Default: the three-city set the comparison evaluates "
+                        "on, plus the whole-history set kept for the record.")
     p.add_argument("--out-dir", default="./data/social_graph/LLMGPR")
     p.add_argument("--window", type=int, default=60, help="co-presence window, minutes")
     p.add_argument("--max-size", type=int, default=8, help="larger co-present sets are crowds, not ties")

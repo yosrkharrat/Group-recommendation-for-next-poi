@@ -38,13 +38,14 @@ MuRP on the POI-only KG of the extended catalogue (stage 5's Foursquare embeddin
 
     beta   friends          copresence       both             both_random      low-history, both
     0.1    .0113 -> .0113   .0081 -> .0086   .0111 -> .0112   .0111 -> .0106   .0182 -> .0182
-    0.5    .0113 -> .0117   .0081 -> .0098   .0111 -> .0118   .0111 -> .0094   .0182 -> .0213
-    1.0    .0113 -> .0117   .0081 -> .0101   .0111 -> .0118   .0111 -> .0073   .0182 -> .0202
+    0.5    .0113 -> .0117   .0082 -> .0102   .0111 -> .0118   .0111 -> .0096   .0182 -> .0213
+    1.0    .0113 -> .0117   .0082 -> .0107   .0111 -> .0118   .0111 -> .0076   .0182 -> .0202
     2.0    .0113 -> .0112   .0081 -> .0099   .0111 -> .0111   .0111 -> .0046   .0182 -> .0176
 
 On MuRP every relation helps at beta 0.5-1 and shuffled ties hurt, so the gain is social signal,
-not shrinkage. Co-presence gains most per moved user (+25% at beta 1); friendship helps too here
-(unlike RefH below); `both` has the best all-user MRR (.0117 -> .0123 at beta 1). The
+not shrinkage. Co-presence gains most per moved user (+30% at beta 1); friendship helps too here
+(unlike RefH below); `both` has the best all-user MRR (.0117 -> .0123 at beta 1). Rows 0.5/1.0
+are on the 2026-11-20 graph (guard on both reproduction sets); 0.1/2.0 on the previous one. The
 recommendation SOCIAL_SMOOTHING=copresence, SOCIAL_BETA=1.0 still holds, with `both` as the
 strongest alternative for the stage 5 ablation.
 

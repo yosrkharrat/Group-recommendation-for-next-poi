@@ -79,13 +79,15 @@ Two relations, both from **train-split** check-ins only:
 
 - `FRIEND_OF`: 8,640 pairs from `friendship_old` only, weight 1. `friendship_new_only` postdates
   the check-ins and is asserted absent.
-- `CO_PRESENT`: 2,203 pairs met at the same venue within 60 min at least twice. There is no
+- `CO_PRESENT`: 2,156 pairs met at the same venue within 60 min at least twice. There is no
   friendship requirement. Each meeting is weighted by venue rarity (idf). That weighting was
-  chosen on validation data: within-edge AUC 0.830 vs 0.771 for a plain count.
+  chosen on validation data: within-edge AUC 0.831 vs 0.771 for a plain count.
 
-The two relations barely overlap (201 pairs). The validation and test outings of the LLMGPR
-reproduction set (`data/groups_llmgpr_match/LLMGPR`) were 1,134 of our train check-ins. They are
-removed before co-presence is computed, and the build asserts that none remain.
+The two relations barely overlap (189 pairs). The validation, test and masked outings of both
+reproduction sets (`data/groups_llmgpr_match/LLMGPR_3CITY`, which the comparison evaluates on, and
+the whole-history `LLMGPR`) were 2,220 of our train check-ins. They are removed before co-presence
+is computed, and the build asserts that none remain. (Until 2026-11-20 only the whole-history set
+was guarded, which left 830 check-ins of three-city evaluation outings in.)
 Rebuild: `python src/build_social_graph.py` (~40 s; `--self-check` first).
 
 ### Enriched user graph
@@ -138,27 +140,97 @@ gain `[user] <user_i>` and `[member N] <user_i>`.
 
 Offline check (`python src/user_tokens.py --diagnose`, no LLM). On the MuRP embeddings, every
 relation moves users closer to their next new POI and shuffled ties move them away, so the gain is
-social. **Co-presence** gains most per moved user (+25% MRR at beta 1); friendship helps a little;
+social. **Co-presence** gains most per moved user (+30% MRR at beta 1); friendship helps a little;
 `both` has the best all-user MRR. On RefH, friendship hurt, so the stage 5 ablation decides.
 Recommended: `STAGE6B_SOCIAL_SMOOTHING=copresence`.
+
+### Group-outing overlap (`STAGE6B_GROUP_OVERLAP`)
+A group check-in is built from its members' own check-ins. A group's held-out outing is therefore
+often also a member's individual **train** check-in: 1,401 train rows are a val/test outing of a
+three-city group (same user, same venue, within 120 min). Without a guard, the model trains on the
+answer for about half the group evaluation. LLMGPR's protocol, as described, splits user and group
+sequences separately, so it does not separate the two either.
+
+- `remove` (default for LLMGPR): stage 5 drops those rows from `train_df` before anything is built
+  from it (targets, histories, profiles, friend favourites, user tokens, the visited sets of
+  section 11c). The rule and sets are the social graph's: val/test/masked outings of
+  `LLMGPR_3CITY` and `LLMGPR`, ±120 min, which is 2,220 of 299,451 rows. An assert checks that none
+  are left.
+
+  It also covers the other direction, which matters once groups are trained on: 711 of the 6,413
+  three-city group **train** outings are a member's individual val or test check-in. Group training
+  data is the scarce side, so those outings stay, and the matching individual rows leave the
+  individual evaluation instead: 302 of 42,005 val rows and 247 of 81,920 test rows
+  (`GROUP_TRAIN_SETS`, same ±120 min rule, asserted). This is done whether or not groups are
+  trained on, so the individual test set is identical in both arms of that ablation.
+- `keep`: all three splits as shipped, i.e. LLMGPR's protocol as described.
+
+`probe` subsamples train by a seeded hash of (user, check-in time), not by position. The `remove`
+sample is then exactly the `keep` sample minus the removed rows (14,482 vs 14,367 examples), so the
+two runs differ only by the overlap.
+
+### Group examples from the matched groups (`STAGE6B_GROUP_SET`)
+`src/build_group_examples_llmgpr_match.py` turns the three-city group files into the group examples
+stage 5 reads (`<group dir>/examples_<overlap>/group_examples_{train,val,test}.jsonl` + a manifest).
+Stage 5 builds them itself when they are missing or were built with other settings (about 15 s).
+
+- **One example per group outing.** The target is the outing's venue, mapped to the pipeline
+  `poi_idx` by `venue_id`. The split is the group file's leave-one-out: the last outing is test,
+  the second last is validation, the rest is training. `masked` rows are never used.
+- **Members are the users present at that outing**, so every example is a real joint outing of
+  friends. 93% of outings have two people present; the largest has eight.
+- **Each member** gets a causal profile and their 30 most recent check-ins before the outing.
+- **The group's own earlier outings** are added as a `[group history]` line in the prompt (up to
+  30). This is LLMGPR's group sequence.
+- **`remove`** additionally keeps a member's own check-in at the target venue, within 120 min
+  before the outing, out of that example's history and profile. `keep` removes nothing.
+
+| | train | val | test |
+|---|---|---|---|
+| `remove` | 6,351 | 1,248 | 1,251 |
+| `keep` | 6,369 | 1,248 | 1,251 |
+
+A few outings are skipped because no member present has any earlier check-in. The script's
+self-check re-reads the written files against the raw inputs: every history item is before its
+outing, no target copy sits inside the guard, the group history is exactly the group's earlier
+outings, and one validation and one test example exist per group.
+
+Prompt length with the LLaDA tokenizer (`remove`): median about 1,800 tokens, 99th percentile
+about 2,800, maximum 3,934 against the 4,085 cap. Groups with six members shown get 20 check-ins
+per member instead of 30: at 30 one test prompt reached 4,283 tokens and would have lost its tail.
+
+Stage 5 then:
+- trains on users **and** groups by default on this set (`STAGE6B_TRAIN_ON_GROUPS=1`, all group
+  training examples; `STAGE6B_GROUP_TRAIN_FRAC` takes `all` or a fraction of the individual count);
+- evaluates section 11b on the matched validation and test examples;
+- in section 11c (LLMGPR's protocol) keeps every test example, since each is already its group's
+  last outing, and excludes the group's earlier outings from the 500 candidates as well as the
+  members' histories.
+
+`STAGE6B_GROUP_SET=social` restores the older 180-min / 5-hop set; its prompts are unchanged.
 
 ## Running stage 5
 
 ```bash
 STAGE6B_USER_TOKENS=1 STAGE6B_SOCIAL_SMOOTHING=copresence   # + STAGE6B_SOCIAL_BETA (default 1.0)
+STAGE6B_GROUP_OVERLAP=remove                          # remove | keep (LLMGPR's protocol)
+STAGE6B_GROUP_SET=llmgpr_match                        # llmgpr_match | social
+STAGE6B_TRAIN_ON_GROUPS=1                             # 1 | 0 (0 = the model never sees a group prompt)
 STAGE6B_RUN_PROFILE=smoke                             # full | probe | smoke (full needs >= 40 GB)
 ```
 
-The ablation grid is `STAGE6B_USER_TOKENS=0`, then `1` with `STAGE6B_SOCIAL_SMOOTHING` = `none` /
-`friends` / `copresence` / `both`.
+The ablation grid is `STAGE6B_TRAIN_ON_GROUPS` = `0` / `1`, `STAGE6B_USER_TOKENS=0`, then `1` with
+`STAGE6B_SOCIAL_SMOOTHING` = `none` / `friends` / `copresence` / `both`. The comparison with LLMGPR
+reports `STAGE6B_GROUP_OVERLAP` = `keep` and `remove`.
 
 ## Not done yet
 
 - **No GPU run on the extended catalogue yet.** The first Kaggle smoke run (old catalogue, user
   tokens + smoothing `both`) completed on 2026-11-19.
-- **Stage 5 does not yet evaluate on the three-city reproduction groups** (it still uses
-  `groups_social`). Join them on `venue_id`, because their `poi_idx` is the house8 id space.
-- **The group model is not trained on groups** (`TRAIN_ON_GROUPS=False`). The main-results group
-  rule is undecided: one strict rule gives about 210 Foursquare groups on this subset. That
-  question is with the supervisor.
+- **Training on groups and the matched-group evaluation are wired but have never run on GPU.**
+  They were checked on CPU only (the group cell executed with the model stubbed, prompt lengths
+  measured with the real tokenizer). Group prompts are about 1,800 tokens, so expect to halve
+  `BATCH_SIZE`.
+- **The KG's `FOLLOWED_BY` edges still come from the unfiltered train split** (1.4% of the edges
+  involve rows that `remove` drops). The embeddings were not retrained.
 - **Gowalla and Weeplace social graphs** wait until Foursquare shows a gain.
