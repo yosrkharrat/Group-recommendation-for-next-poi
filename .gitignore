@@ -84,3 +84,7 @@ venv/
 # GROUP_RULE_SWEEP.md §2.7-2.8 and src/prepare_llmgpr_fsq_output8_full.py.
 data/llmgpr_full/
 data/weeplace_from_branch/
+
+# Group examples built from the LLMGPR-matched group files: 14 MB per overlap setting, rebuilt
+# in ~15 s by src/build_group_examples_llmgpr_match.py (stage 5 does it when they are missing).
+data/groups_llmgpr_match/*/examples_*/

@@ -117,14 +117,21 @@ if _gex and _gex.get("test"):
     _grp_all = _gex["test"]
     if TEST_MAX is not None and len(_grp_all) >= TEST_MAX:        # capped -> reload the full split
         _grp_all = [build_group_example(r) for r in _load_group_examples("test")]
-    loo_grp = EP.last_per_group(_grp_all)
-    _grp = [cp_index.candidates(ex["target"], EP.group_visited(ex), n=CP_N_CAND) for ex in loo_grp]
+    if all("group_id" in ex for ex in _grp_all):
+        # llmgpr_match set: the test split IS each group's last outing (the file's leave-one-out),
+        # so every test example is kept. "Unvisited" also excludes the group's own earlier outings.
+        loo_grp, _grp_select = sorted(_grp_all, key=lambda e: str(e["example_id"])), "file_split"
+        assert len({ex["group_id"] for ex in loo_grp}) == len(loo_grp), "several test outings for one group"
+    else:
+        loo_grp, _grp_select = EP.last_per_group(_grp_all), "last"
+    _grp = [cp_index.candidates(ex["target"], EP.group_visited(ex) | set(ex.get("group_hist", [])),
+                                n=CP_N_CAND) for ex in loo_grp]
     grp_cands = np.stack([c for c, _ in _grp])
     grp_stats = EP.summarize_infos([i for _, i in _grp], CP_N_CAND)
-    print(f"[11c] group: {len(_grp_all):,} test examples -> {len(loo_grp):,} kept (one per member set, "
-          f"chronologically last) | filled {grp_stats['frac_examples_filled']:.1%} | "
+    print(f"[11c] group: {len(_grp_all):,} test examples -> {len(loo_grp):,} kept "
+          f"({'one per group, its last outing' if _grp_select == 'file_split' else 'one per member set, chronologically last'}) | filled {grp_stats['frac_examples_filled']:.1%} | "
           f"anchors w/o coords {grp_stats['n_anchor_no_coord']}")
-    cp_results["group"] = dict(n=len(loo_grp), n_before_selection=len(_grp_all), group_select="last",
+    cp_results["group"] = dict(n=len(loo_grp), n_before_selection=len(_grp_all), group_select=_grp_select,
                                candidate_stats=grp_stats,
                                **comparison_protocol_pass(loo_grp, grp_cands, "group"))
 else:
