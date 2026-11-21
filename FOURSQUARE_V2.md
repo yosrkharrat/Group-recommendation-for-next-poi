@@ -1,4 +1,7 @@
-# `foursquare-v2`: social graph + user tokens (Foursquare / LLMGPR)
+# `foursquare-v3`: social graph, user tokens and group training (Foursquare / LLMGPR)
+
+*Branch `foursquare-v3` continues `foursquare-v2` from commit `3c0fa02`: the same pipeline plus the
+matched-group examples, training on groups and the two-way overlap guard. The file keeps its name.*
 
 Branched from `llmgpr-gowalla` on 2026-11-19. Stage 5 defaults to Foursquare here
 (`STAGE6B_DATASET=LLMGPR`).
