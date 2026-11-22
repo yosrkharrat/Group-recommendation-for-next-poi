@@ -1,0 +1,46 @@
+murp [hyperbolic] on cuda: 15,695 entities, 5 relations, train/val/test 358,929/19,963/19,958, train-only hierarchy pairs 27,888, params 1,036,515, gamma 6.0, depth_weight 1.0 margin 0.1
+epoch=1 kge=0.0394 depth=0.0021 train_s=37.8000 val_mrr=0.0128 val_hits10=0.0255 d1=0.4644 best=True
+epoch=2 kge=0.0260 depth=0.0020 train_s=37.1000 val_mrr=0.0963 val_hits10=0.2540 d1=0.3496 best=True
+epoch=3 kge=0.0226 depth=0.0032 train_s=37.2000 val_mrr=0.1975 val_hits10=0.4770 d1=0.2867 best=True
+epoch=4 kge=0.0215 depth=0.0038 train_s=37.1000 val_mrr=0.1964 val_hits10=0.4765 d1=0.3771
+epoch=5 kge=0.0207 depth=0.0040 train_s=37.1000 val_mrr=0.1947 val_hits10=0.4675 d1=0.4564
+epoch=6 kge=0.0200 depth=0.0043 train_s=37.2000 val_mrr=0.1953 val_hits10=0.4580 d1=0.4625
+epoch=7 kge=0.0195 depth=0.0045 train_s=37.1000 val_mrr=0.1961 val_hits10=0.4670 d1=0.4745
+epoch=8 kge=0.0186 depth=0.0048 train_s=37.1000 val_mrr=0.1979 val_hits10=0.4605 d1=0.4750 best=True
+epoch=9 kge=0.0183 depth=0.0047 train_s=37.1000 val_mrr=0.2044 val_hits10=0.4745 d1=0.4554 best=True
+epoch=10 kge=0.0183 depth=0.0047 train_s=37.2000 val_mrr=0.2064 val_hits10=0.4785 d1=0.4614 best=True
+epoch=11 kge=0.0183 depth=0.0047 train_s=37.1000 val_mrr=0.2021 val_hits10=0.4810 d1=0.4724
+epoch=12 kge=0.0184 depth=0.0047 train_s=37.1000 val_mrr=0.2077 val_hits10=0.4980 d1=0.4551 best=True
+epoch=13 kge=0.0187 depth=0.0045 train_s=37.1000 val_mrr=0.2128 val_hits10=0.4975 d1=0.4474 best=True
+epoch=14 kge=0.0184 depth=0.0044 train_s=37.1000 val_mrr=0.2075 val_hits10=0.5040 d1=0.4613
+epoch=15 kge=0.0184 depth=0.0044 train_s=37.1000 val_mrr=0.2104 val_hits10=0.4985 d1=0.4686
+epoch=16 kge=0.0182 depth=0.0044 train_s=37.1000 val_mrr=0.2140 val_hits10=0.5125 d1=0.4687 best=True
+epoch=17 kge=0.0183 depth=0.0043 train_s=37.2000 val_mrr=0.2128 val_hits10=0.5070 d1=0.4846
+epoch=18 kge=0.0183 depth=0.0043 train_s=37.1000 val_mrr=0.2098 val_hits10=0.5040 d1=0.4671
+epoch=19 kge=0.0186 depth=0.0042 train_s=37.1000 val_mrr=0.2165 val_hits10=0.5055 d1=0.4713 best=True
+epoch=20 kge=0.0185 depth=0.0042 train_s=37.1000 val_mrr=0.2130 val_hits10=0.5070 d1=0.4846
+epoch=21 kge=0.0185 depth=0.0042 train_s=37.1000 val_mrr=0.2161 val_hits10=0.5005 d1=0.4753
+epoch=22 kge=0.0184 depth=0.0042 train_s=37.1000 val_mrr=0.2167 val_hits10=0.5120 d1=0.4845 best=True
+epoch=23 kge=0.0184 depth=0.0041 train_s=37.1000 val_mrr=0.2146 val_hits10=0.5060 d1=0.4670
+epoch=24 kge=0.0184 depth=0.0041 train_s=37.1000 val_mrr=0.2151 val_hits10=0.4995 d1=0.4756
+epoch=25 kge=0.0183 depth=0.0041 train_s=37.2000 val_mrr=0.2152 val_hits10=0.5115 d1=0.4734
+epoch=26 kge=0.0184 depth=0.0041 train_s=37.1000 val_mrr=0.2152 val_hits10=0.5070 d1=0.4902
+epoch=27 kge=0.0185 depth=0.0041 train_s=37.2000 val_mrr=0.2118 val_hits10=0.5050 d1=0.4809
+epoch=28 kge=0.0185 depth=0.0040 train_s=37.1000 val_mrr=0.2153 val_hits10=0.5125 d1=0.4920
+epoch=29 kge=0.0186 depth=0.0040 train_s=37.2000 val_mrr=0.2118 val_hits10=0.5040 d1=0.4797
+epoch=30 kge=0.0184 depth=0.0040 train_s=37.1000 val_mrr=0.2151 val_hits10=0.5015 d1=0.4900
+epoch=31 kge=0.0184 depth=0.0039 train_s=37.2000 val_mrr=0.2217 val_hits10=0.5150 d1=0.4888 best=True
+epoch=32 kge=0.0184 depth=0.0039 train_s=37.1000 val_mrr=0.2186 val_hits10=0.5045 d1=0.4768
+epoch=33 kge=0.0182 depth=0.0039 train_s=37.1000 val_mrr=0.2230 val_hits10=0.5200 d1=0.4922 best=True
+epoch=34 kge=0.0183 depth=0.0039 train_s=37.2000 val_mrr=0.2144 val_hits10=0.5005 d1=0.4849
+epoch=35 kge=0.0185 depth=0.0039 train_s=37.1000 val_mrr=0.2177 val_hits10=0.5145 d1=0.4948
+epoch=36 kge=0.0184 depth=0.0038 train_s=37.1000 val_mrr=0.2187 val_hits10=0.5155 d1=0.4865
+epoch=37 kge=0.0185 depth=0.0038 train_s=37.1000 val_mrr=0.2212 val_hits10=0.5110 d1=0.4914
+epoch=38 kge=0.0183 depth=0.0038 train_s=37.1000 val_mrr=0.2183 val_hits10=0.5105 d1=0.4865
+epoch=39 kge=0.0182 depth=0.0038 train_s=37.1000 val_mrr=0.2192 val_hits10=0.5130 d1=0.4890
+epoch=40 kge=0.0184 depth=0.0038 train_s=37.2000 val_mrr=0.2201 val_hits10=0.5160 d1=0.4844
+epoch=41 kge=0.0183 depth=0.0037 train_s=37.2000 val_mrr=0.2192 val_hits10=0.5155 d1=0.4906
+epoch=42 kge=0.0181 depth=0.0037 train_s=37.2000 val_mrr=0.2224 val_hits10=0.5190 d1=0.4987
+epoch=43 kge=0.0183 depth=0.0037 train_s=37.2000 val_mrr=0.2174 val_hits10=0.5015 d1=0.4901
+early stop: no validation gain for 10 epochs
+BEST epoch 33: val MRR 0.2230  test MRR 0.2194  D1 best +0.4922 final +0.4901  purity@10 leaf 0.1103 (floor 0.0147) top 0.3204 (floor 0.1531)

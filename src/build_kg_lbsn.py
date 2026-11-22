@@ -396,6 +396,21 @@ def run_csv(a):
     from build_groups import load_checkins
     df = load_checkins(a.csv_dir, a.dataset)
     df["split"] = df["orig_split"]        # prepare_lbsn_csvs already split per-user 70/10/20
+    n_overlap = 0
+    if a.drop_group_outings:
+        # Group-outing overlap: a train check-in that IS a held-out (val/test/masked) outing of a
+        # matched group set would put that outing into FOLLOWED_BY, the only behavioural relation
+        # of the POI KG. Same rule and sets as data/social_graph and stage 5's
+        # STAGE6B_GROUP_OVERLAP=remove (same user, same venue, within --outing-guard minutes).
+        from build_social_graph import drop_outing_checkins, holdout_outings
+        outings = holdout_outings(a.drop_group_outings)
+        tr = df[df["split"] == "train"]
+        kept, n_overlap = drop_outing_checkins(tr, outings, a.outing_guard)
+        assert drop_outing_checkins(kept, outings, a.outing_guard)[1] == 0
+        df = pd.concat([kept, df[df["split"] != "train"]]).sort_index()
+        print(f"group-outing overlap: dropped {n_overlap:,} train check-ins that are a held-out "
+              f"outing of {[os.path.basename(d.rstrip('/')) for d in a.drop_group_outings]} "
+              f"(+-{a.outing_guard} min); 0 left")
     meta = pd.read_csv(os.path.join(a.csv_dir, f"poi_metadata_{a.dataset}.csv"))
     cat_of = meta.set_index("poi_idx")["category"].fillna("Unknown").astype(str).to_dict()
     # --friendship-old lets a DENOISED graph (denoise_social_gbsr.py's output) feed FRIEND_OF.
@@ -426,7 +441,8 @@ def run_csv(a):
                     relation_counts=kg.counts(), n_hierarchy_pairs=len(hierarchy),
                     n_prefers_category=len(pref),
                     n_friendship_old=int(len(friends_old)),
-                    n_friendship_new_only=len(eval_pairs))
+                    n_friendship_new_only=len(eval_pairs),
+                    n_train_checkins_dropped_as_group_outings=int(n_overlap))
     write_all(a.out_dir, kg, hierarchy, meta, manifest)
 
 
@@ -640,6 +656,10 @@ def main():
     p.add_argument("--tau", type=float, default=0.4)
     p.add_argument("--poi-only", action="store_true",
                    help="POI KG only: taxonomy, LOCATED_IN, IS_NEAR_TO, FOLLOWED_BY (no users/groups/social)")
+    p.add_argument("--drop-group-outings", nargs="*", default=None,
+                   help="csv mode: matched group dirs (data/groups_llmgpr_match/<set>) whose held-out "
+                        "outings are removed from the train check-ins before FOLLOWED_BY is built")
+    p.add_argument("--outing-guard", type=int, default=120, help="+- minutes around a held-out outing")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:

@@ -72,6 +72,28 @@ histories would mean 430k POIs, which is too large. Instead:
    costs category structure. The previous RefH file (150 epochs) scores purity 0.068, the same as the
    benchmark RefH. All per-run results are in `data/llmgpr/kg_poi/kge_comparison/`;
    `STAGE6B_KGE_MODEL=refh` re-runs the old embedding.
+6. **KG rebuilt without the held-out group outings, MuRP retrained on it** (2026-11-22). The graph
+   in item 3 drew its `FOLLOWED_BY` edges from every individual train check-in, including the
+   2,220 that are a held-out group outing. `build_kg_lbsn.py --drop-group-outings
+   ./data/groups_llmgpr_match/LLMGPR_3CITY ./data/groups_llmgpr_match/LLMGPR` (guard ±120 min, the
+   stage-5 rule) drops them first: same 15,695 entities and ids, 398,850 triples (`FOLLOWED_BY`
+   177,599 → 176,286). `data/llmgpr/kg_poi/` now holds this graph. The four-model comparison was
+   re-run on it unchanged (same job, seeds 42–44). Three-seed means, before → after:
+
+   | Model | Test MRR | D1 | purity_aligned@10 |
+   |---|---|---|---|
+   | **MuRP** | 0.2305 → **0.2283** | +0.498 → +0.498 | 0.0927 → **0.0957** |
+   | RefH | 0.2023 → 0.1987 | +0.454 → +0.454 | 0.0654 → 0.0653 |
+   | RotH | 0.1774 → 0.1809 | +0.487 → +0.501 | 0.0670 → 0.0666 |
+   | AttH | 0.1768 → 0.1749 | +0.386 → +0.389 | 0.0605 → 0.0603 |
+
+   Every shift is within the seed-to-seed spread; all twelve runs pass the D1 gate and MuRP still
+   wins both stages. The shipped `poi_hyperbolic_embs_LLMGPR_murp.npy` is now **seed 44 of this
+   run**, its best Stage-2 seed (MRR 0.2194, D1 +0.492, purity 0.107; seed 43 falls to purity 0.077
+   here). Stage-5 numbers produced with the earlier seed-43 file are not comparable with later
+   ones. Per-run results: `data/llmgpr/kg_poi/kge_comparison/`; the item-5 tables are kept in
+   `data/llmgpr/kg_poi/kge_comparison_before_outing_removal/`. The RefH files in `kg_poi/`
+   (`*_refh.npy`, `refh_best.pt`) are still the ones trained on the item-3 graph.
 
 The new 913 POIs have no individual check-ins in the 10 km pipeline data. They are learned through
 the KG (category, location, proximity) and the group sequences.

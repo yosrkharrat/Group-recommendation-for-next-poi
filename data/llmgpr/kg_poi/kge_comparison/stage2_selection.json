@@ -1,0 +1,325 @@
+{
+ "decision": {
+  "rule": "supervisor's model_selection_hyperbolic_kge.ipynb: Stage 2 (max purity_aligned@10 after the alignment adapter) is authoritative over Stage 1 (max test MRR); restricted to variants passing stage 5's D1 gate (rho > 0.30, monotone, 1% tie tolerance)",
+  "stage1_winner": "murp",
+  "stage2_winner": "murp",
+  "carry_forward": "murp",
+  "stages_agree": true,
+  "failed_d1_gate": []
+ },
+ "per_model": [
+  {
+   "model": "atth",
+   "test_mrr": 0.1749,
+   "d1_rho": 0.389,
+   "overlap_at10": 0.9037,
+   "purity_hyp_at10": 0.061,
+   "purity_aligned_at10": 0.0603,
+   "d1_pass": true,
+   "n_seeds": 3
+  },
+  {
+   "model": "murp",
+   "test_mrr": 0.2283,
+   "d1_rho": 0.4979,
+   "overlap_at10": 0.8419,
+   "purity_hyp_at10": 0.1041,
+   "purity_aligned_at10": 0.0957,
+   "d1_pass": true,
+   "n_seeds": 3
+  },
+  {
+   "model": "refh",
+   "test_mrr": 0.1987,
+   "d1_rho": 0.4544,
+   "overlap_at10": 0.8991,
+   "purity_hyp_at10": 0.0669,
+   "purity_aligned_at10": 0.0653,
+   "d1_pass": true,
+   "n_seeds": 3
+  },
+  {
+   "model": "roth",
+   "test_mrr": 0.1809,
+   "d1_rho": 0.5012,
+   "overlap_at10": 0.908,
+   "purity_hyp_at10": 0.066,
+   "purity_aligned_at10": 0.0666,
+   "d1_pass": true,
+   "n_seeds": 3
+  }
+ ],
+ "per_run": [
+  {
+   "run": "atth_s42",
+   "model": "atth",
+   "seed": 42,
+   "test_mrr": 0.1749937430185676,
+   "best_epoch": 4,
+   "d1_rho": 0.3598,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2838,
+    0.2875,
+    0.3058,
+    0.3584
+   ],
+   "overlap_at10": 0.8979,
+   "purity_hyp_at10": 0.0609,
+   "purity_aligned_at10": 0.06,
+   "purity_random": 0.0143,
+   "align_sec": 674
+  },
+  {
+   "run": "atth_s43",
+   "model": "atth",
+   "seed": 43,
+   "test_mrr": 0.17237492106068017,
+   "best_epoch": 4,
+   "d1_rho": 0.399,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2908,
+    0.2916,
+    0.317,
+    0.3486
+   ],
+   "overlap_at10": 0.9091,
+   "purity_hyp_at10": 0.0619,
+   "purity_aligned_at10": 0.0611,
+   "purity_random": 0.0143,
+   "align_sec": 676
+  },
+  {
+   "run": "atth_s44",
+   "model": "atth",
+   "seed": 44,
+   "test_mrr": 0.1772027832062491,
+   "best_epoch": 4,
+   "d1_rho": 0.4083,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2861,
+    0.2887,
+    0.3075,
+    0.3473
+   ],
+   "overlap_at10": 0.904,
+   "purity_hyp_at10": 0.0603,
+   "purity_aligned_at10": 0.0599,
+   "purity_random": 0.0143,
+   "align_sec": 671
+  },
+  {
+   "run": "murp_s42",
+   "model": "murp",
+   "seed": 42,
+   "test_mrr": 0.22359571152185292,
+   "best_epoch": 44,
+   "d1_rho": 0.4912,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2811,
+    0.2863,
+    0.3139,
+    0.3464
+   ],
+   "overlap_at10": 0.8506,
+   "purity_hyp_at10": 0.106,
+   "purity_aligned_at10": 0.1034,
+   "purity_random": 0.0143,
+   "align_sec": 668
+  },
+  {
+   "run": "murp_s43",
+   "model": "murp",
+   "seed": 43,
+   "test_mrr": 0.24178883650206862,
+   "best_epoch": 88,
+   "d1_rho": 0.5103,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2454,
+    0.2485,
+    0.2749,
+    0.3123
+   ],
+   "overlap_at10": 0.8061,
+   "purity_hyp_at10": 0.096,
+   "purity_aligned_at10": 0.0766,
+   "purity_random": 0.0143,
+   "align_sec": 670
+  },
+  {
+   "run": "murp_s44",
+   "model": "murp",
+   "seed": 44,
+   "test_mrr": 0.21942651800949545,
+   "best_epoch": 33,
+   "d1_rho": 0.4922,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2889,
+    0.2934,
+    0.3229,
+    0.3548
+   ],
+   "overlap_at10": 0.8689,
+   "purity_hyp_at10": 0.1103,
+   "purity_aligned_at10": 0.1072,
+   "purity_random": 0.0143,
+   "align_sec": 668
+  },
+  {
+   "run": "refh_s42",
+   "model": "refh",
+   "seed": 42,
+   "test_mrr": 0.20163883117852388,
+   "best_epoch": 5,
+   "d1_rho": 0.4834,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.3043,
+    0.309,
+    0.3411,
+    0.3679
+   ],
+   "overlap_at10": 0.903,
+   "purity_hyp_at10": 0.0678,
+   "purity_aligned_at10": 0.0663,
+   "purity_random": 0.0143,
+   "align_sec": 672
+  },
+  {
+   "run": "refh_s43",
+   "model": "refh",
+   "seed": 43,
+   "test_mrr": 0.19559372820815205,
+   "best_epoch": 4,
+   "d1_rho": 0.4234,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2962,
+    0.3002,
+    0.3237,
+    0.3547
+   ],
+   "overlap_at10": 0.8921,
+   "purity_hyp_at10": 0.0666,
+   "purity_aligned_at10": 0.0647,
+   "purity_random": 0.0143,
+   "align_sec": 672
+  },
+  {
+   "run": "refh_s44",
+   "model": "refh",
+   "seed": 44,
+   "test_mrr": 0.19896612406316266,
+   "best_epoch": 5,
+   "d1_rho": 0.4564,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.3028,
+    0.3067,
+    0.3353,
+    0.3814
+   ],
+   "overlap_at10": 0.9022,
+   "purity_hyp_at10": 0.0663,
+   "purity_aligned_at10": 0.0649,
+   "purity_random": 0.0143,
+   "align_sec": 672
+  },
+  {
+   "run": "roth_s42",
+   "model": "roth",
+   "seed": 42,
+   "test_mrr": 0.18109319540917174,
+   "best_epoch": 27,
+   "d1_rho": 0.4994,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2943,
+    0.3027,
+    0.3418,
+    0.3675
+   ],
+   "overlap_at10": 0.9104,
+   "purity_hyp_at10": 0.0664,
+   "purity_aligned_at10": 0.0674,
+   "purity_random": 0.0143,
+   "align_sec": 671
+  },
+  {
+   "run": "roth_s43",
+   "model": "roth",
+   "seed": 43,
+   "test_mrr": 0.1795040472081952,
+   "best_epoch": 33,
+   "d1_rho": 0.5022,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2888,
+    0.298,
+    0.3355,
+    0.3651
+   ],
+   "overlap_at10": 0.9055,
+   "purity_hyp_at10": 0.0661,
+   "purity_aligned_at10": 0.0662,
+   "purity_random": 0.0143,
+   "align_sec": 671
+  },
+  {
+   "run": "roth_s44",
+   "model": "roth",
+   "seed": 44,
+   "test_mrr": 0.18224425920990237,
+   "best_epoch": 31,
+   "d1_rho": 0.5019,
+   "d1_monotone": true,
+   "d1_pass": true,
+   "radius_by_depth": [
+    0.2902,
+    0.2986,
+    0.3367,
+    0.367
+   ],
+   "overlap_at10": 0.9081,
+   "purity_hyp_at10": 0.0655,
+   "purity_aligned_at10": 0.0661,
+   "purity_random": 0.0143,
+   "align_sec": 672
+  }
+ ],
+ "align_config": {
+  "HIDDEN_DIM": 1024,
+  "NUM_LAYERS": 4,
+  "DROPOUT": 0.1,
+  "EPOCHS": 500,
+  "BATCH_SIZE": 512,
+  "TRIPLE_SAMPLE": 256,
+  "LR": 0.001,
+  "WEIGHT_DECAY": 0.0001,
+  "W_RANKING": 1.0,
+  "W_RADIUS": 0.2,
+  "W_TRIPLE": 1.0,
+  "W_SPECTRAL": 0.01,
+  "SPECTRAL_TOPM": 32,
+  "SPECTRAL_START_EPOCH": 100
+ },
+ "llm_stats": "llada_moe_embed_stats.npz",
+ "device": "cuda",
+ "seconds": 8056
+}

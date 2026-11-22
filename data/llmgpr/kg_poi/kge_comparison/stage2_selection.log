@@ -1,0 +1,154 @@
+=== atth_s42  (atth, seed 42)
+    [align] epoch 50/500  loss=0.2311
+    [align] epoch 100/500  loss=0.2122
+    [align] epoch 150/500  loss=0.1887
+    [align] epoch 200/500  loss=0.1777
+    [align] epoch 250/500  loss=0.1733
+    [align] epoch 300/500  loss=0.1593
+    [align] epoch 350/500  loss=0.1592
+    [align] epoch 400/500  loss=0.1571
+    [align] epoch 450/500  loss=0.1423
+    [align] epoch 500/500  loss=0.1493
+    D1 +0.3598 monotone=True  overlap@10 0.8979  purity hyp 0.0609 aligned 0.06 (random 0.0143)  test MRR 0.1749937430185676  (674s)
+=== atth_s43  (atth, seed 43)
+    [align] epoch 50/500  loss=0.2588
+    [align] epoch 100/500  loss=0.2232
+    [align] epoch 150/500  loss=0.1947
+    [align] epoch 200/500  loss=0.1872
+    [align] epoch 250/500  loss=0.1739
+    [align] epoch 300/500  loss=0.1589
+    [align] epoch 350/500  loss=0.1605
+    [align] epoch 400/500  loss=0.1593
+    [align] epoch 450/500  loss=0.1493
+    [align] epoch 500/500  loss=0.1536
+    D1 +0.3990 monotone=True  overlap@10 0.9091  purity hyp 0.0619 aligned 0.0611 (random 0.0143)  test MRR 0.17237492106068017  (676s)
+=== atth_s44  (atth, seed 44)
+    [align] epoch 50/500  loss=0.2382
+    [align] epoch 100/500  loss=0.2103
+    [align] epoch 150/500  loss=0.1871
+    [align] epoch 200/500  loss=0.1834
+    [align] epoch 250/500  loss=0.1692
+    [align] epoch 300/500  loss=0.1551
+    [align] epoch 350/500  loss=0.1616
+    [align] epoch 400/500  loss=0.1592
+    [align] epoch 450/500  loss=0.1439
+    [align] epoch 500/500  loss=0.1492
+    D1 +0.4083 monotone=True  overlap@10 0.904  purity hyp 0.0603 aligned 0.0599 (random 0.0143)  test MRR 0.1772027832062491  (671s)
+=== murp_s42  (murp, seed 42)
+    [align] epoch 50/500  loss=0.4528
+    [align] epoch 100/500  loss=0.3266
+    [align] epoch 150/500  loss=0.2612
+    [align] epoch 200/500  loss=0.2493
+    [align] epoch 250/500  loss=0.2370
+    [align] epoch 300/500  loss=0.2237
+    [align] epoch 350/500  loss=0.2183
+    [align] epoch 400/500  loss=0.2160
+    [align] epoch 450/500  loss=0.2079
+    [align] epoch 500/500  loss=0.2114
+    D1 +0.4912 monotone=True  overlap@10 0.8506  purity hyp 0.106 aligned 0.1034 (random 0.0143)  test MRR 0.22359571152185292  (668s)
+=== murp_s43  (murp, seed 43)
+    [align] epoch 50/500  loss=0.6624
+    [align] epoch 100/500  loss=0.3555
+    [align] epoch 150/500  loss=0.2916
+    [align] epoch 200/500  loss=0.2719
+    [align] epoch 250/500  loss=0.2635
+    [align] epoch 300/500  loss=0.2509
+    [align] epoch 350/500  loss=0.2473
+    [align] epoch 400/500  loss=0.2433
+    [align] epoch 450/500  loss=0.2346
+    [align] epoch 500/500  loss=0.2387
+    D1 +0.5103 monotone=True  overlap@10 0.8061  purity hyp 0.096 aligned 0.0766 (random 0.0143)  test MRR 0.24178883650206862  (670s)
+=== murp_s44  (murp, seed 44)
+    [align] epoch 50/500  loss=0.3524
+    [align] epoch 100/500  loss=0.2861
+    [align] epoch 150/500  loss=0.2351
+    [align] epoch 200/500  loss=0.2208
+    [align] epoch 250/500  loss=0.2083
+    [align] epoch 300/500  loss=0.1942
+    [align] epoch 350/500  loss=0.1937
+    [align] epoch 400/500  loss=0.1948
+    [align] epoch 450/500  loss=0.1848
+    [align] epoch 500/500  loss=0.1883
+    D1 +0.4922 monotone=True  overlap@10 0.8689  purity hyp 0.1103 aligned 0.1072 (random 0.0143)  test MRR 0.21942651800949545  (668s)
+=== refh_s42  (refh, seed 42)
+    [align] epoch 50/500  loss=0.2141
+    [align] epoch 100/500  loss=0.1951
+    [align] epoch 150/500  loss=0.1646
+    [align] epoch 200/500  loss=0.1710
+    [align] epoch 250/500  loss=0.1582
+    [align] epoch 300/500  loss=0.1362
+    [align] epoch 350/500  loss=0.1476
+    [align] epoch 400/500  loss=0.1445
+    [align] epoch 450/500  loss=0.1331
+    [align] epoch 500/500  loss=0.1357
+    D1 +0.4834 monotone=True  overlap@10 0.903  purity hyp 0.0678 aligned 0.0663 (random 0.0143)  test MRR 0.20163883117852388  (672s)
+=== refh_s43  (refh, seed 43)
+    [align] epoch 50/500  loss=0.2390
+    [align] epoch 100/500  loss=0.2101
+    [align] epoch 150/500  loss=0.1873
+    [align] epoch 200/500  loss=0.1821
+    [align] epoch 250/500  loss=0.1667
+    [align] epoch 300/500  loss=0.1576
+    [align] epoch 350/500  loss=0.1591
+    [align] epoch 400/500  loss=0.1559
+    [align] epoch 450/500  loss=0.1465
+    [align] epoch 500/500  loss=0.1509
+    D1 +0.4234 monotone=True  overlap@10 0.8921  purity hyp 0.0666 aligned 0.0647 (random 0.0143)  test MRR 0.19559372820815205  (672s)
+=== refh_s44  (refh, seed 44)
+    [align] epoch 50/500  loss=0.2174
+    [align] epoch 100/500  loss=0.1907
+    [align] epoch 150/500  loss=0.1681
+    [align] epoch 200/500  loss=0.1734
+    [align] epoch 250/500  loss=0.1551
+    [align] epoch 300/500  loss=0.1407
+    [align] epoch 350/500  loss=0.1447
+    [align] epoch 400/500  loss=0.1451
+    [align] epoch 450/500  loss=0.1333
+    [align] epoch 500/500  loss=0.1367
+    D1 +0.4564 monotone=True  overlap@10 0.9022  purity hyp 0.0663 aligned 0.0649 (random 0.0143)  test MRR 0.19896612406316266  (672s)
+=== roth_s42  (roth, seed 42)
+    [align] epoch 50/500  loss=0.2130
+    [align] epoch 100/500  loss=0.1897
+    [align] epoch 150/500  loss=0.1661
+    [align] epoch 200/500  loss=0.1625
+    [align] epoch 250/500  loss=0.1547
+    [align] epoch 300/500  loss=0.1331
+    [align] epoch 350/500  loss=0.1385
+    [align] epoch 400/500  loss=0.1380
+    [align] epoch 450/500  loss=0.1315
+    [align] epoch 500/500  loss=0.1300
+    D1 +0.4994 monotone=True  overlap@10 0.9104  purity hyp 0.0664 aligned 0.0674 (random 0.0143)  test MRR 0.18109319540917174  (671s)
+=== roth_s43  (roth, seed 43)
+    [align] epoch 50/500  loss=0.2198
+    [align] epoch 100/500  loss=0.1913
+    [align] epoch 150/500  loss=0.1659
+    [align] epoch 200/500  loss=0.1635
+    [align] epoch 250/500  loss=0.1567
+    [align] epoch 300/500  loss=0.1394
+    [align] epoch 350/500  loss=0.1413
+    [align] epoch 400/500  loss=0.1425
+    [align] epoch 450/500  loss=0.1290
+    [align] epoch 500/500  loss=0.1319
+    D1 +0.5022 monotone=True  overlap@10 0.9055  purity hyp 0.0661 aligned 0.0662 (random 0.0143)  test MRR 0.1795040472081952  (671s)
+=== roth_s44  (roth, seed 44)
+    [align] epoch 50/500  loss=0.2201
+    [align] epoch 100/500  loss=0.1957
+    [align] epoch 150/500  loss=0.1677
+    [align] epoch 200/500  loss=0.1646
+    [align] epoch 250/500  loss=0.1548
+    [align] epoch 300/500  loss=0.1359
+    [align] epoch 350/500  loss=0.1421
+    [align] epoch 400/500  loss=0.1394
+    [align] epoch 450/500  loss=0.1306
+    [align] epoch 500/500  loss=0.1278
+    D1 +0.5019 monotone=True  overlap@10 0.9081  purity hyp 0.0655 aligned 0.0661 (random 0.0143)  test MRR 0.18224425920990237  (672s)
+
+       test_mrr  d1_rho  overlap_at10  purity_hyp_at10  purity_aligned_at10  d1_pass  n_seeds
+model                                                                                        
+atth     0.1749  0.3890        0.9037           0.0610               0.0603     True        3
+murp     0.2283  0.4979        0.8419           0.1041               0.0957     True        3
+refh     0.1987  0.4544        0.8991           0.0669               0.0653     True        3
+roth     0.1809  0.5012        0.9080           0.0660               0.0666     True        3
+
+Stage 1 (max test MRR): murp   Stage 2 (max purity_aligned@10, D1-gated): murp   -> carry forward: murp
+wrote out/stage2_selection.json
