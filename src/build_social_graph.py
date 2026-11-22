@@ -34,8 +34,8 @@ user's held-out period.
 The LLMGPR reproduction set (data/groups_llmgpr_match/LLMGPR) is built from the whole history
 (house8_whole) with old+new friendship, so its held-out outings can also sit in our train split.
 Every val/test/masked outing of that set is removed from the train check-ins before co-presence is
-computed: the outing's members' check-ins at that venue within ±`--guard` minutes. The default
-guard of 120 min is the set's own ±60 min window plus our 60 min co-presence window. Matched on
+computed: the outing's members' check-ins at that venue inside that set's manifest window.
+The default is per-set (three-city +/-1440 min, whole-history +/-60 min); --guard may widen it. Matched on
 venue_id: that set's poi_idx is a different id space; user_id is shared (checked on 5,085 joined
 rows: 5,083 agree).
 
@@ -85,6 +85,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from build_groups import build_co_attended, build_ephemeral_groups, load_checkins, venue_rarity  # noqa: E402
+from group_outing_guard import (drop_outing_checkins, file_sha256, group_guard_policy, holdout_outings)  # noqa: E402
 
 COLS = ["u1", "u2", "relation", "weight", "weight_idf", "weight_count", "n_meetings", "n_venues"]
 
@@ -97,34 +98,6 @@ def load_pairs(path):
     """Undirected pair set {(min, max)} from a `u1,u2` CSV; self-pairs dropped."""
     e = pd.read_csv(path, dtype={"u1": int, "u2": int})
     return {(min(a, b), max(a, b)) for a, b in zip(e["u1"], e["u2"]) if a != b}
-
-
-def holdout_outings(repro_dirs, splits=("val", "test", "masked")):
-    """Held-out outings of the reproduction set(s): one row per (outing, member) with
-    venue_id, user_id and the outing time in epoch minutes. Several sets are unioned."""
-    if isinstance(repro_dirs, str):
-        repro_dirs = [repro_dirs]
-    g = pd.concat([pd.read_csv(os.path.join(d, "group_checkins.csv")).assign(repro=os.path.basename(d.rstrip("/")))
-                   for d in repro_dirs], ignore_index=True)
-    g = g[g["split"].isin(splits)].copy()
-    t = pd.to_datetime(g["utc_time"], utc=True)
-    g["ev_ts"] = t.dt.as_unit("ns").astype("int64") // (60 * 10 ** 9)
-    g["outing"] = np.arange(len(g))
-    g["user_id"] = g["present"].astype(str).str.split("|")
-    g = g.explode("user_id")
-    g["user_id"] = g["user_id"].astype(int)
-    return g[["outing", "group_id", "split", "venue_id", "ev_ts", "user_id"]].reset_index(drop=True)
-
-
-def drop_outing_checkins(train, outings, guard_min):
-    """Remove the train check-ins that ARE a held-out outing: same user, same venue, within
-    ±guard_min of the outing time. Returns (kept frame, number of rows dropped)."""
-    if outings is None or outings.empty:
-        return train, 0
-    tr = train[["venue_id", "user_id", "ts"]].reset_index().rename(columns={"index": "_row"})
-    m = tr.merge(outings[["venue_id", "user_id", "ev_ts"]], on=["venue_id", "user_id"])
-    hit = m.loc[(m["ts"] - m["ev_ts"]).abs() <= guard_min, "_row"].unique()
-    return train.drop(index=hit), len(hit)
 
 
 # --------------------------------------------------------------------------
@@ -344,6 +317,8 @@ def run(a):
     a.repro_dir = [d for d in (a.repro_dir or []) if d]
     outings = holdout_outings(a.repro_dir) if a.repro_dir else None
     train_used, n_dropped = drop_outing_checkins(train, outings, a.guard)
+    assert drop_outing_checkins(train_used, outings, a.guard)[1] == 0
+    guard_policy = group_guard_policy(a.repro_dir, a.guard)
     print(f"train check-ins {len(train):,}  dropped as held-out reproduction outings {n_dropped:,}")
 
     co, _ = co_presence(train_used, a.window, a.max_size)
@@ -382,9 +357,11 @@ def run(a):
     manifest = dict(
         dataset=ds, built=pd.Timestamp.now(tz="UTC").isoformat(timespec="seconds"), git_head=git_head(),
         script="src/build_social_graph.py", undirected=True, storage="one row per pair and relation, u1 < u2",
+        social_edges_sha256=file_sha256(os.path.join(a.out_dir, f"social_edges_{ds}.csv")),
         config=dict(window_min=a.window, max_group_size=a.max_size, min_meetings=a.min_meetings,
                     co_weight=co_weight, co_weight_arg=a.co_weight, guard_min=a.guard,
-                    heldout_repro_splits=["val", "test", "masked"], friendship="old only"),
+                    heldout_repro_splits=["val", "test", "masked"], friendship="old only",
+                    guard_policy=guard_policy),
         inputs=inputs,
         counts=dict(train_checkins=len(train), dropped_repro_outing_checkins=n_dropped,
                     train_checkins_used=len(train_used), train_users=len(users_train),
@@ -507,7 +484,8 @@ def main():
     p.add_argument("--max-size", type=int, default=8, help="larger co-present sets are crowds, not ties")
     p.add_argument("--min-meetings", type=int, default=2)
     p.add_argument("--co-weight", choices=("auto", "idf", "count"), default="auto")
-    p.add_argument("--guard", type=int, default=120, help="± minutes around a held-out outing")
+    p.add_argument("--guard", type=float, default=None,
+                   help="default: each set's manifest window; an override may only widen it")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:

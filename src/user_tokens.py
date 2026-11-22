@@ -237,12 +237,29 @@ def _ball_dist_matrix(U, P, c=1.0, chunk=1024):
     return torch.cat(out)
 
 
-def diagnose(data_dir, dataset, emb_path, edges_path, top_k=10, beta=0.5, c=1.0, seed=0):
+def diagnose(data_dir, dataset, emb_path, edges_path, top_k=10, beta=0.5, c=1.0, seed=0,
+             guard_dirs=None, train_dirs=None):
     t0 = time.time()
-    tr = pd.read_csv(os.path.join(data_dir, f"train_{dataset}.csv"), usecols=["user_id", "poi_idx"])
-    va = pd.read_csv(os.path.join(data_dir, f"val_{dataset}.csv"), usecols=["user_id", "poi_idx"])
+    from build_group_examples_llmgpr_match import load_individual
+    guard_dirs = guard_dirs if guard_dirs is not None else (
+        ["./data/groups_llmgpr_match/LLMGPR_3CITY", "./data/groups_llmgpr_match/LLMGPR"]
+        if dataset == "LLMGPR" else [])
+    train_dirs = train_dirs if train_dirs is not None else (guard_dirs[:1] if dataset == "LLMGPR" else [])
+    frame, removed = load_individual(data_dir, dataset, "remove", guard_dirs, train_dirs)
+    tr, va = (frame[frame["orig_split"] == split] for split in ("train", "val"))
+    print(f"[diagnose] manifest-window exclusions: {removed}")
     emb = np.load(emb_path)
     edges = pd.read_csv(edges_path)
+    if guard_dirs:
+        import json
+        from group_outing_guard import file_sha256, group_guard_policy, validate_poi_artifacts
+        policy = group_guard_policy(guard_dirs)
+        validate_poi_artifacts(emb_path, policy, os.path.join(data_dir, f"poi_metadata_{dataset}.csv"))
+        manifest_path = os.path.join(os.path.dirname(edges_path), f"social_graph_manifest_{dataset}.json")
+        social_manifest = json.load(open(manifest_path))
+        if (social_manifest["config"].get("guard_policy") != policy or
+                social_manifest.get("social_edges_sha256") != file_sha256(edges_path)):
+            raise ValueError("rebuild the social graph with the current outing windows before diagnosing")
     n_users = int(max(tr["user_id"].max(), va["user_id"].max())) + 1
     sig, has = user_signatures(tr, emb, n_users, top_k=top_k, c=c)
     n_tr = tr.groupby("user_id").size().reindex(range(n_users), fill_value=0).to_numpy()
@@ -367,11 +384,16 @@ def main():
     p.add_argument("--edges", default="./data/social_graph/LLMGPR/social_edges_LLMGPR.csv")
     p.add_argument("--beta", type=float, default=0.5)
     p.add_argument("--top-k", type=int, default=10)
+    p.add_argument("--guard-sets", nargs="*", default=None,
+                   help="group sets whose held-out outings leave train; defaults to Foursquare's two sets")
+    p.add_argument("--train-sets", nargs="*", default=None,
+                   help="group sets whose train outings leave validation; default Foursquare three-city")
     a = p.parse_args()
     if a.self_test:
         _self_test()
     if a.diagnose:
-        diagnose(a.data_dir, a.dataset, a.emb, a.edges, top_k=a.top_k, beta=a.beta)
+        diagnose(a.data_dir, a.dataset, a.emb, a.edges, top_k=a.top_k, beta=a.beta,
+                 guard_dirs=a.guard_sets, train_dirs=a.train_sets)
     if not (a.self_test or a.diagnose):
         p.print_help()
 

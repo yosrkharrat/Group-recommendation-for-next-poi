@@ -32,12 +32,12 @@ individual check-ins of the members.
 
     remove   (default) the clean setting, the same rules as stage 5's STAGE6B_GROUP_OVERLAP=remove:
              * individual TRAIN rows that are a held-out (val/test/masked) outing of a guarded
-               group set are dropped (`--guard-sets`, +-`--guard` min);
+               group set are dropped (`--guard-sets`, each set's manifest window);
              * individual VAL/TEST rows that are a TRAIN outing of a trained group set are dropped
                (`--train-sets`), so the group training data is kept and the individual
                evaluation gives those rows up;
-             * on top of that, a member's own check-in at the target venue within `--guard`
-               minutes before the outing never enters that example's history or profile
+             * on top of that, a member's own check-in at the target venue within its set's window
+               before the outing never enters that example's history or profile
                (it would put the answer in the prompt).
     keep     nothing is removed. Histories are still strictly before the outing time. This is
              LLMGPR's protocol as described (user and group sequences are not separated).
@@ -72,6 +72,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from build_groups import MemberState, heterogeneity, load_categories, load_checkins  # noqa: E402
 from build_social_graph import drop_outing_checkins, holdout_outings  # noqa: E402
+from group_outing_guard import group_guard_policy, group_window_minutes  # noqa: E402
 
 SPLITS = ("train", "val", "test")
 DOW = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -89,7 +90,7 @@ def sha256(path):
 # inputs
 # --------------------------------------------------------------------------
 
-def load_individual(data_dir, dataset, overlap, guard_dirs, train_dirs, guard_min):
+def load_individual(data_dir, dataset, overlap, guard_dirs, train_dirs, guard_min=None):
     """All individual check-ins (train + val + test) with `ts` in epoch minutes, after the
     overlap rules. Returns (frame, counts of rows removed per split)."""
     df = load_checkins(data_dir, dataset)
@@ -180,7 +181,7 @@ def build(outings, state, cat_of, a, regime):
             t, target = int(r.ts), int(r.target)
             merged, profiles = [], []
             for u in r.members:
-                ts, pois, hours = member_prefix(state, u, t, target, a.guard, exclude)
+                ts, pois, hours = member_prefix(state, u, t, target, a.profile_guard_min, exclude)
                 profiles.append(profile_of(pois, hours, cat_of, a.profile_top_k,
                                            a.profile_cats, a.profile_hours))
                 lo = max(0, len(ts) - a.hist_per_member)
@@ -190,7 +191,7 @@ def build(outings, state, cat_of, a, regime):
                 checks["hist_not_before_target"] += int((ts >= t).sum())
                 if exclude:
                     checks["target_copy_in_history"] += int(
-                        ((pois == target) & (ts >= t - a.guard)).sum())
+                        ((pois == target) & (ts >= t - a.profile_guard_min)).sum())
             if not any(p["n_seen"] for p in profiles):
                 stats[f"skip_no_member_history_{r.split}"] += 1
                 continue
@@ -301,7 +302,7 @@ def self_check(out_dir, group_dir, data_dir, dataset, n_poi):
                                 if o == u and p == rec["target"])
                     if ts is None or not shown:
                         continue
-                    older = int((ts < t - cfg["guard"]).sum())
+                    older = int((ts < t - cfg.get("profile_guard_min", cfg["guard"])).sum())
                     n_copy += int(shown > older)
     assert n_future == 0, f"{n_future} history items have no visit before the outing"
     assert n_impossible == 0
@@ -333,6 +334,9 @@ def run(a):
     out_dir = a.out_dir or os.path.join(group_dir, f"examples_{a.overlap}")
     guard_dirs = a.guard_sets or [group_dir]
     train_dirs = a.train_sets or [group_dir]
+    a.profile_guard_min = group_window_minutes(group_dir, a.guard)
+    guard_policy = group_guard_policy(guard_dirs, a.guard)
+    train_policy = group_guard_policy(train_dirs, a.guard)
     os.makedirs(out_dir, exist_ok=True)
 
     cat_of, n_poi = load_categories(a.data_dir, a.dataset)
@@ -371,6 +375,8 @@ def run(a):
         built=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         config=dict(group_dir=group_dir, data_dir=a.data_dir, dataset=a.dataset, overlap=a.overlap,
                     guard=a.guard, guard_sets=guard_dirs, train_sets=train_dirs,
+                    profile_guard_min=a.profile_guard_min,
+                    guard_policy=guard_policy, train_guard_policy=train_policy,
                     hist_per_member=a.hist_per_member, group_hist_len=a.group_hist_len,
                     profile_top_k=a.profile_top_k, profile_cats=a.profile_cats,
                     profile_hours=a.profile_hours, cat_level=a.cat_level, regime=regime,
@@ -417,7 +423,8 @@ def main():
     p.add_argument("--dataset", default="LLMGPR")
     p.add_argument("--out-dir", default=None, help="default: <group-dir>/examples_<overlap>")
     p.add_argument("--overlap", choices=("remove", "keep"), default="remove")
-    p.add_argument("--guard", type=int, default=120, help="+- minutes around an outing")
+    p.add_argument("--guard", type=float, default=None,
+                   help="default: each set's manifest window; override may only widen it")
     p.add_argument("--guard-sets", nargs="*", default=None,
                    help="group dirs whose held-out outings are removed from individual train "
                         "(default: --group-dir only; stage 5 passes its GROUP_OVERLAP_SETS)")

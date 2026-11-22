@@ -401,8 +401,8 @@ def run_csv(a):
         # Group-outing overlap: a train check-in that IS a held-out (val/test/masked) outing of a
         # matched group set would put that outing into FOLLOWED_BY, the only behavioural relation
         # of the POI KG. Same rule and sets as data/social_graph and stage 5's
-        # STAGE6B_GROUP_OVERLAP=remove (same user, same venue, within --outing-guard minutes).
-        from build_social_graph import drop_outing_checkins, holdout_outings
+        # STAGE6B_GROUP_OVERLAP=remove (same user/venue, per-set manifest exclusion windows).
+        from group_outing_guard import drop_outing_checkins, holdout_outings
         outings = holdout_outings(a.drop_group_outings)
         tr = df[df["split"] == "train"]
         kept, n_overlap = drop_outing_checkins(tr, outings, a.outing_guard)
@@ -410,7 +410,7 @@ def run_csv(a):
         df = pd.concat([kept, df[df["split"] != "train"]]).sort_index()
         print(f"group-outing overlap: dropped {n_overlap:,} train check-ins that are a held-out "
               f"outing of {[os.path.basename(d.rstrip('/')) for d in a.drop_group_outings]} "
-              f"(+-{a.outing_guard} min); 0 left")
+              f"(per-set manifest windows; override={a.outing_guard}); 0 left")
     meta = pd.read_csv(os.path.join(a.csv_dir, f"poi_metadata_{a.dataset}.csv"))
     cat_of = meta.set_index("poi_idx")["category"].fillna("Unknown").astype(str).to_dict()
     # --friendship-old lets a DENOISED graph (denoise_social_gbsr.py's output) feed FRIEND_OF.
@@ -434,7 +434,9 @@ def run_csv(a):
     eval_pairs = assert_no_new_friendship_leak(kg, friends_old, all_friends)
     print(f"leakage guard: {len(eval_pairs):,} friendship_new-only pairs verified absent")
 
+    from group_outing_guard import group_guard_policy
     manifest = dict(config={k: v for k, v in vars(a).items()},
+                    outing_guard_policy=group_guard_policy(a.drop_group_outings, a.outing_guard),
                     source=a.csv_dir, dataset=a.dataset,
                     n_entities=len(kg.ent_id), n_triples=len(kg.triples),
                     n_relations=len(kg.rel_id), node_types=kg.type_counts(),
@@ -659,7 +661,8 @@ def main():
     p.add_argument("--drop-group-outings", nargs="*", default=None,
                    help="csv mode: matched group dirs (data/groups_llmgpr_match/<set>) whose held-out "
                         "outings are removed from the train check-ins before FOLLOWED_BY is built")
-    p.add_argument("--outing-guard", type=int, default=120, help="+- minutes around a held-out outing")
+    p.add_argument("--outing-guard", type=float, default=None,
+                   help="default: each group set's manifest window; override may only widen it")
     p.add_argument("--self-check", action="store_true")
     a = p.parse_args()
     if a.self_check:

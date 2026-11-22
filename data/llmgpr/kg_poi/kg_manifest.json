@@ -22,13 +22,31 @@
       "./data/groups_llmgpr_match/LLMGPR_3CITY",
       "./data/groups_llmgpr_match/LLMGPR"
     ],
-    "outing_guard": 120,
+    "outing_guard": null,
     "self_check": false
+  },
+  "outing_guard_policy": {
+    "version": "group-window-v1",
+    "mode": "manifest",
+    "sets": [
+      {
+        "name": "LLMGPR",
+        "guard_min": 60.0,
+        "manifest_sha256": "77f71b9c4ddc7364b96d683bef9a947b474858ecacc470d03146d5f348970e11",
+        "checkins_sha256": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0"
+      },
+      {
+        "name": "LLMGPR_3CITY",
+        "guard_min": 1440.0,
+        "manifest_sha256": "6106880fc0f1d9194836e3fb79f6d90a0f1cdca3116f0129663018f0ef25c97b",
+        "checkins_sha256": "3f470fc80ae7a7e5ff9e142eb58bcc923faa3aeb9d2e0fc4a2ab0bea2232b5dd"
+      }
+    ]
   },
   "source": "./data/llmgpr",
   "dataset": "LLMGPR",
   "n_entities": 15695,
-  "n_triples": 398850,
+  "n_triples": 398761,
   "n_relations": 5,
   "node_types": {
     "CATEGORY": 374,
@@ -38,7 +56,7 @@
   },
   "relation_counts": {
     "IS_NEAR_TO": 191576,
-    "FOLLOWED_BY": 176286,
+    "FOLLOWED_BY": 176197,
     "LOCATED_IN": 15318,
     "HAS_CATEGORY": 15315,
     "SUBCATEGORY_OF": 355
@@ -47,5 +65,5 @@
   "n_prefers_category": 0,
   "n_friendship_old": 8640,
   "n_friendship_new_only": 5528,
-  "n_train_checkins_dropped_as_group_outings": 2220
+  "n_train_checkins_dropped_as_group_outings": 2434
 }

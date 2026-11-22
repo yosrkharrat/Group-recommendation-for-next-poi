@@ -1,3 +1,96 @@
+# Foursquare run guide — `foursquare-v3`
+
+Run from the repository root. Commands use Bash on the GPU server.
+Use CUDA-enabled PyTorch; the full fine-tune requires at least 40 GB VRAM.
+
+**Status:** CPU artifacts rebuilt and checked. KGE comparison, embedding retraining and
+fine-tuning under the corrected windows are pending. Existing embeddings are stale.
+
+## 1. Dependencies and data preparation
+
+Use the committed CSVs and matched groups. Exclusion windows: three-city **±24 hours**;
+whole-history **±1 hour**, read automatically from their manifests.
+
+```bash
+python -m pip install -r requirements.txt jupyterlab
+python -m unittest discover -s tests -p test_group_outing_guard.py -v
+python src/build_kg_lbsn.py --csv-dir data/llmgpr --dataset LLMGPR --out-dir data/llmgpr/kg_poi --poi-only --drop-group-outings data/groups_llmgpr_match/LLMGPR_3CITY data/groups_llmgpr_match/LLMGPR
+python src/build_poi_poi_triples.py --kg-dir data/llmgpr/kg_poi --meta data/llmgpr/poi_metadata_LLMGPR.csv --out-dir data/llmgpr/kg_poi --dataset LLMGPR
+python src/build_social_graph.py
+python src/build_group_examples_llmgpr_match.py --guard-sets data/groups_llmgpr_match/LLMGPR_3CITY data/groups_llmgpr_match/LLMGPR --train-sets data/groups_llmgpr_match/LLMGPR_3CITY
+```
+
+Expected: **2,434** train check-ins excluded; **398,761** POI-KG triples;
+**10,792** social edges; **6,343 / 1,247 / 1,251** group train/validation/test examples.
+
+## 2. KGE comparison — GPU
+
+```bash
+mkdir -p outputs/foursquare_kge
+for model in roth refh atth murp; do
+  for seed in 42 43 44; do
+    python src/kge_bench.py --kg-dir data/llmgpr/kg_poi --data-dir data/llmgpr --dataset LLMGPR --model "$model" --seed "$seed" --split-seed 42 --epochs 150 --patience 10 --device cuda --save-embs --out "outputs/foursquare_kge/${model}_s${seed}.json"
+  done
+done
+python src/kge_alignment_eval.py --runs 'outputs/foursquare_kge/*_s4?.json' --kg-dir data/llmgpr/kg_poi --dataset LLMGPR --meta data/llmgpr/poi_metadata_LLMGPR.csv --llm-stats data/llm/llada_moe_embed_stats.npz --device cuda --out outputs/foursquare_kge/stage2
+```
+
+## 3. Install the selected embeddings
+
+Uses the existing Stage-2 rule: winning model, then its highest-purity passing seed.
+The embedding and its provenance sidecar must travel together.
+
+```bash
+python - <<'PY'
+import json, shutil
+from pathlib import Path
+root = Path("outputs/foursquare_kge")
+result = json.loads((root / "stage2.json").read_text())
+model = result["decision"]["carry_forward"]
+assert model is not None, "No model passed selection"
+run = max((r for r in result["per_run"] if r["model"] == model and r["d1_pass"]),
+          key=lambda r: r["purity_aligned_at10"])["run"]
+source = root / f"{run}_poi_embs.npy"
+target = Path(f"data/llmgpr/kg_poi/poi_hyperbolic_embs_LLMGPR_{model}.npy")
+shutil.copy2(source, target)
+shutil.copy2(str(source) + ".manifest.json", str(target) + ".manifest.json")
+(root / "selected_model.txt").write_text(model)
+print("Selected:", run, "→", target)
+PY
+```
+
+## 4. Fine-tune — smoke first, then full
+
+```bash
+export STAGE6B_DATASET=LLMGPR
+export STAGE6B_KGE_MODEL="$(cat outputs/foursquare_kge/selected_model.txt)"
+export STAGE6B_USER_TOKENS=1
+export STAGE6B_SOCIAL_SMOOTHING=copresence
+export STAGE6B_GROUP_OVERLAP=remove
+export STAGE6B_GROUP_SET=llmgpr_match
+export STAGE6B_TRAIN_ON_GROUPS=1
+export STAGE6B_GROUP_TRAIN_FRAC=all
+export STAGE6B_BATCH_SIZE=1
+export STAGE6B_GRAD_ACCUM=32
+export STAGE6B_RUN_PROFILE=smoke
+export STAGE6B_OUT_DIR=./outputs/foursquare_window_smoke
+jupyter lab notebooks/stage5_lbsn_finetune.ipynb
+```
+
+Run all cells. After smoke passes, stop Jupyter and relaunch:
+
+```bash
+export STAGE6B_RUN_PROFILE=full
+export STAGE6B_OUT_DIR=./outputs/foursquare_window_full
+jupyter lab notebooks/stage5_lbsn_finetune.ipynb
+```
+
+Use new output directories; do not resume old-graph checkpoints.
+Save the run directory, selected KGE results, embedding and sidecar.
+User tokens are regenerated automatically; no separate user-KGE training is needed.
+
+---
+
 # `foursquare-v3`: social graph, user tokens and group training (Foursquare / LLMGPR)
 
 *Branch `foursquare-v3` continues `foursquare-v2` from commit `3c0fa02`: the same pipeline plus the

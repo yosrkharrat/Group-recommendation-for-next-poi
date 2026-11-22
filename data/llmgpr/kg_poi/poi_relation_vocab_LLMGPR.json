@@ -5,21 +5,41 @@
   },
   "counts": {
     "IS_NEAR_TO": 191576,
-    "FOLLOWED_BY": 176286
+    "FOLLOWED_BY": 176197
   },
   "provenance": {
     "source": "build_kg_dir",
-    "kg_file": "./data/llmgpr/kg_poi",
-    "metadata_file": "/Users/macbook/Documents/POI/data/llmgpr/poi_metadata_LLMGPR.csv",
+    "kg_file": "C:\\backup\\Bureau\\stage\\Group-recommendation-for-next-poi\\data\\llmgpr\\kg_poi",
+    "metadata_file": "C:\\backup\\Bureau\\stage\\Group-recommendation-for-next-poi\\data\\llmgpr\\poi_metadata_LLMGPR.csv",
     "n_pois": 15315,
-    "n_native_poi_poi_triples": 367862,
-    "n_after_derive_and_cap": 367862,
+    "n_native_poi_poi_triples": 367773,
+    "n_after_derive_and_cap": 367773,
     "derived": "none",
     "excluded_relations": [],
     "max_per_relation": null,
     "seed": 42,
     "behavioural_relations_present": [
       "FOLLOWED_BY"
-    ]
+    ],
+    "triples_sha256": "0bffb910ec5f3099dae634ddf5b1fa321f007569764dcfb385f7903b5da5fd4d",
+    "kg_triples_sha256": "0160da8c976588c95b47695c496e4254624465667e1bb47754e9565441971d37",
+    "outing_guard_policy": {
+      "version": "group-window-v1",
+      "mode": "manifest",
+      "sets": [
+        {
+          "name": "LLMGPR",
+          "guard_min": 60.0,
+          "manifest_sha256": "77f71b9c4ddc7364b96d683bef9a947b474858ecacc470d03146d5f348970e11",
+          "checkins_sha256": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0"
+        },
+        {
+          "name": "LLMGPR_3CITY",
+          "guard_min": 1440.0,
+          "manifest_sha256": "6106880fc0f1d9194836e3fb79f6d90a0f1cdca3116f0129663018f0ef25c97b",
+          "checkins_sha256": "3f470fc80ae7a7e5ff9e142eb58bcc923faa3aeb9d2e0fc4a2ab0bea2232b5dd"
+        }
+      ]
+    }
   }
 }

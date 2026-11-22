@@ -464,6 +464,19 @@ def run(a):
             # rows in poi_idx order (meta order), best checkpoint -- for Stage 2 alignment later
             np.save(a.out[:-5] + "_poi_embs.npy",
                     poi_points(model, poi_rows).detach().cpu().numpy().astype(np.float32))
+            # Travel with the selected embedding when it is copied/renamed for stage 5.
+            # Prevent a rebuilt KG being paired with embeddings trained on an older guard.
+            from group_outing_guard import file_sha256
+            emb_path = a.out[:-5] + "_poi_embs.npy"
+            kg_manifest_path = os.path.join(a.kg_dir, "kg_manifest.json")
+            provenance = dict(version="kge-embedding-v1", model=a.model, seed=a.seed,
+                              embedding_sha256=file_sha256(emb_path),
+                              kg_triples_sha256=file_sha256(os.path.join(a.kg_dir, "kg_triples.pt")),
+                              kg_manifest_sha256=file_sha256(kg_manifest_path),
+                              metadata_sha256=file_sha256(os.path.join(a.data_dir, f"poi_metadata_{a.dataset}.csv")),
+                              outing_guard_policy=json.load(open(kg_manifest_path)).get("outing_guard_policy"))
+            with open(emb_path + ".manifest.json", "w") as f:
+                json.dump(provenance, f, indent=2)
     return res
 
 

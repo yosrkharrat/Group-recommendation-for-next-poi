@@ -289,6 +289,13 @@ def write_outputs(out_dir: Path, dataset, tensor, relation_to_id, counts, proven
     out_relvocab = out_dir / f"poi_relation_vocab_{dataset}.json"
 
     torch.save(tensor, out_triples)
+    from group_outing_guard import file_sha256
+    provenance = {**provenance, "triples_sha256": file_sha256(out_triples)}
+    if provenance.get("source") == "build_kg_dir":
+        kg_dir = Path(provenance["kg_file"])
+        provenance["kg_triples_sha256"] = file_sha256(kg_dir / "kg_triples.pt")
+        provenance["outing_guard_policy"] = json.loads(
+            (kg_dir / "kg_manifest.json").read_text()).get("outing_guard_policy")
     with open(out_relvocab, "w") as f:
         json.dump({"relation_to_id": relation_to_id, "counts": counts,
                    "provenance": provenance}, f, indent=2)
