@@ -209,14 +209,22 @@ The ablation grid is `STAGE6B_TRAIN_ON_GROUPS` = `0` / `1`, `STAGE6B_USER_TOKENS
 `STAGE6B_SOCIAL_SMOOTHING` = `none` / `friends` / `copresence` / `both`. The comparison with LLMGPR
 reports `STAGE6B_GROUP_OVERLAP` = `keep` and `remove`.
 
+## Status (2026-11-22)
+
+- **Smoke run passed end to end on a 16 GB Kaggle GPU** (this branch at `94584be`: leak-free KG,
+  MuRP seed 44, matched groups, `TRAIN_ON_GROUPS=1`, user tokens with `copresence` smoothing,
+  `BATCH_SIZE=1`, `GRAD_ACCUM=8`). It trains on 300 examples for one epoch, so its numbers only
+  show that every stage runs. About 35 min of training, then about 3 h for section 11c, which
+  scores all 6,646 individual users in every profile.
+- **The `full` profile has not been run with group training.** It needs a GPU of 40 GB or more
+  (the notebook stops otherwise). Group prompts reach about 3,900 tokens against 530 for
+  individual ones, so the default `BATCH_SIZE` may not fit: lower it with `STAGE6B_BATCH_SIZE`
+  and raise `STAGE6B_GRAD_ACCUM` to keep the effective batch.
+
 ## Not done yet
 
-- **No GPU run on the extended catalogue yet.** The first Kaggle smoke run (old catalogue, user
-  tokens + smoothing `both`) completed on 2026-11-19.
-- **Training on groups and the matched-group evaluation are wired but have never run on GPU.**
-  They were checked on CPU only (the group cell executed with the model stubbed, prompt lengths
-  measured with the real tokenizer). Group prompts are about 1,800 tokens, so expect to halve
-  `BATCH_SIZE`.
-- **The KG's `FOLLOWED_BY` edges still come from the unfiltered train split** (1.4% of the edges
-  involve rows that `remove` drops). The embeddings were not retrained.
+- **Ablations and baselines** (the grid above, and the baselines under the same protocol).
+- **Time order.** 698 of the 1,251 group test outings fall before the end of some member's
+  individual training history; this follows from the per-user chronological split and is to be
+  reported, with the 553 remaining outings as a robustness subset.
 - **Gowalla and Weeplace social graphs** wait until Foursquare shows a gain.
