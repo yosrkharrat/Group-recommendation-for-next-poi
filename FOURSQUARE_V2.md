@@ -23,6 +23,12 @@ python src/build_group_examples_llmgpr_match.py --guard-sets data/groups_llmgpr_
 Expected: **2,434** train check-ins excluded; **398,761** POI-KG triples;
 **10,792** social edges; **6,343 / 1,247 / 1,251** group train/validation/test examples.
 
+The committed graph, alignment triples and social graph are already the output of these commands,
+and the stage-5 checks accept them on Windows, Linux and macOS (text files are fingerprinted with
+normalised line endings). Re-running them is safe, but the graph builder is not bit-reproducible
+across machines (same counts, a few dozen different triples), so run steps 2 to 4 on the same copy
+of `data/llmgpr/kg_poi/` and do not `git checkout` those files in between.
+
 ## 2. KGE comparison — GPU
 
 ```bash
@@ -70,14 +76,18 @@ export STAGE6B_GROUP_OVERLAP=remove
 export STAGE6B_GROUP_SET=llmgpr_match
 export STAGE6B_TRAIN_ON_GROUPS=1
 export STAGE6B_GROUP_TRAIN_FRAC=all
-export STAGE6B_BATCH_SIZE=1
-export STAGE6B_GRAD_ACCUM=32
 export STAGE6B_RUN_PROFILE=smoke
 export STAGE6B_OUT_DIR=./outputs/foursquare_window_smoke
 jupyter lab notebooks/stage5_lbsn_finetune.ipynb
 ```
 
-Run all cells. After smoke passes, stop Jupyter and relaunch:
+Run all cells. Batch size is left to the notebook: on a GPU of 40 GB or more it uses
+`BATCH_SIZE=16`, `GRAD_ACCUM=2`. Only if the long group prompts (up to about 3,900 tokens) run
+out of memory, set e.g. `STAGE6B_BATCH_SIZE=8` and `STAGE6B_GRAD_ACCUM=4`, keeping the product
+at 32. `STAGE6B_BATCH_SIZE=1` is only for a 16 GB card, where the `full` profile is refused anyway;
+at batch 1 the full run takes 16 times as many steps per epoch.
+
+After smoke passes, stop Jupyter and relaunch:
 
 ```bash
 export STAGE6B_RUN_PROFILE=full

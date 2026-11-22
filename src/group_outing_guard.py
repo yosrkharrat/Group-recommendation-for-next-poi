@@ -17,11 +17,23 @@ POLICY_VERSION = "group-window-v1"
 OUTING_COLUMNS = ["outing", "group_id", "split", "venue_id", "ev_ts", "user_id", "repro", "guard_min"]
 
 
+TEXT_SUFFIXES = {".json", ".jsonl", ".csv", ".txt"}
+
+
 def file_sha256(path):
+    """Content fingerprint. Text files are hashed with LF line endings, so a Windows checkout
+    (CRLF) and a Linux/macOS one (LF) of the same committed file agree; binary files are raw."""
     h = hashlib.sha256()
+    text = Path(path).suffix.lower() in TEXT_SUFFIXES
+    carry = b""
     with open(path, "rb") as f:
         for block in iter(lambda: f.read(1 << 20), b""):
+            if text:
+                block = carry + block
+                carry = b"\r" if block.endswith(b"\r") else b""   # a CRLF may straddle two blocks
+                block = (block[:-1] if carry else block).replace(b"\r\n", b"\n")
             h.update(block)
+    h.update(carry)
     return h.hexdigest()
 
 

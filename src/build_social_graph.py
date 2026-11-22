@@ -288,11 +288,9 @@ def read_member_sets(path):
 # --------------------------------------------------------------------------
 
 def sha256(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    """Same fingerprint as the stage-5 checks (line-ending independent for text files)."""
+    from group_outing_guard import file_sha256
+    return file_sha256(path)
 
 
 def git_head():

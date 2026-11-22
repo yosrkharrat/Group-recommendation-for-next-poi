@@ -79,11 +79,9 @@ DOW = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sund
 
 
 def sha256(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for block in iter(lambda: f.read(1 << 20), b""):
-            h.update(block)
-    return h.hexdigest()
+    """Same fingerprint as the stage-5 checks (line-ending independent for text files)."""
+    from group_outing_guard import file_sha256
+    return file_sha256(path)
 
 
 # --------------------------------------------------------------------------

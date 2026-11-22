@@ -1,12 +1,12 @@
 {
   "config": {
-    "csv_dir": "./data/llmgpr",
+    "csv_dir": "data/llmgpr",
     "mat": null,
     "poi_meta": null,
     "taxonomy": "./data/lbsn/fsq_category_paths_2014.json",
     "groups_dir": null,
     "friendship_old": null,
-    "out_dir": "./data/llmgpr/kg_poi",
+    "out_dir": "data/llmgpr/kg_poi",
     "export_dir": null,
     "dataset": "LLMGPR",
     "split": "user",
@@ -19,8 +19,8 @@
     "tau": 0.4,
     "poi_only": true,
     "drop_group_outings": [
-      "./data/groups_llmgpr_match/LLMGPR_3CITY",
-      "./data/groups_llmgpr_match/LLMGPR"
+      "data/groups_llmgpr_match/LLMGPR_3CITY",
+      "data/groups_llmgpr_match/LLMGPR"
     ],
     "outing_guard": null,
     "self_check": false
@@ -32,18 +32,18 @@
       {
         "name": "LLMGPR",
         "guard_min": 60.0,
-        "manifest_sha256": "77f71b9c4ddc7364b96d683bef9a947b474858ecacc470d03146d5f348970e11",
-        "checkins_sha256": "eaa236f1d847d0140a6d850a67250d08983a5bd259840aea951e2b6f38f3dad0"
+        "manifest_sha256": "c0ac4315b4dfe60fd7f3f5b0281c367248074c2b8c686981d291183b154594cf",
+        "checkins_sha256": "27753f40ab3899087538d8300d0fff948820038006429b6eba43e6e6c786f509"
       },
       {
         "name": "LLMGPR_3CITY",
         "guard_min": 1440.0,
-        "manifest_sha256": "6106880fc0f1d9194836e3fb79f6d90a0f1cdca3116f0129663018f0ef25c97b",
-        "checkins_sha256": "3f470fc80ae7a7e5ff9e142eb58bcc923faa3aeb9d2e0fc4a2ab0bea2232b5dd"
+        "manifest_sha256": "23b48d72c4a7dce8aca5df21883b704308e7712386bed1b2a4483d3586843b49",
+        "checkins_sha256": "90c53232b9589454eaa8e8093ed3a7d08aeefc1c9ae8a50d0c1d82c1227e6593"
       }
     ]
   },
-  "source": "./data/llmgpr",
+  "source": "data/llmgpr",
   "dataset": "LLMGPR",
   "n_entities": 15695,
   "n_triples": 398761,

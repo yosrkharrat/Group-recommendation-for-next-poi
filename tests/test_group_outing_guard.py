@@ -94,6 +94,17 @@ class GuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_poi_artifacts(emb, policy)
 
+    def test_text_fingerprints_ignore_line_endings(self):
+        lf, crlf = self.root / "a.csv", self.root / "b.csv"
+        body = b"x,y\n" * 300000                      # over 1 MiB, so a CRLF straddles blocks
+        lf.write_bytes(body)
+        crlf.write_bytes(body.replace(b"\n", b"\r\n"))
+        self.assertEqual(file_sha256(lf), file_sha256(crlf))
+        raw_lf, raw_crlf = self.root / "a.pt", self.root / "b.pt"
+        raw_lf.write_bytes(b"1\n2\n")
+        raw_crlf.write_bytes(b"1\r\n2\r\n")
+        self.assertNotEqual(file_sha256(raw_lf), file_sha256(raw_crlf))   # binary files stay raw
+
 
 if __name__ == "__main__":
     unittest.main()
