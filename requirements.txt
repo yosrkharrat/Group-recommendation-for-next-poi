@@ -21,3 +21,6 @@ pandas<3                # the committed groups/KGs were built on pandas 2.x; pan
 scipy
 networkx                # build_groups.py --group-source social
 python-dotenv           # optional: lets the notebook read HF_TOKEN from a .env file
+
+# src/run_seeds.py: runs the notebook once per seed (headless execution)
+nbconvert
