@@ -38,8 +38,26 @@ for model in roth refh atth murp; do
     python src/kge_bench.py --kg-dir data/llmgpr/kg_poi --data-dir data/llmgpr --dataset LLMGPR --model "$model" --seed "$seed" --split-seed 42 --epochs 150 --patience 10 --device cuda --save-embs --out "outputs/foursquare_kge/${model}_s${seed}.json"
   done
 done
-python src/kge_alignment_eval.py --runs 'outputs/foursquare_kge/*_s4?.json' --kg-dir data/llmgpr/kg_poi --dataset LLMGPR --meta data/llmgpr/poi_metadata_LLMGPR.csv --llm-stats data/llm/llada_moe_embed_stats.npz --device cuda --out outputs/foursquare_kge/stage2
+python src/kge_seed_summary.py --runs 'outputs/foursquare_kge/*_s4?.json' --expected-seeds 42 43 44 --out outputs/foursquare_kge/training_summary
+python src/kge_alignment_eval.py --runs 'outputs/foursquare_kge/*_s4?.json' --expected-seeds 42 43 44 --seed 42 --kg-dir data/llmgpr/kg_poi --dataset LLMGPR --meta data/llmgpr/poi_metadata_LLMGPR.csv --llm-stats data/llm/llada_moe_embed_stats.npz --device cuda --out outputs/foursquare_kge/stage2
 ```
+
+Each model is trained independently with seeds **42, 43, 44**. `--split-seed 42` stays
+fixed so every run uses the same graph split and validation queries. Python, NumPy and
+PyTorch RNGs are seeded before model initialization. This controls random draws; it does
+not guarantee bit-identical accelerator kernels across hardware/software versions.
+
+`training_summary.csv` / `.json` report per-model means and sample standard deviations
+(`ddof=1`) for validation MRR, test MRR / Hits@1,3,10 / mean rank, D1, category purity,
+and resource measurements. `training_summary_per_seed.csv` retains each run. Duplicate
+runs, missing expected seeds and incompatible split/dimension/evaluation settings are
+rejected. Per-relation metrics remain in each benchmark JSON.
+
+Stage 2 reports means and `_std` columns in `stage2_summary.csv` and `stage2.json`,
+and retains the original per-run `stage2.csv`. Its `--seed 42` is the **alignment seed**,
+held constant across models and KGE seeds; it is recorded separately as `alignment_seed`.
+These standard deviations measure KGE-training variability conditional on that alignment
+seed. Stage-5 fine-tuning seeds are a separate experiment (`src/run_seeds.py`).
 
 ## 3. Install the selected embeddings
 

@@ -42,6 +42,7 @@ import copy
 import json
 import math
 import os
+import random
 import sys
 import time
 
@@ -366,7 +367,9 @@ def run(a):
     val_q = val_t[torch.randperm(len(val_t), generator=gv)[:a.max_val]]
     test_q = test_t if a.max_test <= 0 else test_t[:a.max_test]
 
-    torch.manual_seed(a.seed)
+    random.seed(a.seed)
+    np.random.seed(a.seed)
+    torch.manual_seed(a.seed)  # seeds CPU and CUDA generators
     gen = torch.Generator().manual_seed(a.seed)
     tail_types = {}
     for h, r, t in train_t.tolist():

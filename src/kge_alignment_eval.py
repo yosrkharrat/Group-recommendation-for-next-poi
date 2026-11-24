@@ -48,7 +48,8 @@ Decision rule written to the output (supervisor's rule + stage 5's hard gate)
 3. Stage 1 (max test MRR, from kge_bench.py's JSON) is reported next to it, with a flag when the
    two stages disagree.
 
-With several seeds per model, metrics are averaged over seeds before the decision.
+With several KGE seeds per model, report mean and sample std before the decision.
+The alignment seed is held fixed and recorded separately from the KGE training seed.
 
 Usage
 -----
@@ -65,6 +66,7 @@ import argparse
 import glob
 import json
 import os
+import random
 import sys
 import time
 
@@ -77,6 +79,7 @@ from torch.utils.data import DataLoader, TensorDataset
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from alignment import (GeometryPreservingLoss, ManifoldAwareAdapter, RadiusPredictor,  # noqa: E402
                        RelationScorer)
+from kge_seed_summary import seed_statistics
 
 # stage 5, notebook cell 9 (do not change one without the other)
 ALIGN = dict(HIDDEN_DIM=1024, NUM_LAYERS=4, DROPOUT=0.1, EPOCHS=500, BATCH_SIZE=512, TRIPLE_SAMPLE=256,
@@ -214,6 +217,8 @@ def main():
     ap.add_argument("--out", required=True, help="output prefix: <out>.json and <out>.csv")
     ap.add_argument("--epochs", type=int, default=ALIGN["EPOCHS"], help="alignment epochs (stage 5: 500)")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--expected-seeds", type=int, nargs="+", default=None,
+                    help="require these KGE training seeds for each model; alignment seed stays --seed")
     ap.add_argument("--device", default=None)
     a = ap.parse_args()
     if a.merge:
@@ -221,7 +226,7 @@ def main():
         dup = df["run"].duplicated(keep=False)
         assert not dup.any(), f"the same run appears twice: {sorted(df.loc[dup, 'run'].unique())}"
         df.to_csv(a.out + ".csv", index=False)
-        decide(df, a.out, extra=dict(merged_from=a.merge))
+        decide(df, a.out, extra=dict(merged_from=a.merge), expected_seeds=a.expected_seeds)
         return
     missing = [k for k in ("runs", "kg_dir", "meta", "llm_stats") if getattr(a, k) is None]
     if missing:
@@ -257,7 +262,7 @@ def main():
         name = os.path.basename(path)[:-5]
         print(f"=== {name}  ({cfg.get('model')}, seed {cfg.get('seed')})", flush=True)
         rho, mono, means = d1_gate(z, depths)
-        torch.manual_seed(a.seed); np.random.seed(a.seed)               # same start for every variant
+        random.seed(a.seed); torch.manual_seed(a.seed); np.random.seed(a.seed)  # same alignment start
         t0 = time.time()
         raw = run_geometry_alignment(z, triples, n_rel, D_MODEL, device, a.epochs)
         aligned = match_to_llm_stats(raw.float(), t_mean, t_std)
@@ -266,32 +271,35 @@ def main():
             al_top10 = euc_topk(aligned)
         overlap = float(np.mean([len(set(h) & set(al)) / 10 for h, al in
                                  zip(hyp_top10.cpu().tolist(), al_top10.cpu().tolist())]))
-        row = dict(run=name, model=cfg.get("model"), seed=cfg.get("seed"),
+        row = dict(run=name, model=cfg.get("model"), seed=cfg.get("seed"), alignment_seed=a.seed,
                    test_mrr=res.get("test", {}).get("mrr", res.get("test_mrr")),
                    best_epoch=res.get("best_epoch"),
-                   d1_rho=round(rho, 4), d1_monotone=mono, d1_pass=bool(rho > D1_GATE and mono),
+                   d1_rho=rho, d1_monotone=mono, d1_pass=bool(rho > D1_GATE and mono),
                    radius_by_depth=means,
-                   overlap_at10=round(overlap, 4),
-                   purity_hyp_at10=round(purity_at(hyp_top10, cats), 4),
-                   purity_aligned_at10=round(purity_at(al_top10, cats), 4),
-                   purity_random=round(purity_random, 4), align_sec=round(time.time() - t0))
-        print(f"    D1 {rho:+.4f} monotone={mono}  overlap@10 {row['overlap_at10']}  purity hyp "
-              f"{row['purity_hyp_at10']} aligned {row['purity_aligned_at10']} (random {row['purity_random']})"
+                   overlap_at10=overlap,
+                   purity_hyp_at10=purity_at(hyp_top10, cats),
+                   purity_aligned_at10=purity_at(al_top10, cats),
+                   purity_random=purity_random, align_sec=round(time.time() - t0))
+        print(f"    D1 {rho:+.4f} monotone={mono}  overlap@10 {row['overlap_at10']:.4f}  purity hyp "
+              f"{row['purity_hyp_at10']:.4f} aligned {row['purity_aligned_at10']:.4f} (random {row['purity_random']:.4f})"
               f"  test MRR {row['test_mrr']}  ({row['align_sec']}s)", flush=True)
         rows.append(row)
 
     df = pd.DataFrame(rows)
     df.to_csv(a.out + ".csv", index=False)
     decide(df, a.out, extra=dict(align_config=ALIGN, llm_stats=a.llm_stats, device=device,
-                                 seconds=round(time.time() - t_all)))
+                                 alignment_seed=a.seed, seconds=round(time.time() - t_all)),
+           expected_seeds=a.expected_seeds)
 
 
-def decide(df, out_prefix, extra=None):
+def decide(df, out_prefix, extra=None, expected_seeds=None):
     """Seed means per model, the D1 gate, then the supervisor's rule. Shared by the normal run and
     --merge (several Stage-2 CSVs, e.g. models split across Kaggle kernels)."""
     num = ["test_mrr", "d1_rho", "overlap_at10", "purity_hyp_at10", "purity_aligned_at10"]
-    agg = df.groupby("model").agg({**{c: "mean" for c in num}, "d1_pass": "all", "seed": "count"})
-    agg = agg.rename(columns={"seed": "n_seeds"}).round(4)
+    if "alignment_seed" in df and df["alignment_seed"].nunique(dropna=False) != 1:
+        raise ValueError("All runs must use the same alignment seed for a KGE-seed comparison")
+    agg = seed_statistics(df, num, expected_seeds)
+    agg["d1_pass"] = df.groupby("model")["d1_pass"].all()
     ok = agg[agg["d1_pass"]]
     stage2 = ok["purity_aligned_at10"].idxmax() if len(ok) else None
     stage1 = agg["test_mrr"].astype(float).idxmax() if agg["test_mrr"].notna().any() else None
@@ -302,11 +310,13 @@ def decide(df, out_prefix, extra=None):
         stage1_winner=stage1, stage2_winner=stage2, carry_forward=stage2,
         stages_agree=None if stage1 is None else (stage1 == stage2),
         failed_d1_gate=sorted(agg.index[~agg["d1_pass"]].tolist()))
-    out = dict(decision=decision, per_model=agg.reset_index().to_dict(orient="records"),
+    agg.round(6).to_csv(out_prefix + "_summary.csv")
+    out = dict(decision=decision, std_ddof=1,
+               per_model=json.loads(agg.reset_index().to_json(orient="records", double_precision=15)),
                per_run=df.to_dict(orient="records"), **(extra or {}))
     with open(out_prefix + ".json", "w") as f:
         json.dump(out, f, indent=1, default=str)
-    print("\n" + agg.to_string())
+    print("\n" + agg.round(4).to_string())
     print(f"\nStage 1 (max test MRR): {stage1}   Stage 2 (max purity_aligned@10, D1-gated): {stage2}"
           f"   -> carry forward: {stage2}" + ("" if stage1 in (None, stage2) else "   (stages DISAGREE)"))
     print(f"wrote {out_prefix}.json")
